@@ -1,0 +1,80 @@
+/* Dropdown Profile Styling */
+.nav-profile {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--dark);
+    font-weight: 500;
+    transition: color 0.3s ease-in-out;
+}
+
+.nav-profile:hover {
+    color: var(--primary);
+}
+
+.nav-profile img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 8px;
+}
+
+/* Dropdown Menu */
+.dropdown-menu.profile {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+    padding: 10px;
+    min-width: 200px;
+}
+
+.dropdown-menu.profile .dropdown-header {
+    text-align: center;
+    padding: 10px 15px;
+    background: var(--light);
+    border-radius: 8px 8px 0 0;
+}
+
+.dropdown-menu.profile .dropdown-header h6 {
+    margin: 0;
+    color: var(--dark);
+    font-weight: 600;
+}
+
+.dropdown-menu.profile .dropdown-header span {
+    font-size: 14px;
+    color: var(--secondary3);
+}
+
+/* Dropdown Items */
+.dropdown-menu.profile .dropdown-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    font-size: 16px;
+    color: var(--dark);
+    transition: background 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+.dropdown-menu.profile .dropdown-item i {
+    margin-right: 10px;
+    font-size: 18px;
+    color: var(--primary);
+}
+
+.dropdown-menu.profile .dropdown-item:hover {
+    background: #7aa369;
+    color: white;
+}
+
+.dropdown-menu.profile .dropdown-item:hover i {
+    color: white;
+}
+
+/* Divider */
+.dropdown-menu.profile .dropdown-divider {
+    margin: 8px 0;
+    border-color: rgba(0, 0, 0, 0.1);
+}

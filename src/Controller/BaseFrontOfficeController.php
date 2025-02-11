@@ -15,4 +15,12 @@ final class BaseFrontOfficeController extends AbstractController
             'controller_name' => 'BaseFrontOfficeController',
         ]);
     }
+
+    #[Route('/base/front/office/cnx', name: 'app_base_front_office_cnx')]
+    public function cnx(): Response
+    {
+        return $this->render('base_front_office/cnx.html.twig', [
+            'controller_name' => 'BaseFrontOfficeController',
+        ]);
+    }
 }

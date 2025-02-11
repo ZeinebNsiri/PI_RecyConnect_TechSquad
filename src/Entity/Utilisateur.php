@@ -92,6 +92,9 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Like::class, mappedBy: 'ueser_like', orphanRemoval: true)]
     private Collection $likes;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $photo_profil = null;
+
     public function __construct()
     {
         $this->Articles = new ArrayCollection();
@@ -456,6 +459,18 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
                 $like->setUeserLike(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPhotoProfil(): ?string
+    {
+        return $this->photo_profil;
+    }
+
+    public function setPhotoProfil(?string $photo_profil): static
+    {
+        $this->photo_profil = $photo_profil;
 
         return $this;
     }
