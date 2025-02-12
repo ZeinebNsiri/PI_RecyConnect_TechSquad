@@ -1,0 +1,49 @@
+{% extends 'basecnx.html.twig' %}
+
+{% block title %}Liste des Articles{% endblock %}
+
+{% block body %}
+    <h1>Liste des Articles</h1>
+    <table class="table table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th>Nom</th>
+                <th>Description</th>
+                <th>Quantité</th>
+                <th>Prix</th>
+                <th>Image</th>
+                <th>Localisation</th>
+                <th>Catégorie</th>
+                <th>Utilisateur</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for articlepanier in articles %}
+                <tr>
+                    <td>{{ articlepanier.nomArticle }}</td>
+                    <td>{{ articlepanier.descriptionArticle }}</td>
+                    <td>{{ articlepanier.quantiteArticle }}</td>
+                    <td>{{ articlepanier.prix }} €</td>
+                    <td>
+                        <img src="{{ asset('uploads/' ~ articlepanier.imageArticle) }}" alt="Image" width="100">
+                    </td>
+                    <td>{{ articlepanier.localisationArticle }}</td>
+                    <td>{{ articlepanier.categorie.id }}</td>
+                    <td>{{ articlepanier.utilisateur }}</td>
+                    <td>
+                        
+                          <a href="{{ path('cart_add', { id: articlepanier.id }) }}" class="btn btn-success">
+                        Ajouter au panier
+                    </a>
+                 
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="9">Aucun article disponible</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
