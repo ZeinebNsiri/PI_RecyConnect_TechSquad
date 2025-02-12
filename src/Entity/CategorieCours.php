@@ -7,8 +7,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: CategorieCoursRepository::class)]
+#[UniqueEntity(fields: ['nomCategorie'], message: 'Ce nom de catégorie existe déjà.')]
+
 class CategorieCours
 {
     #[ORM\Id]
@@ -16,11 +20,19 @@ class CategorieCours
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)] 
+    #[Assert\NotBlank(message: 'Le nom de la categorie est obligatoire.')]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: "Le nom ne peut pas dépasser {{ limit }} caractères."
+    )]
     private ?string $nomCategorie = null;
 
+
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank(message: 'La description de la catégorie est obligatoire.')]
     private ?string $descriptionCategorie = null;
+
 
     /**
      * @var Collection<int, Cours>

@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\CoursRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CoursRepository::class)]
 class Cours
@@ -15,18 +16,22 @@ class Cours
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Le titre est obligatoire.')]
     private ?string $titreCours = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank(message: 'La description est obligatoire.')]
     private ?string $descriptionCours = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $video = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'L image est obligatoire.')]
     private ?string $imageCours = null;
 
     #[ORM\ManyToOne(inversedBy: 'cours')]
+    #[Assert\NotBlank(message: 'La categorie est obligatoire')]
     #[ORM\JoinColumn(nullable: false)]
     private ?CategorieCours $categorieC = null;
 

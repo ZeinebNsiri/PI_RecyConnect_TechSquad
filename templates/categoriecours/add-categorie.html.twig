@@ -1,0 +1,54 @@
+{% extends 'base2.html.twig' %}
+
+{% block title %} Ajouter une Catégorie {% endblock %}
+
+{% block body %}
+  <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Ajouter une Catégorie</h5>
+
+           
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate','class': 'row g-3'}}) }}
+
+            {% if form.vars.errors|length > 0 %}
+                  <div class="alert alert-danger">
+            {% for error in form.vars.errors %}
+                     <p>{{ error.message }}</p>
+              {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="col-12">
+                {{ form_label(form.nomCategorie, 'Nom de la Catégorie') }}
+                {{ form_widget(form.nomCategorie, {'attr': {'class': 'form-control'}}) }}
+                {% for error in form.nomCategorie.vars.errors %}
+                 <div class="alert alert-danger">{{ error.message }}</div>
+                {% endfor %}
+
+
+
+            </div>
+
+           <div class="col-12">
+                {{ form_label(form.descriptionCategorie, 'Description Catégorie') }}
+                 {{ form_widget(form.descriptionCategorie, {'attr': {'class': 'form-control'}}) }}
+                     {% for error in form.descriptionCategorie.vars.errors %}
+                        <div class="alert alert-danger">{{ error.message }}</div>
+                     {% endfor %}
+            </div>
+
+           
+                
+                
+           <div class="col-12 text-center d-flex justify-content-center gap-2 mt-3">
+            {{ form_widget(form.submit) }}
+
+            {# Bouton Annuler (type="reset") si tu le souhaites #}
+            <a href="{{ path('app_allcategoriecours') }}" class="btn btn-secondary">Annuler</a>
+
+        </div>
+
+        {{ form_end(form) }}
+        </div>
+   </div>
+{% endblock %}
