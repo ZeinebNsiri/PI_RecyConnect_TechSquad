@@ -2,14 +2,17 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Entity\CategorieArticle;
+use App\Form\CategoriArticleType;
+use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\HttpFoundation\Request;
+use App\Repository\CategorieArticleRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\HttpFoundation\Request;
-use Doctrine\Persistence\ManagerRegistry;
-use App\Form\CategoriArticleType;
-use App\Entity\CategorieArticle;
-use App\Repository\CategorieArticleRepository;
+use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class CategorieArticleController extends AbstractController
 {
@@ -22,7 +25,8 @@ final class CategorieArticleController extends AbstractController
     }
 
     #[Route('/categorie/article/add', name: 'app_addCategorieArticle')]
-    public function addCategorieArticle(ManagerRegistry $manager, Request $req, CategorieArticleRepository $repository)
+    public function addCategorieArticle(ManagerRegistry $manager, Request $req, CategorieArticleRepository $repository, SluggerInterface $slugger,
+    #[Autowire('%kernel.project_dir%/public/uploads/photo_dir')] string $brochuresDirectory)
     {
         $em= $manager->getManager();
 
@@ -32,6 +36,28 @@ final class CategorieArticleController extends AbstractController
 
         if($form->isSubmitted())
         {
+            $image_categorie = $form->get('image_categorie')->getData();
+
+            // this condition is needed because the 'brochure' field is not required
+            // so the PDF file must be processed only when a file is uploaded
+            if ($image_categorie) {
+                $originalFilename = pathinfo($image_categorie->getClientOriginalName(), PATHINFO_FILENAME);
+                // this is needed to safely include the file name as part of the URL
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$image_categorie->guessExtension();
+
+                // Move the file to the directory where brochures are stored
+                try {
+                    $image_categorie->move($brochuresDirectory, $newFilename);
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                }
+
+                // updates the 'brochureFilename' property to store the PDF file name
+                // instead of its contents
+                $categorieArticle->setImageCategorie($newFilename);
+            }
+
             $em->persist($categorieArticle);
             $em->flush();
             return $this->redirectToRoute('app_addCategorieArticle');
@@ -62,7 +88,8 @@ final class CategorieArticleController extends AbstractController
 
     #[Route('/categorie/article/update/{id}',name:'pp_updateCategorieArticle')]
 
-    public function updateCategorieArticle(Request $req,ManagerRegistry $manager,CategorieArticle $categorieArticle ,CategorieArticleRepository $repo, int $id){
+    public function updateCategorieArticle(Request $req,ManagerRegistry $manager,CategorieArticle $categorieArticle ,CategorieArticleRepository $repo, int $id,SluggerInterface $slugger
+    , #[Autowire('%kernel.project_dir%/public/uploads/photo_dir')] string $brochuresDirectory ){
         $em= $manager->getManager();
         $categorieArticle = $repo->find($id);
 
@@ -73,6 +100,27 @@ final class CategorieArticleController extends AbstractController
       if($form->isSubmitted())
 
       {
+        $image_categorie = $form->get('image_categorie')->getData();
+
+            // this condition is needed because the 'brochure' field is not required
+            // so the PDF file must be processed only when a file is uploaded
+            if ($image_categorie) {
+                $originalFilename = pathinfo($image_categorie->getClientOriginalName(), PATHINFO_FILENAME);
+                // this is needed to safely include the file name as part of the URL
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$image_categorie->guessExtension();
+
+                // Move the file to the directory where brochures are stored
+                try {
+                    $image_categorie->move($brochuresDirectory, $newFilename);
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                }
+
+                // updates the 'brochureFilename' property to store the PDF file name
+                // instead of its contents
+                $categorieArticle->setImageCategorie($newFilename);
+            }
 
       $em->flush();
 

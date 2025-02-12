@@ -75,7 +75,7 @@
                                 {% for categorie in categories %}
                                     <tr>
                                         <td> {{categorie.id}} </td>
-                                        <td> {{categorie.imageCategorie}} </td>
+                                        <td><img src="{{ asset('uploads/photo_dir/' ~ categorie.imageCategorie) }}" alt="Image" height: 60px width: 70px  ></td>
                                         <td>{{ categorie.nomCategorie }} </td>
                                         <td>50</td>
                                         <td class="fw-bold">
