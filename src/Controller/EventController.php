@@ -73,7 +73,7 @@ if ($form->isSubmitted() && $form->isValid()) {
 }
 
         $imageFile->move(
-            $this->getParameter('images_directory'),
+            $this->getParameter('photo_dir'),
             $newFilename
         );
 
@@ -109,14 +109,14 @@ public function edit(Request $request, Evenement $event, EntityManagerInterface 
             $newFilename = $imageFile->getClientOriginalName();
 
             $imageFile->move(
-                $this->getParameter('images_directory'),
+                $this->getParameter('photo_dir'),
                 $newFilename
             );
 
             $event->setImageEvent($newFilename);
 
-            if ($oldImage && file_exists($this->getParameter('images_directory').'/'.$oldImage)) {
-                unlink($this->getParameter('images_directory').'/'.$oldImage);
+            if ($oldImage && file_exists($this->getParameter('photo_dir').'/'.$oldImage)) {
+                unlink($this->getParameter('photo_dir').'/'.$oldImage);
             }
         } else {
             $event->setImageEvent($oldImage);

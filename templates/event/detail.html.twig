@@ -33,7 +33,7 @@
             <p class="event-date">{{ evenement.dateEvent|date('l j F Y') }} à {{ evenement.heureEvent|date('H:i') }}</p>
             <p>{{ evenement.descriptionEvent }}</p>
             <p>Ne manquez pas cette occasion de faire la différence ! Inscrivez-vous dès maintenant pour réserver votre place.</p>
-            <a href="{{ path('event_registration', {'id': evenement.id}) }}" class="btn btn-primary">S'inscrire</a>
+            <a href="{{ path('events_list', {'id': evenement.id}) }}" class="btn btn-primary">S'inscrire</a>
             <a href="{{ path('events_list') }}" class="btn btn-secondary">Retour à la liste</a>          </div>  
         </div>
         <div class="col-lg-4">
