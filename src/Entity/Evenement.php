@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: EvenementRepository::class)]
 class Evenement
 {
+  
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -40,11 +41,7 @@ class Evenement
     #[ORM\Column]
     private ?int $nb_restant = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $created_AT = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $updated_AT = null;
+ 
 
     /**
      * @var Collection<int, Reservation>
@@ -158,29 +155,6 @@ class Evenement
         return $this;
     }
 
-    public function getCreatedAT(): ?\DateTimeInterface
-    {
-        return $this->created_AT;
-    }
-
-    public function setCreatedAT(\DateTimeInterface $created_AT): static
-    {
-        $this->created_AT = $created_AT;
-
-        return $this;
-    }
-
-    public function getUpdatedAT(): ?\DateTimeInterface
-    {
-        return $this->updated_AT;
-    }
-
-    public function setUpdatedAT(\DateTimeInterface $updated_AT): static
-    {
-        $this->updated_AT = $updated_AT;
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, Reservation>
@@ -203,7 +177,6 @@ class Evenement
     public function removeReservation(Reservation $reservation): static
     {
         if ($this->reservations->removeElement($reservation)) {
-            // set the owning side to null (unless already changed)
             if ($reservation->getEventId() === $this) {
                 $reservation->setEventId(null);
             }
