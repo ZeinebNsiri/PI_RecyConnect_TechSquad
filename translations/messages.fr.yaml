@@ -1,0 +1,5 @@
+# translations/messages.fr.yaml
+security:
+  invalid_credentials: "Identifiants invalides. Veuillez réessayer."
+  account_disabled: "Votre compte est désactivé. Contactez l'administrateur."
+  # Ajoutez d'autres messages d'erreur ici

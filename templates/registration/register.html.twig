@@ -18,19 +18,31 @@
                     <div class="card col-lg-4 mx-auto">
                         <div class="card-body px-5 py-5">
                             <h3 class="card-title text-left mb-3">S'inscrire</h3>
-                             <!-- Boutons radio avec espace et fond coloré -->
+
+                            {{ form_start(form,{attr:{novalidate:'novalidate'}}) }}
+
+                            <!-- Boutons radio Particulier/Professionnel -->
                             <div class="form-group" style="display: flex; gap: 20px;">
                                 <label class="form-check-label" style="padding: 10px; border-radius: 5px;">
-                                <input type="radio" class="form-check-input" name="options" id="option1" value="Particulier" checked> Particulier
+                                    {{ form_widget(form.typeUtilisateur.0, { 
+                                        'attr': {
+                                            'class': 'form-check-input', 
+                                            'onchange': 'updateForm()',
+                                            'checked': 'checked',
+                                            'id': 'type_particulier'  
+                                        }
+                                    }) }} Particulier
                                 </label>
                                 <label class="form-check-label" style="padding: 10px; border-radius: 5px;">
-                                <input type="radio" class="form-check-input" name="options" id="option2" value="Professionel"> Professionel
+                                    {{ form_widget(form.typeUtilisateur.1, { 
+                                        'attr': {
+                                            'class': 'form-check-input', 
+                                            'onchange': 'updateForm()',
+                                            'id': 'type_professionnel'  
+                                        }
+                                    }) }} Professionnel
                                 </label>
                             </div>
-                
-                            {{ form_start(form) }}
-
-
 
                             <!-- Champs Nom et Prénom -->
                             <div class="row" id="nomPrenomGroup">
@@ -109,8 +121,8 @@
     <!-- Scripts JavaScript spécifiques -->
     <script src="{{ asset('login_signup/vendors/js/vendor.bundle.base.js') }}"></script>
     <script src="{{ asset('login_signup/js/misc.js') }}"></script>
-    <script src="{{ asset('login_signup/signup.js') }}"></script>   
+    <script src="{{ asset('login_signup/signup.js') }}"></script>
 
-    
+   
 </body>
 </html>
