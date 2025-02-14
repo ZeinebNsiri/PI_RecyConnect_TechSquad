@@ -27,10 +27,7 @@ class SecurityController extends AbstractController
     
         if ($error) {
             
-            $errorMessageKey = $error->getMessageKey();
-            
-    
-            
+            $errorMessageKey = $error->getMessageKey(); 
             if ($error instanceof BadCredentialsException) {
                 $errorMessageKey = 'Email ou mot de passe incorrect. Veuillez réessayer.';
             } 

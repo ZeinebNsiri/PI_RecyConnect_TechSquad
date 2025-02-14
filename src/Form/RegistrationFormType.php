@@ -6,6 +6,7 @@ use App\Entity\Utilisateur;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -23,15 +24,7 @@ class RegistrationFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-        ->add('typeUtilisateur', ChoiceType::class, [
-            'choices'  => [
-                'Particulier' => 'particulier',
-                'Professionnel' => 'professionnel',
-            ],
-            'expanded' => true,  // Afficher sous forme de boutons radio
-            'multiple' => false,
-            'mapped' => false,
-        ])
+        
         
 
             ->add('nom_user', TextType::class, [
@@ -40,22 +33,25 @@ class RegistrationFormType extends AbstractType
                 ],
             ])
             ->add('prenom', TextType::class, [
-                'required' => false, // Pas obligatoire si Professionnel
+                'constraints' => [
+                    new NotBlank(['message' => 'Veuillez entrer votre prénom']),
+                ], 
             ])
-            ->add('matricule_fiscale', TextType::class, [
-                'required' => false, // Seulement pour les professionnels
-            ])
+
             ->add('numTel', TelType::class, [
                 'constraints' => [
                     new NotBlank(['message' => 'Veuillez entrer votre numéro de téléphone']),
                 ],
             ])
-            ->add('email')
+            ->add('email', EmailType::class, [
+                'constraints' => [new NotBlank(['message' => 'Veuillez entrer votre email'])],
+            ])
             
-            ->add('password',RepeatedType::class, [
-                'type'=>PasswordType::class,
-                'first_options'=>['label'=>'Password'],
-                'second_options'=>['label'=>'Confirm Password']
+            ->add('password', RepeatedType::class, [
+                'type' => PasswordType::class,
+                'first_options' => ['label' => 'Mot de passe'],
+                'second_options' => ['label' => 'Confirmer le mot de passe'],
+                'invalid_message' => 'Les mots de passe ne correspondent pas.',
             ])
         
             
