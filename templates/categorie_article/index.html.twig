@@ -3,12 +3,23 @@
 {% block title %}Hello CategorieArticleController!{% endblock %}
 
 {% block body %}
+
 <style>
     .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
     .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
 </style>
 
 <main id="main" class="main">
+
+{% for message in app.flashes('success') %}
+    <div class="alert alert-success alert-dismissible fade show d-flex justify-content-between align-items-center" role="alert">
+        <span>{{ message }}</span>
+        <span class="close-icon" style="cursor: pointer;" data-bs-dismiss="alert" aria-label="Close">
+            X
+        </span>
+    </div>
+{% endfor %}
+
 
     <div class="pagetitle">
         <h4>Les catégories des articles proposés</h4>
@@ -19,11 +30,12 @@
             <h5 class="card-title">Ajouter une nouvelle catégorie</h5>
 
             <!-- Floating Labels Form -->
-            {{ form_start(form, {'attr': {'class': 'row g-3'}}) }}
+            {{ form_start(form, {'attr': {'class': 'row g-3'} }) }}
             
             <div class="col-md-12">
                 <div class="form-floating">
                     {{ form_widget(form.nom_categorie, {'attr': {'class': 'form-control', 'placeholder': 'Nom de la catégorie', 'id': 'floatingName'}}) }}
+                 
                     <label for="floatingName">Nom de la catégorie</label>
                 </div>
             </div>
@@ -43,7 +55,7 @@
             </div>
 
             <div class="text-center">
-                {{ form_widget(form.Confirmer, {'attr': {'class': 'btn btn-primary'}}) }}
+                {{ form_widget(form.Confirmer, {'attr': {'class': 'btn btn-success ' }}) }}
                 {{ form_widget(form.Annuler, {'attr': {'class': 'btn btn-secondary', 'type': 'reset'}}) }}
             </div>
 
@@ -79,7 +91,7 @@
                                         <td>{{ categorie.nomCategorie }} </td>
                                         <td>50</td>
                                         <td class="fw-bold">
-                                            <a href='{{ path ('pp_updateCategorieArticle' , { 'id':categorie.id } ) }}' class="btn btn-primary">Modifier</a>
+                                            <a href='{{ path ('pp_updateCategorieArticle' , { 'id':categorie.id } ) }}' class="btn btn-success">Modifier</a>
                                         </td>
                                         <td>
                                             <a href='{{ path ('app_deleteCategorieArticle' , { 'id':categorie.id } ) }}' class="btn btn-danger">Supprimer</a>

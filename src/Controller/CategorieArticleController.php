@@ -34,7 +34,7 @@ final class CategorieArticleController extends AbstractController
         $form = $this ->createForm(CategoriArticleType::class, $categorieArticle);
         $form->handleRequest($req);
 
-        if($form->isSubmitted())
+        if($form->isSubmitted() )
         {
             $image_categorie = $form->get('image_categorie')->getData();
 
@@ -60,6 +60,7 @@ final class CategorieArticleController extends AbstractController
 
             $em->persist($categorieArticle);
             $em->flush();
+            $this->addFlash('success', 'Catégorie article ajoutée avec succès!');
             return $this->redirectToRoute('app_addCategorieArticle');
             
         }
@@ -82,7 +83,7 @@ final class CategorieArticleController extends AbstractController
         $em -> remove($categorieArticle);
 
         $em -> flush();
-
+        $this->addFlash('success', 'Catégorie article supprimée avec succès!');
         return $this-> redirectToRoute('app_addCategorieArticle'); 
     }
 
@@ -123,11 +124,12 @@ final class CategorieArticleController extends AbstractController
             }
 
       $em->flush();
+      $this->addFlash('success', 'Catégorie article modifiée avec succès!');
 
       return $this->redirectToRoute('app_addCategorieArticle');
 
       }
-      return $this->render('categorie_article/index.html.twig',[
+      return $this->render('categorie_article/updateCatArt.html.twig',[
 
         'form'=>$form->createView(),
         'categories' => $categorieArticle
