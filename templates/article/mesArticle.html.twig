@@ -22,9 +22,9 @@
   <div class="container">
       <div class="text-center mx-auto wow fadeInUp" data-wow-delay="0.1s" style="max-width: 500px;">
           <p class="fs-5 fw-bold text-primary">CHEZ RECYCONNECT</p>
-          <h1 class="display-5 mb-5">Vous trouverez une grande variété d'articles à recycler</h1>
+          <h1 class="display-5 mb-5">Vous trouverez l'historique de tous vos articles déjà proposés</h1>
           <a class="btn btn-primary py-3 px-4" href={{ path('app_addArticle') }} style="margin-bottom: 50px;">Proposez un article </a>
-          <a class="btn btn-primary py-3 px-4" href={{ path('app_article_mine') }} style="margin-bottom: 50px;">Mes article </a>
+          
       </div>
       
       <div class="row wow fadeInUp" data-wow-delay="0.3s">
@@ -51,7 +51,7 @@
                                <h5 class="card-title">
                                         <a href="#">{{ article.nomArticle }} <br> PU: {{ article.prix }} TN/Kg | {{ article.quantiteArticle }} Kg</a>
                                 </h5>
-                                <td><a class="detail-button" href='{{ path ('detail_article' , { 'id':article.id } ) }}'>Detail<i class="fas fa-info-circle"></i></a><td>
+                                <td><a class="detail-button" href='{{ path ('pp_updateArticle' , { 'id':article.id } ) }}'><i class="fas fa-edit"></i></a><td>
                             </div>
                         </div>
                     </div>

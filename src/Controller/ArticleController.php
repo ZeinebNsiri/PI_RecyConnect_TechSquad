@@ -26,7 +26,7 @@ final class ArticleController extends AbstractController
     }
 
     #[Route('/article/add', name: 'app_addArticle')]
-    public function addCategorieArticle(ManagerRegistry $manager, Request $req, ArticleRepository $repository, SluggerInterface $slugger,
+    public function addArticle(ManagerRegistry $manager, Request $req, SluggerInterface $slugger,
     #[Autowire('%kernel.project_dir%/public/uploads/photo_dir')] string $brochuresDirectory, UtilisateurRepository $UtilisateurRepository)
     {
         $em= $manager->getManager();
@@ -82,5 +82,76 @@ final class ArticleController extends AbstractController
         return $this->render('article/index.html.twig', [
             'articles' => $articles,
         ]);  
+    }
+
+    #[Route('/Article/getMine', name: 'app_article_mine')]
+    public function getMesArticle(ArticleRepository $repository)
+    {
+        $articles= $repository-> findAll();
+        return $this->render('article/mesArticle.html.twig', [
+            'articles' => $articles,
+        ]);  
+    }
+
+    #[Route('/article/detail/{id}',name:'detail_article')]
+
+    public function DetailsArticle(ArticleRepository $repo, int $id){
+        
+        $article = $repo->find($id);
+        
+        return $this->render('article/detailsArticle.html.twig',[
+        'article' => $article
+      ]);
+    }
+
+
+    #[Route('/article/update/{id}',name:'pp_updateArticle')]
+
+    public function updateArticle(Request $req,ManagerRegistry $manager,Article $Article ,ArticleRepository $repo, int $id,SluggerInterface $slugger
+    , #[Autowire('%kernel.project_dir%/public/uploads/photo_dir')] string $brochuresDirectory ){
+        $em= $manager->getManager();
+        $Article = $repo->find($id);
+
+      $form = $this->createForm(ArticleType::class,$Article);
+
+      $form->handleRequest($req);
+
+      if($form->isSubmitted())
+
+      {
+        $image_article = $form->get('image_article')->getData();
+
+            // this condition is needed because the 'brochure' field is not required
+            // so the PDF file must be processed only when a file is uploaded
+            if ($image_article) {
+                $originalFilename = pathinfo($image_article->getClientOriginalName(), PATHINFO_FILENAME);
+                // this is needed to safely include the file name as part of the URL
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$image_article->guessExtension();
+
+                // Move the file to the directory where brochures are stored
+                try {
+                    $image_article->move($brochuresDirectory, $newFilename);
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                }
+
+                // updates the 'brochureFilename' property to store the PDF file name
+                // instead of its contents
+                $Article->setImageArticle($newFilename);
+            }
+
+      $em->flush();
+      $this->addFlash('success', 'L\'article est modifié avec succès!');
+
+      return $this->redirectToRoute('app_article_mine');
+
+      }
+      return $this->render('article/addArticle.html.twig',[
+
+        'form'=>$form->createView(),
+        'articles' => $Article
+
+      ]);
     }
 }

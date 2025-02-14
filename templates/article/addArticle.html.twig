@@ -81,7 +81,8 @@
                     </div>
 
                     <div class="col-12">
-                        <button class="btn btn-primary py-3 px-4" type="submit">Confirmer</button>
+                        {{ form_widget(form.Confirmer, {'attr': {'class': 'btn btn-primary'}}) }}
+                        {{ form_widget(form.Annuler, {'attr': {'class': 'btn btn-secondary', 'type': 'reset'}}) }}
                     </div>
                 </div>
                 {{ form_end(form) }}
@@ -89,7 +90,7 @@
 
             <div class="col-lg-6 wow fadeIn" data-wow-delay="0.5s" style="min-height: 450px;">
                 <div class="position-relative rounded overflow-hidden h-100">
-                    <img class="position-relative w-100 h-100" src="{{ asset('img/kkkkk.jpg') }}" style="min-height: 300px; border:0;" alt="">
+                    <img class="position-relative w-100 h-100" src="{{ asset('frontOffice/img/kkkkk.jpg') }}" style="min-height: 300px; border:0;" alt="">
                 </div>
             </div>
         </div>

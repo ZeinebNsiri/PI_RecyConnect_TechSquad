@@ -1,0 +1,60 @@
+{% extends 'basecnx.html.twig' %}
+
+{% block title %}Hello ArticleController!{% endblock %}
+
+{% block body %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+</style>
+
+<!-- About Start -->
+
+<div class="container-xxl py-5">
+
+    <div class="container">
+    
+        <div class="row g-5 align-items-end">
+            <div class="col-lg-3 col-md-5 wow fadeInUp" data-wow-delay="0.1s">
+                <h1 class="display-5 mb-4">{{ article.nomArticle }}</h1>
+                <img class="img-fluid rounded" data-wow-delay="0.1s" src="{{ asset('uploads/photo_dir/' ~ article.imageArticle ) }}">
+            </div>
+            <div class="col-lg-6 col-md-7 wow fadeInUp" data-wow-delay="0.3s">
+                <h1 class="display-5 mb-4">Description de l'article proposé</h1>
+                <p class="mb-4">{{ article.descriptionArticle }}</p>
+                <a class="btn btn-primary py-3 px-4" href="">Commander</a>
+            </div>
+            <div class="col-lg-3 col-md-12 wow fadeInUp" data-wow-delay="0.5s">
+                <div class="row g-5">
+                    <div class="col-12 col-sm-6 col-lg-12">
+                        <div class="border-start ps-4">
+                            <i class="fa fa-award fa-3x  text-primary mb-3"></i>
+                            <h4 class="mb-3">Le prix unitaire de l'article</h4>
+                            <h4 class="mb-3"> {{ article.prix }} TN/Kg</h4>
+                            
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-12">
+                        <div class="border-start ps-4">
+                            <i class="fa fa-users fa-3x text-primary mb-3"></i>
+                            
+                            <h4 class="mb-3">La quantité proposée</h4>
+                            <h4 class="mb-3">{{ article.quantiteArticle }} Kg</h4>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+   
+</div>
+
+<!-- About End -->
+
+
+
+
+{% endblock %}
