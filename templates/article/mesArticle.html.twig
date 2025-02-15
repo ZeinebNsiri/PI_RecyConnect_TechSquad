@@ -52,6 +52,7 @@
                                         <a href="#">{{ article.nomArticle }} <br> PU: {{ article.prix }} TN/Kg | {{ article.quantiteArticle }} Kg</a>
                                 </h5>
                                 <td><a class="detail-button" href='{{ path ('pp_updateArticle' , { 'id':article.id } ) }}'><i class="fas fa-edit"></i></a><td>
+                                <td><a class="detail-button" href='{{ path ('app_deleteArticle' , { 'id':article.id } ) }}'><i class="fas fa-trash"></i></a><td>
                             </div>
                         </div>
                     </div>

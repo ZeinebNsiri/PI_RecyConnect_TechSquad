@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CategorieArticleRepository::class)]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_NOM_CATEGORIE', fields: ['nom_categorie'])]
 class CategorieArticle
 {
     #[ORM\Id]

@@ -31,10 +31,12 @@ final class CategorieArticleController extends AbstractController
         $em= $manager->getManager();
 
         $categorieArticle= new   CategorieArticle();
-        $form = $this ->createForm(CategoriArticleType::class, $categorieArticle);
+        $form = $this ->createForm(CategoriArticleType::class, $categorieArticle, [
+            'validation_groups' => ['create']
+        ]);
         $form->handleRequest($req);
 
-        if($form->isSubmitted() )
+        if($form->isSubmitted() && $form->isValid() )
         {
             $image_categorie = $form->get('image_categorie')->getData();
 
@@ -65,6 +67,14 @@ final class CategorieArticleController extends AbstractController
             
         }
         $categories= $repository-> findAll();
+
+        if ($form->isSubmitted() && !$form->isValid()) {
+            // Récupérer les erreurs
+            foreach ($form->getErrors() as $error) {
+                // Ajouter le message d'erreur
+                $this->addFlash('error', $error->getMessage());
+            }
+        }
 
         return $this->render('categorie_article/index.html.twig',[
             
