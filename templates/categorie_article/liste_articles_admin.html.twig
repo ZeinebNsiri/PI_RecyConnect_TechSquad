@@ -1,0 +1,72 @@
+{% extends 'base2.html.twig' %}
+
+{% block title %}Hello CategorieArticleController!{% endblock %}
+
+{% block body %}
+
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+</style>
+
+<main id="main" class="main">
+{% for message in app.flashes('success') %}
+    <div class="alert alert-success alert-dismissible fade show d-flex justify-content-between align-items-center" role="alert">
+        <span>{{ message }}</span>
+        <span class="close-icon" style="cursor: pointer;" data-bs-dismiss="alert" aria-label="Close">
+            X
+        </span>
+    </div>
+{% endfor %}
+
+
+    <div class="pagetitle">
+        <h4>Tous les articles proposés chez RecyConnect</h4>
+    </div><!-- End Page Title -->
+
+    <section class="section dashboard">
+        <div class="row">
+            <div class="col-12">
+                <div class="card top-selling overflow-auto">
+
+                    <div class="card-body pb-0">
+                        
+                        <table class="table table-borderless">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Id</th>
+                                    <th scope="col">Image</th>
+                                    <th scope="col">Nom de l'article</th>
+                                    <th scope="col">Catégorie</th>
+                                    <th scope="col">Quantité </th>
+                                    <th scope="col">Prix unitaire</th>
+                                    <th scope="col">Proprietaire</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for article in articles %}
+                                    <tr>
+                                        <td> {{article.id}} </td>
+                                        <td><img src="{{ asset('uploads/photo_dir/' ~ article.imageArticle) }}" alt="Image" height: 60px width: 70px  ></td>
+                                        <td>{{ article.nomArticle }} </td>
+                                        <td>{{ article.categorie }} </td>
+                                        <td>{{ article.quantiteArticle }} KG</td>
+                                        <td>{{ article.prix }} TN/KG</td>
+                                        <td>{{ article.utilisateur}}</td>
+                                        
+                                        <td>
+                                            <a href='{{ path ('app_deleteArticleAdmin' , { 'id':article.id } ) }}' class="btn btn-danger">Banner</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+{% endblock %}

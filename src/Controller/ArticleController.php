@@ -166,4 +166,25 @@ final class ArticleController extends AbstractController
         $this->addFlash('success', ' L\'article supprimé avec succès!');
         return $this-> redirectToRoute('app_article_mine'); 
     }
+
+    #[Route('/Article/getall/admin', name: 'app_article_admin')]
+    public function getallArticleAdmin(ArticleRepository $repository)
+    {
+        $articles= $repository-> findAll();
+        return $this->render('categorie_article/liste_articles_admin.html.twig', [
+            'articles' => $articles,
+        ]);  
+    }
+
+    #[Route('article/delete/admin/{id}', name: 'app_deleteArticleAdmin')]
+    public function deleteArticleAdmin (ManagerRegistry $manager, ArticleRepository $repository, $id) {
+        $em= $manager->getManager();
+       
+        $Article = $repository -> find($id);
+        $em -> remove($Article);
+
+        $em -> flush();
+        $this->addFlash('success', ' L\'article supprimé avec succès!');
+        return $this-> redirectToRoute('app_article_admin'); 
+    }
 }
