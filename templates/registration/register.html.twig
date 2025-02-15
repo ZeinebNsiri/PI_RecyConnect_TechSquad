@@ -48,12 +48,18 @@
                                 <div class="form-group">
                                     <label>Nom</label>
                                     {{ form_widget(form.nom_user, { 'attr': {'class': 'form-control p_input'} }) }}
+                                    <div class="text-danger">
+                                     {{ form_errors(form.nom_user) }}
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Prénom</label>
                                     {{ form_widget(form.prenom, { 'attr': {'class': 'form-control p_input'} }) }}
+                                    <div class="text-danger">
+                                    {{ form_errors(form.prenom) }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -62,6 +68,9 @@
                     <div class="form-group">
                         <label>Nom</label>
                         {{ form_widget(form.nom_user, { 'attr': {'class': 'form-control p_input'} }) }}
+                        <div class="text-danger">
+                            {{ form_errors(form.nom_user) }}
+                        </div>
                     </div>
                     {% endif %}
                     
