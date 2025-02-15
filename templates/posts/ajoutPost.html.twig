@@ -1,0 +1,31 @@
+{% extends 'basecnx.html.twig' %}
+
+{% block title %}Créer un post{% endblock %}
+
+{% block stylesheets %}
+   
+    <link href="{{asset('Posts/css/form.css')}}" rel="stylesheet" type="text/css">
+    
+{% endblock %}
+
+{% block body %}
+    <div class="form-container">
+        <h1>Créer un Post</h1>
+
+        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'class': 'post-form', novalidate:'novalidate' }}) }}
+            <div class="form-group">
+                {{ form_label(form.contenu) }}
+                {{ form_widget(form.contenu, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.media) }}
+                {{ form_widget(form.media, {'attr': {'class': 'form-control-file'}}) }}
+            </div>
+
+            <button type="submit" class="btnf btnf-primary">Publier</button>
+        {{ form_end(form) }}
+
+        <a href="{{ path('app_posts') }}" class="btnf btnf-secondary">Retour</a>
+    </div>
+{% endblock %}

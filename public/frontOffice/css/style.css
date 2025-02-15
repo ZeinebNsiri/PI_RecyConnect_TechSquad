@@ -93,7 +93,7 @@ h6,
 
 /*** Navbar ***/
 .navbar.sticky-top {
-    top: -100px;
+    top: 0px;
     transition: .5s;
 }
 
