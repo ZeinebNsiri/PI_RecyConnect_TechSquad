@@ -60,10 +60,16 @@ final class CategorieArticleController extends AbstractController
                 $categorieArticle->setImageCategorie($newFilename);
             }
 
-            $em->persist($categorieArticle);
-            $em->flush();
-            $this->addFlash('success', 'Catégorie article ajoutée avec succès!');
-            return $this->redirectToRoute('app_addCategorieArticle');
+            try {
+                $em->persist($categorieArticle);
+                $em->flush();
+                $this->addFlash('success', 'Catégorie article ajoutée avec succès!');
+                return $this->redirectToRoute('app_addCategorieArticle');
+            } catch (\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
+                $this->addFlash('danger', 'Le nom de la catégorie existe déjà!');
+            } catch (\Exception $e) {
+                $this->addFlash('danger', 'Une erreur est survenue lors de l\'ajout de la catégorie.');
+            }
             
         }
         $categories= $repository-> findAll();

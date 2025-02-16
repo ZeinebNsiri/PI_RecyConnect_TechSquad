@@ -31,8 +31,8 @@
           <div class="col-12 text-center">
               <ul class="list-inline rounded mb-5" id="portfolio-flters">
                   <li class="mx-2 active" data-filter="*">Tous les articles</li>
-                  {% for article in articles %}
-                  <li class="mx-2" >{{ article.categorie }}</li>
+                  {% for categorie in categories %}
+                  <li class="mx-2" >{{ categorie.nomCategorie }}</li>
                   {% endfor %}
               </ul>
           </div>

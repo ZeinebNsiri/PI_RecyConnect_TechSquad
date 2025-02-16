@@ -18,21 +18,22 @@
     </div>
 {% endfor %}
 
+
 <div class="container-xxl py-5">
   <div class="container">
       <div class="text-center mx-auto wow fadeInUp" data-wow-delay="0.1s" style="max-width: 500px;">
           <p class="fs-5 fw-bold text-primary">CHEZ RECYCONNECT</p>
           <h1 class="display-5 mb-5">Vous trouverez une grande variété d'articles à recycler</h1>
           <a class="btn btn-primary py-3 px-4" href={{ path('app_addArticle') }} style="margin-bottom: 50px;">Proposez un article </a>
-          <a class="btn btn-primary py-3 px-4" href={{ path('app_article_mine') }} style="margin-bottom: 50px;">Mes article </a>
+          <a class="btn btn-primary py-3 px-4" href={{ path('app_article_mine') }} style="margin-bottom: 50px;">Mes articles </a>
       </div>
       
       <div class="row wow fadeInUp" data-wow-delay="0.3s">
           <div class="col-12 text-center">
               <ul class="list-inline rounded mb-5" id="portfolio-flters">
                   <li class="mx-2 active" data-filter="*">Tous les articles</li>
-                  {% for article in articles %}
-                  <li class="mx-2" >{{ article.categorie }}</li>
+                  {% for categorie in categories %}
+                  <li class="mx-2" >{{ categorie.nomCategorie }}</li>
                   {% endfor %}
               </ul>
           </div>

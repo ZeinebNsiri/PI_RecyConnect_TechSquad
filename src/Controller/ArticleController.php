@@ -8,6 +8,7 @@ use App\Repository\ArticleRepository;
 use App\Repository\UtilisateurRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
+use App\Repository\CategorieArticleRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -32,10 +33,12 @@ final class ArticleController extends AbstractController
         $em= $manager->getManager();
         $user = $UtilisateurRepository->find(1);
         $Article= new   Article();
-        $form = $this ->createForm(ArticleType::class, $Article);
+        $form = $this ->createForm(ArticleType::class, $Article, [
+            'validation_groups' => ['create']
+        ]);
         $form->handleRequest($req);
 
-        if($form->isSubmitted() )
+        if($form->isSubmitted() && $form->isValid() )
         {
             $image_article = $form->get('image_article')->getData();
 
@@ -66,6 +69,13 @@ final class ArticleController extends AbstractController
             
         }
         
+        if ($form->isSubmitted() && !$form->isValid()) {
+            // Récupérer les erreurs
+            foreach ($form->getErrors() as $error) {
+                // Ajouter le message d'erreur
+                $this->addFlash('error', $error->getMessage());
+            }
+        }
 
         return $this->render('article/addArticle.html.twig',[
             
@@ -76,20 +86,24 @@ final class ArticleController extends AbstractController
     }
 
     #[Route('/Article/getall', name: 'app_article')]
-    public function getallArticle(ArticleRepository $repository)
+    public function getallArticle(ArticleRepository $repository, CategorieArticleRepository $repo)
     {
         $articles= $repository-> findAll();
+        $categories= $repo-> findAll();
         return $this->render('article/index.html.twig', [
             'articles' => $articles,
+            'categories' => $categories,
         ]);  
     }
 
     #[Route('/Article/getMine', name: 'app_article_mine')]
-    public function getMesArticle(ArticleRepository $repository)
+    public function getMesArticle(ArticleRepository $repository, CategorieArticleRepository $repo)
     {
         $articles= $repository-> findAll();
+        $categories= $repo-> findAll();
         return $this->render('article/mesArticle.html.twig', [
             'articles' => $articles,
+            'categories' => $categories,
         ]);  
     }
 
@@ -187,4 +201,6 @@ final class ArticleController extends AbstractController
         $this->addFlash('success', ' L\'article supprimé avec succès!');
         return $this-> redirectToRoute('app_article_admin'); 
     }
+
+    
 }
