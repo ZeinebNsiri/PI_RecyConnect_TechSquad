@@ -27,7 +27,6 @@ class Cours
     private ?string $video = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: 'L image est obligatoire.')]
     private ?string $imageCours = null;
 
     #[ORM\ManyToOne(inversedBy: 'cours')]

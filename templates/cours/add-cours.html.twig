@@ -1,0 +1,77 @@
+{% extends 'base2.html.twig' %}
+
+{% block title %} Ajouter Workshop {% endblock %}
+
+{% block body %}
+  <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Ajouter Workshop</h5>
+
+            {{ form_start(form, {
+    'attr': {
+        'novalidate': 'novalidate',
+        'class': 'row g-3',
+        'enctype': 'multipart/form-data'
+    }
+}) }}
+
+            {% if form.vars.errors|length > 0 %}
+                  <div class="alert alert-danger">
+                      {% for error in form.vars.errors %}
+                          <p>{{ error.message }}</p>
+                      {% endfor %}
+                  </div>
+            {% endif %}
+
+
+                <div class="col-12">
+                {{ form_label(form.imageCours, 'Image du cours') }}
+                {{ form_widget(form.imageCours, {'attr': {'class': 'form-control'}}) }}
+                {% for error in form.imageCours.vars.errors %}
+                    <div class="alert alert-danger">{{ error.message }}</div>
+                {% endfor %}
+               </div>
+
+            <div class="col-12">
+                {{ form_label(form.titreCours, 'Nom du cours') }}
+                {{ form_widget(form.titreCours, {'attr': {'class': 'form-control'}}) }}
+                {% for error in form.titreCours.vars.errors %}
+                    <div class="alert alert-danger">{{ error.message }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="col-12">
+                {{ form_label(form.categorieC, 'Catégorie du cours') }}
+                {{ form_widget(form.categorieC, {'attr': {'class': 'form-select'}}) }}
+                {% for error in form.categorieC.vars.errors %}
+                    <div class="alert alert-danger">{{ error.message }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="col-12">
+                {{ form_label(form.descriptionCours, 'Description du cours') }}
+                {{ form_widget(form.descriptionCours, {'attr': {'class': 'form-control'}}) }}
+                {% for error in form.descriptionCours.vars.errors %}
+                    <div class="alert alert-danger">{{ error.message }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="col-12">
+                {{ form_label(form.video, 'Vidéo du cours (optionnelle)') }}
+                {{ form_widget(form.video, {'attr': {'class': 'form-control'}}) }}
+                {% for error in form.video.vars.errors %}
+                    <div class="alert alert-danger">{{ error.message }}</div>
+                {% endfor %}
+            </div>
+
+            
+
+            <div class="col-12 text-center d-flex justify-content-center gap-2 mt-3">
+                {{ form_widget(form.submit) }}
+                <a href="{{ path('app_allcours') }}" class="btn btn-secondary">Annuler</a>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+   </div>
+{% endblock %}

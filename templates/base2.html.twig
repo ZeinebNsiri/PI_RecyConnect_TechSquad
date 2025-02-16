@@ -12,6 +12,8 @@
         <link href="https://fonts.gstatic.com" rel="preconnect">
         <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
+        <!-- SweetAlert2 -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <!-- Vendor CSS Files -->
         <link href="{{asset('backOffice/assets/vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
         <link href="{{asset('backOffice/assets/vendor/bootstrap-icons/bootstrap-icons.css')}}" rel="stylesheet">
@@ -32,6 +34,22 @@
         {% endblock %}
     </head>
     <body>
+
+     <!-- Messages Flash avec SweetAlert -->
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        Swal.fire({
+                            icon: "{{ label == 'success' ? 'success' : 'error' }}",
+                            title: "{{ label == 'success' ? 'Succès' : 'Erreur' }}",
+                            text: "{{ message }}",
+                            confirmButtonColor: "#198754"
+                        });
+                    {% endfor %}
+                {% endfor %}
+            });
+        </script>
                     <!-- ======= Header ======= -->
             <header id="header" class="header fixed-top d-flex align-items-center">
 
@@ -303,7 +321,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="charts-apexcharts.html">
+                        <a href="{{ path('app_allcours') }}">
                         <i class="bi bi-circle"></i><span>Workshops</span>
                         </a>
                     </li>
@@ -354,5 +372,71 @@
 
         <!-- Template Main JS File -->
         <script src="{{asset('backOffice/assets/js/main.js')}}"></script>
+
+        
+        <!-- Confirmation de suppression avec SweetAlert -->
+
+
+        <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".delete-btn").forEach(button => {
+            button.addEventListener("click", function (event) {
+                event.preventDefault();
+
+                const deleteUrl = this.getAttribute("data-url");
+                const entity = this.getAttribute("data-entity") || "élément";
+                const genre = this.getAttribute("data-genre") || "m"; // Par défaut masculin
+
+                // Accord du texte selon le genre
+                const article = (genre === "f") ? "cette" : "ce";
+                const supprimé = (genre === "f") ? "supprimée" : "supprimé";
+                const erreur = (genre === "f") ? "une erreur s'est produite lors de la suppression de la" : "une erreur s'est produite lors de la suppression du";
+
+                Swal.fire({
+                    title: "Êtes-vous sûr ?",
+                    text: `Vous ne pourrez pas revenir en arrière !`,
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#198754",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Oui, supprimer !",
+                    cancelButtonText: "Annuler"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(deleteUrl, { method: 'GET' })
+                        .then(response => {
+                            if (response.ok) {
+                                Swal.fire({
+                                    title: "Supprimé !",
+                                    text: `${article.charAt(0).toUpperCase() + article.slice(1)} ${entity} a été ${supprimé} avec succès.`,
+                                    icon: "success"
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: "Erreur",
+                                    text: `${erreur} ${entity}.`,
+                                    icon: "error"
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            Swal.fire({
+                                title: "Erreur",
+                                text: `Une erreur inattendue s'est produite lors de la suppression de ${article} ${entity}.`,
+                                icon: "error"
+                            });
+                        });
+                    }
+                });
+            });
+        });
+    });
+</script>
+
+
+
+
     </body>
 </html>

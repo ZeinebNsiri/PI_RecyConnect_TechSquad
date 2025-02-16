@@ -1,20 +1,85 @@
 {% extends 'base2.html.twig' %}
 
-{% block title %}Hello CoursController!{% endblock %}
+{% block title %} Liste des Workshops {% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+{% for message in app.session.flashBag.get('success') %}
+    <div class="alert alert-success bg-success text-light border-0 alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endfor %}
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>C:/Users/Eya_/Desktop/PI_RecyConnect_TechSquad/src/Controller/CoursController.php</code></li>
-        <li>Your template at <code>C:/Users/Eya_/Desktop/PI_RecyConnect_TechSquad/templates/cours/index.html.twig</code></li>
-    </ul>
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Liste des Workshops</h5>
+
+        <a href="{{ path('appcours_add') }}" class="btn btn-success">+ Ajouter Workshop </a><br><br>
+
+        <!-- Table avec des lignes survolables -->
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Image</th>
+                    <th scope="col">Titre du workshop</th>
+                    <th scope="col">Catégorie </th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Vidéo</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cour in cours %}
+                    <tr>
+                        <th scope="row">{{ loop.index }}</th>
+                        <td>
+                        {% if cour.imageCours %}
+                            <img src="{{ asset('uploads/images/' ~ cour.imageCours) }}" alt="Image du cours" height="60" width="70">
+                        {% else %}
+                            <span class="text-muted">Aucune image</span>
+                        {% endif %} 
+                    </td>
+                        <td>{{ cour.titreCours }}</td>
+                        <td>{{ cour.categorieC.nomCategorie }}</td>
+                        <td>{{ cour.descriptionCours }}</td>
+                        <td>
+                            
+                         {% if cour.video %}
+                          <video width="150" controls>
+                        <source src="{{ asset('uploads/videos/' ~ cour.video) }}" type="video/mp4">
+                             Votre navigateur ne supporte pas la lecture des vidéos.
+                          </video>
+                       {% else %}
+                       <span class="text-muted">Aucune vidéo</span>
+                      {% endif %}
+
+                        
+      
+                        <td>
+                            <a href="{{ path('app_editcours', {'id': cour.id}) }}" class="btn btn-warning">
+                                <i class="bi bi-pencil-square"></i> Modifier
+                            </a>
+
+                        
+                           <a href="#" class="btn btn-danger delete-btn"data-url="{{ path('app_deletecours', {'id': cour.id}) }}"data-entity="Cours"data-genre="m"><i class="bi bi-trash"></i> Supprimer</a>
+                           
+                            
+                        </td>
+
+                        
+                    </tr>
+
+
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center">Aucune workshop trouvé</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <!-- Fin de la Table -->
+    </div>
 </div>
 {% endblock %}
