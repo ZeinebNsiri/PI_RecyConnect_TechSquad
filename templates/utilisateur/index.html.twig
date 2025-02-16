@@ -1,0 +1,61 @@
+{% extends 'base2.html.twig' %}
+
+{% block title %}Recyconnect{% endblock %}
+
+{% block body %}
+<main id="main" class="main">
+<section class="section dashboard">
+        <div class="row">
+            <div class="col-12">
+                <div class="card top-selling overflow-auto">
+
+                    <div class="card-body pb-0">
+                        <h5 class="card-title">Tous les utilisateurs</h5>
+                        <div class="col-md-2">
+                  
+                  <select id="inputState" class="form-select">
+                    <option selected>Choose...</option>
+                    <option>...</option>
+                  </select>
+                </div>
+
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Nom utilisateur</th>
+                                    <th scope="col">Prénom_utilisateur</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Role</th>
+                                    <th scope="col">Matricule_fiscale</th>
+                                    <th scope="col"></th>
+                                    
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                    <tr>
+                                        <th scope="row">{{ loop.index }}</th>
+
+                                        <td>{{user.nomUser}}</td>
+                                        <td>{{user.prenom}}</td>
+                                        <td>{{user.email}}</td>
+                                        {% if 'ROLE_PROFESSIONNEL' in user.roles %}
+                                        <td>Professionnel</td>
+                                        {% endif %}
+                                        {% if 'ROLE_USER' in user.roles %}
+                                        <td>Particulier</td>
+                                        {% endif %}
+                                        <td>{{user.matriculeFiscale}}</td>
+                                        
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    </main>
+{% endblock %}

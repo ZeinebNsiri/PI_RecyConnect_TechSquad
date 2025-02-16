@@ -48,15 +48,15 @@ class UtilisateurRepository extends ServiceEntityRepository implements PasswordU
     //        ;
     //    }
 
-       public function findusers(): ?Utilisateur
+       public function findusers(): array
        {
            return $this->createQueryBuilder('u')
-               ->Where('u.roles LIKE role1')
-               ->andWhere('u.roles LIKE role2')
-               ->setParameter('role1', ["ROLE_USER"])
-               ->setParameter('role2', ["ROLE_PROFESSIONNEL"])
+               ->Where('u.roles LIKE :role1')
+               ->orWhere('u.roles LIKE :role2')
+               ->setParameter('role1', '%ROLE_USER%')
+               ->setParameter('role2', '%ROLE_PROFESSIONNEL%')
                ->getQuery()
-               ->getOneOrNullResult()
+               ->getResult()
            ;
        }
 }
