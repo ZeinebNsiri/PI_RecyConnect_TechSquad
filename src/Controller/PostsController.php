@@ -14,12 +14,18 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Repository\LikeRepository;
+use App\Entity\Like;
+
 
 final class PostsController extends AbstractController
 {
     #[Route('/posts', name: 'app_posts')]
     public function index(EntityManagerInterface $entityManager, MediaPostRepository $mediaPostRepository): Response
     {
+        $user = $entityManager->getRepository(Utilisateur::class)->findOneBy([]);
+
         $posts = $entityManager->getRepository(Post::class)->findBy(['status_post' => true], ['datePublication' => 'DESC']);
         $postsWithMedia = [];
         foreach ($posts as $post) {
@@ -27,11 +33,13 @@ final class PostsController extends AbstractController
             $postsWithMedia[] = [
                 'post' => $post,
                 'medias' => $medias,
+                
             ];
         }
 
         return $this->render('posts/posts1.html.twig', [
             'postsWithMedia' => $postsWithMedia,
+            'user' => $user,
         ]);
     }
 
@@ -47,7 +55,7 @@ final class PostsController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
             $user = $entityManager->getRepository(Utilisateur::class)->findOneBy([]);
-            dump($user);
+            
             if (!$user) {
                 $this->addFlash('error', 'Aucun utilisateur trouvé dans la base. Ajoutez un utilisateur avant de tester.');
                 return $this->redirectToRoute('app_posts');
@@ -91,6 +99,43 @@ final class PostsController extends AbstractController
 
         return $this->render('posts/ajoutPost.html.twig', [
             'form' => $form->createView(),
+        ]);
+    }
+
+
+    #[Route('/post/like/{id}', name: 'post_like', methods: ['POST'])]
+    public function like(Post $post, EntityManagerInterface $entityManager, LikeRepository $likeRepository): JsonResponse
+    {
+        $user = $entityManager->getRepository(Utilisateur::class)->findOneBy([]);
+
+        if (!$user) {
+            return new JsonResponse(['message' => 'Unauthorized'], 403);
+        }
+
+        // Vérifier si le like existe déjà
+        $existingLike = $likeRepository->findOneBy([
+            'post_like' => $post,
+            'user_like' => $user
+        ]);
+
+        if ($existingLike) {
+            // Supprimer le like
+            $entityManager->remove($existingLike);
+            $liked = false;
+        } else {
+            // Ajouter un like
+            $like = new Like();
+            $like->setPostLike($post);
+            $like->setUserLike($user);
+            $entityManager->persist($like);
+            $liked = true;
+        }
+
+        $entityManager->flush();
+
+        return new JsonResponse([
+            'liked' => $liked,
+            'likesCount' => count($post->getLikesPost())
         ]);
     }
 

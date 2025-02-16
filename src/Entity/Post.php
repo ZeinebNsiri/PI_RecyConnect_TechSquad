@@ -57,9 +57,9 @@ class Post
         $this->commentaires_post = new ArrayCollection();
         $this->postEnregistres_post = new ArrayCollection();
         $this->likes_post = new ArrayCollection();
-        
-        $this->status_post = false; // Définir status_post par défaut à false
-        $this->nbrJaime = 0; // Définir le nombre de "j'aime" à 0
+        //par defaut
+        $this->status_post = false; 
+        $this->nbrJaime = 0; 
         $this->datePublication = new \DateTime(); // Date actuelle
     
     }
@@ -220,4 +220,15 @@ class Post
 
         return $this;
     }
+
+
+    public function isLikedByUser(Utilisateur $user): bool
+            {
+                foreach ($this->likes_post as $like) {
+                    if ($like->getUserLike() === $user) {
+                        return true;
+                    }
+                }
+                return false;
+            }
 }

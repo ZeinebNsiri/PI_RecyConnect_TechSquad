@@ -9,6 +9,7 @@
     <link href="{{asset('Posts/css/style.css')}}" rel="stylesheet" type="text/css">
     <!-- <link href="{{asset('Posts/css/animate.css')}}" rel="stylesheet" type="text/css"> -->
     <link href="{{asset('Posts/css/font-awesome.min.css')}}" rel="stylesheet" type="text/css"> 
+    <link href="{{asset('Posts/css/post.css')}}" rel="stylesheet" type="text/css">
 {% endblock %}
 
 
@@ -58,16 +59,27 @@
                                             <!-- Gestion des médias associés au post -->
                                             {% if postData.medias is not empty %}
                                                 <div class="post-media">
-                                                    {% for media in postData.medias %}
-                                                        <img src="{{ asset('posts/uploads/' ~ media.chemin) }}" alt="Post Image">
+                                                    {% for media in postData.medias|slice(0, 3) %}
+                                                        <img src="{{ asset('posts/uploads/' ~ media.chemin) }}" alt="Post Image"  class="clickable-image" data-post-id="{{ postData.post.id }}">
                                                     {% endfor %}
+                                                    {% if postData.medias|length > 3 %}
+                                                        <div class="more-images-overlay clickable-image"
+                                                            data-post-id="{{ postData.post.id }}"
+                                                            data-remaining="{{ postData.medias|length - 3 }}">
+                                                            +{{ postData.medias|length - 3 }}
+                                                        </div>
+                                                    {% endif %}
                                                 </div>
                                             {% endif %}
 
 
                                             <hr>
                                             <div class="ques-icon-info3293"> 
-                                                <a href="#" class="fa fa-thumbs-up" aria-hidden="true"> {{ postData.post.nbrJaime }}</a> 
+                                                
+                                                <a href="#" class="fa fa-heart like-btn {% if postData.post.isLikedByUser(user) %}liked{% endif %}" 
+                                                data-post-id="{{ postData.post.id }}">
+                                                    {{ postData.post.getLikesPost()|length }}
+                                                </a>
                                                 <a href="#" class="fa fa-comment" aria-hidden="true"> 5</a> 
                                             </div>
                                         </div>
@@ -85,202 +97,7 @@
                             <p>Aucun post disponible.</p>
                             {% endfor %}
 
-                            <div class="question-type2033">
-                                <div class="row">
-                                    <!-- User Info -->
-                                    <div class="col-md-1">
-                                        <div class="left-user12923 left-user12923-repeat">
-                                            <a href="#"><img src="{{asset('frontOffice/img/team-2.jpg')}}" alt="User Profile"></a>
-                                            <a href="#" class="user-name">Zouari Mohamed aziz</a>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Post Content -->
-                                    <div class="col-md-9">
-                                        <div class="right-description893">
-                                            <div id="que-hedder2983">
-                                                <span class="fa fa-clock-o" aria-hidden="true"> Il y a 1 heure</span>
-                                            </div>
-                                            <div class="ques-details10018">
-                                                <p>Ceci est un exemple de contenu de post. Il peut contenir du texte ainsi que des images.</p>
-                                            </div>
-                                            <div class="post-media">
-                                                <img src="" alt="Post Image">
-                                            </div>
-                                            <hr>
-                                            <div class="ques-icon-info3293"> 
-                                                <a href="#" class="fa fa-thumbs-up" aria-hidden="true"> 10</a> 
-                                                <a href="#" class="fa fa-comment" aria-hidden="true"> 5</a> 
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Comment Section -->
-                                    <div class="col-md-2">
-                                        <div class="ques-type302">
-                                            <a href="#" class="view-comments">Voir les commentaires</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="question-type2033">
-                                <div class="row">
-                                    <!-- User Info -->
-                                    <div class="col-md-1">
-                                        <div class="left-user12923 left-user12923-repeat">
-                                            <a href="#"><img src="{{asset('frontOffice/img/team-2.jpg')}}" alt="User Profile"></a>
-                                            <a href="#" class="user-name">Zouari Mohamed aziz</a>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Post Content -->
-                                    <div class="col-md-9">
-                                        <div class="right-description893">
-                                            <div id="que-hedder2983">
-                                                <span class="fa fa-clock-o" aria-hidden="true"> Il y a 1 heure</span>
-                                            </div>
-                                            <div class="ques-details10018">
-                                                <p>Ceci est un exemple de contenu de post. Il peut contenir du texte ainsi que des images.</p>
-                                            </div>
-                                            <div class="post-media">
-                                                <img src="" alt="Post Image">
-                                            </div>
-                                            <hr>
-                                            <div class="ques-icon-info3293"> 
-                                                <a href="#" class="fa fa-thumbs-up" aria-hidden="true"> 10</a> 
-                                                <a href="#" class="fa fa-comment" aria-hidden="true"> 5</a> 
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Comment Section -->
-                                    <div class="col-md-2">
-                                        <div class="ques-type302">
-                                            <a href="#" class="view-comments">Voir les commentaires</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                          
                            
-                            <div class="question-type2033">
-                                <div class="row">
-                                    <!-- User Info -->
-                                    <div class="col-md-1">
-                                        <div class="left-user12923 left-user12923-repeat">
-                                            <a href="#"><img src="{{asset('frontOffice/img/team-2.jpg')}}" alt="User Profile"></a>
-                                            <a href="#" class="user-name">Zouari Mohamed aziz</a>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Post Content -->
-                                    <div class="col-md-9">
-                                        <div class="right-description893">
-                                            <div id="que-hedder2983">
-                                                <span class="fa fa-clock-o" aria-hidden="true"> Il y a 1 heure</span>
-                                            </div>
-                                            <div class="ques-details10018">
-                                                <p>Ceci est un exemple de contenu de post. Il peut contenir du texte ainsi que des images.</p>
-                                            </div>
-                                            <div class="post-media">
-                                                <img src="" alt="Post Image">
-                                            </div>
-                                            <hr>
-                                            <div class="ques-icon-info3293"> 
-                                                <a href="#" class="fa fa-thumbs-up" aria-hidden="true"> 10</a> 
-                                                <a href="#" class="fa fa-comment" aria-hidden="true"> 5</a> 
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Comment Section -->
-                                    <div class="col-md-2">
-                                        <div class="ques-type302">
-                                            <a href="#" class="view-comments">Voir les commentaires</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                            <div class="question-type2033">
-                                <div class="row">
-                                    <!-- User Info -->
-                                    <div class="col-md-1">
-                                        <div class="left-user12923 left-user12923-repeat">
-                                            <a href="#"><img src="{{asset('frontOffice/img/team-2.jpg')}}" alt="User Profile"></a>
-                                            <a href="#" class="user-name">Zouari Mohamed aziz</a>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Post Content -->
-                                    <div class="col-md-9">
-                                        <div class="right-description893">
-                                            <div id="que-hedder2983">
-                                                <span class="fa fa-clock-o" aria-hidden="true"> Il y a 1 heure</span>
-                                            </div>
-                                            <div class="ques-details10018">
-                                                <p>Ceci est un exemple de contenu de post. Il peut contenir du texte ainsi que des images.</p>
-                                            </div>
-                                            <div class="post-media">
-                                                <img src="" alt="Post Image">
-                                            </div>
-                                            <hr>
-                                            <div class="ques-icon-info3293"> 
-                                                <a href="#" class="fa fa-thumbs-up" aria-hidden="true"> 10</a> 
-                                                <a href="#" class="fa fa-comment" aria-hidden="true"> 5</a> 
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Comment Section -->
-                                    <div class="col-md-2">
-                                        <div class="ques-type302">
-                                            <a href="#" class="view-comments">Voir les commentaires</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="question-type2033">
-                                <div class="row">
-                                    <!-- User Info -->
-                                    <div class="col-md-1">
-                                        <div class="left-user12923 left-user12923-repeat">
-                                            <a href="#"><img src="{{asset('frontOffice/img/team-2.jpg')}}" alt="User Profile"></a>
-                                            <a href="#" class="user-name">Zouari Mohamed aziz</a>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Post Content -->
-                                    <div class="col-md-9">
-                                        <div class="right-description893">
-                                            <div id="que-hedder2983">
-                                                <span class="fa fa-clock-o" aria-hidden="true"> Il y a 1 heure</span>
-                                            </div>
-                                            <div class="ques-details10018">
-                                                <p>Ceci est un exemple de contenu de post. Il peut contenir du texte ainsi que des images.</p>
-                                            </div>
-                                            <div class="post-media">
-                                                <img src="" alt="Post Image">
-                                            </div>
-                                            <hr>
-                                            <div class="ques-icon-info3293"> 
-                                                <a href="#" class="fa fa-thumbs-up" aria-hidden="true"> 10</a> 
-                                                <a href="#" class="fa fa-comment" aria-hidden="true"> 5</a> 
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Comment Section -->
-                                    <div class="col-md-2">
-                                        <div class="ques-type302">
-                                            <a href="#" class="view-comments">Voir les commentaires</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                             
                             <nav aria-label="Page navigation">
                                 <ul class="pagination">
@@ -302,12 +119,20 @@
                                 </ul>
                               </nav>
                         </section>
-                        <!--  End of content-1------>
+                        <!--  End of content-1 -->
                      
                
                     </div>
                 </div>
               
+            </div>
+        </div>
+
+
+        <div id="imageModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <div id="modal-images"></div>
             </div>
         </div>
     </section>
@@ -319,6 +144,79 @@
         <script src="{{asset('Posts/js/jquery-3.1.1.min.js')}}"></script>
         <script src="{{asset('Posts/js/bootstrap.min.js')}}"></script>
         
+        <!-- script lel modal-->
+        <script>
+           document.addEventListener('DOMContentLoaded', function () {
+                const modal = document.getElementById('imageModal');
+                const modalImages = document.getElementById('modal-images');
+                const closeModal = document.querySelector('.close');
+
+                // Fonction pour afficher toutes les images d'un post dans la modale
+                function openImageModal(postId) {
+                    modal.style.display = 'block';
+                    modalImages.innerHTML = ''; // Vider les images précédentes
+
+                    // Récupérer toutes les images du post
+                    const images = document.querySelectorAll(`[data-post-id="${postId}"]`);
+                    images.forEach(img => {
+                        const imgElement = document.createElement('img');
+                        imgElement.src = img.src;
+                        imgElement.alt = 'Post Image';
+                        imgElement.classList.add('modal-image');
+                        modalImages.appendChild(imgElement);
+                    });
+                }
+
+                // Gérer les clics sur les images et le "+X"
+                document.querySelectorAll('.clickable-image').forEach(image => {
+                    image.addEventListener('click', function () {
+                        openImageModal(this.dataset.postId);
+                    });
+                });
+
+                // Fermer la modale
+                closeModal.addEventListener('click', () => {
+                    modal.style.display = 'none';
+                });
+
+                // Fermer en cliquant à l'extérieur
+                window.addEventListener('click', (event) => {
+                    if (event.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            });
+
+        </script>
+
+
+        <!-- script lel like-->
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.like-btn').forEach(button => {
+                button.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    let postId = this.dataset.postId;
+
+                    fetch(`/post/like/${postId}`, { 
+                        method: 'POST', 
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' } 
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.liked) {
+                            this.classList.add('liked');
+                        } else {
+                            this.classList.remove('liked');
+                        }
+                        this.innerHTML = data.likesCount;
+                    })
+                    .catch(error => console.error('Erreur:', error));
+                });
+            });
+        });
+        </script>
+
     {% endblock %}
    
 

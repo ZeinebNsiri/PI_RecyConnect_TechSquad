@@ -20,7 +20,7 @@ class Like
 
     #[ORM\ManyToOne(inversedBy: 'likes')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Utilisateur $ueser_like = null;
+    private ?Utilisateur $user_like = null;
 
     public function getId(): ?int
     {
@@ -39,14 +39,14 @@ class Like
         return $this;
     }
 
-    public function getUeserLike(): ?Utilisateur
+    public function getUserLike(): ?Utilisateur
     {
-        return $this->ueser_like;
+        return $this->user_like;
     }
 
-    public function setUeserLike(?Utilisateur $ueser_like): static
+    public function setUserLike(?Utilisateur $ueser_like): static
     {
-        $this->ueser_like = $ueser_like;
+        $this->user_like = $ueser_like;
 
         return $this;
     }
