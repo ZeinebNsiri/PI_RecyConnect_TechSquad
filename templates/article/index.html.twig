@@ -8,6 +8,12 @@
     .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
     .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
 </style>
+<div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s">
+        <div class="container text-center py-5">
+          <p class="fs-5 fw-bold text-white">CHEZ RECYCONNECT</p>
+          <h1 class="display-3 text-white mb-4 animated slideInDown">Vous trouverez une grande variété d'articles à recycler</h1>
+        </div>
+    </div>
 
 {% for message in app.flashes('success') %}
     <div class="alert alert-success alert-dismissible fade show d-flex justify-content-between align-items-center" role="alert">
@@ -22,8 +28,6 @@
 <div class="container-xxl py-5">
   <div class="container">
       <div class="text-center mx-auto wow fadeInUp" data-wow-delay="0.1s" style="max-width: 500px;">
-          <p class="fs-5 fw-bold text-primary">CHEZ RECYCONNECT</p>
-          <h1 class="display-5 mb-5">Vous trouverez une grande variété d'articles à recycler</h1>
           <a class="btn btn-primary py-3 px-4" href={{ path('app_addArticle') }} style="margin-bottom: 50px;">Proposez un article </a>
           <a class="btn btn-primary py-3 px-4" href={{ path('app_article_mine') }} style="margin-bottom: 50px;">Mes articles </a>
       </div>
@@ -31,9 +35,9 @@
       <div class="row wow fadeInUp" data-wow-delay="0.3s">
           <div class="col-12 text-center">
               <ul class="list-inline rounded mb-5" id="portfolio-flters">
-                  <li class="mx-2 active" data-filter="*">Tous les articles</li>
+                  <li class="mx-2 active" data-filter="*" ><a href={{ path('app_article') }}>Tous les articles</a></li>
                   {% for categorie in categories %}
-                  <li class="mx-2" >{{ categorie.nomCategorie }}</li>
+                    <li class="mx-2"><a href="{{ path('app_articles_by_category', { 'categoryId': categorie.id }) }}">{{ categorie.nomCategorie }}</a></li>
                   {% endfor %}
               </ul>
           </div>

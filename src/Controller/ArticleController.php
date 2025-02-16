@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
+
 final class ArticleController extends AbstractController
 {
     #[Route('/article', name: 'app_article1')]
@@ -202,5 +203,17 @@ final class ArticleController extends AbstractController
         return $this-> redirectToRoute('app_article_admin'); 
     }
 
+#[Route('/articles/{categoryId}', name: 'app_articles_by_category')]
+public function articlesByCategory(ArticleRepository $articleRepository, $categoryId, CategorieArticleRepository $repository): Response
+{
+    $articles = $articleRepository->findBy(['categorie' => $categoryId]);
+    
+    $categories = $repository -> findAll();
+
+    return $this->render('article/index.html.twig', [
+        'articles' => $articles,
+        'categories' => $categories,
+    ]);
+}
     
 }
