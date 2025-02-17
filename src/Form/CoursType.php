@@ -47,7 +47,8 @@ class CoursType extends AbstractType
             'required' => true, // Ensure it's mandatory
             'constraints' => [
                 new NotBlank([
-                    'message' => 'Veuillez télécharger une image', // Make sure it's applied globally
+                    'message' => 'Veuillez télécharger une image',
+                    'groups' => ['create']
                 ]),
                 new File([
                     'maxSize' => '2M',
