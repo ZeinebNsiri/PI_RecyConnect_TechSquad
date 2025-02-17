@@ -42,22 +42,30 @@ class UpdateUserType extends AbstractType
 
 
             ->add('nom_user', TextType::class, [
+                'required' => true,
+                'empty_data' => '',
                 'constraints' => [
                     new NotBlank(['message' => 'Veuillez entrer votre nom']),
                 ],
             ])
             ->add('prenom', TextType::class, [
+                'required' => true,
+                'empty_data' => '',
                 'constraints' => [
                     new NotBlank(['message' => 'Veuillez entrer votre prénom']),
                 ], 
             ])
             ->add('email', EmailType::class, [
+                'required' => true,
+                'empty_data' => '',
                 'constraints' => [
                     new NotBlank(['message' => 'Veuillez entrer votre email']),
                     new Email(['message' => 'Veuillez entrer une adresse email valide.']),
                 ],
             ])
             ->add('numTel', TelType::class, [
+                'required' => true,
+                'empty_data' => '',
                 'constraints' => [
                     new NotBlank(['message' => 'Veuillez entrer votre numéro de téléphone']),
                     new Regex([

@@ -75,7 +75,8 @@ final class UtilisateurController extends AbstractController
 
         
         return $this->render('utilisateur/profile.html.twig', [
-            'form'=>$form->createView()
+            'form'=>$form->createView(),
+            'user'=>$user
         ]);
     }
 
@@ -86,19 +87,21 @@ final class UtilisateurController extends AbstractController
     {   
         $em=$manager->getManager();
         $user = $repository -> find($id);
-
+        $userOriginal = clone $user;
 
         
 
 
         // modifier le profile
         if(in_array('ROLE_PROFESSIONNEL',$this->getUser()->getRoles(),true)){
+            
         
             $form = $this->createForm(UpdateUserproType::class,$user);
             $form->handleRequest($req);
-                if($form->isSubmitted()&& $form->isValid())
-
-                    {   $photo_profil = $form->get('photo_profil')->getData();
+                if($form->isSubmitted())
+                    {if($form->isValid()){
+                       $em->refresh($user);
+                        $photo_profil = $form->get('photo_profil')->getData();
 
                         
                         if ($photo_profil) {
@@ -120,10 +123,12 @@ final class UtilisateurController extends AbstractController
 
 
 
-                    $em->flush();
-
-                    return $this->redirectToRoute('app_profile', ['id' => $id]);
-
+                        $em->flush();
+                        
+                        return $this->redirectToRoute('app_profile', ['id' => $id]);
+                    }else{
+                        $user=$userOriginal;
+                    }
                     }
 
            
@@ -135,8 +140,8 @@ final class UtilisateurController extends AbstractController
         $form = $this->createForm(UpdateUserType::class,$user);
         $form->handleRequest($req);
         if($form->isSubmitted()&& $form->isValid())
-
-                    {
+            {if($form->isValid())
+                    {$em->refresh($user);
                         $photo_profil = $form->get('photo_profil')->getData();
 
                         
@@ -158,16 +163,19 @@ final class UtilisateurController extends AbstractController
                         }
 
 
-                    $em->persist($user);
+                    //$em->persist($user);
                     $em->flush();
 
                     return $this->redirectToRoute('app_profile', ['id' => $id]);
-
+                }else{
+                    $user=$userOriginal;
+                }
                     }
                 }
         
         return $this->render('utilisateur/profileUser.html.twig', [
-            'form'=>$form->createView()
+            'form'=>$form->createView(),
+            'user'=>$user
         ]);
     }
 }

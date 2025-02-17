@@ -18,11 +18,11 @@
                         <img src="{{ asset(app.user.PhotoProfil ? 'uploads/profile_dir/' ~ app.user.PhotoProfil : 'backOffice/assets/img/profile.jpg') }}" alt="Profile" class="rounded-circle">
                         
                         {% if (('ROLE_USER' in app.user.roles)or('ROLE_ADMIN' in app.user.roles)) %}
-                        <h2>{{app.user.prenom}} {{app.user.nomUser}}</h2>
+                        <h2>{{user.prenom}} {{user.nomUser}}</h2>
                         {% endif %}
 
                         {% if 'ROLE_PROFESSIONNEL' in app.user.roles %}
-                        <h2>{{app.user.nomUser}}</h2>
+                        <h2>{{user.nomUser}}</h2>
                         {% endif %}
 
                         {% if 'ROLE_USER' in app.user.roles %}
@@ -62,12 +62,12 @@
                                 <h5 class="card-title">Détails</h5>
                                 <div class="row">
                                     <div class="col-lg-3 col-md-4 label">Nom</div>
-                                    <div class="col-lg-9 col-md-8">{{ app.user.nomUser }}</div>
+                                    <div class="col-lg-9 col-md-8">{{ user.nomUser }}</div>
                                 </div>
 
                                 <div class="row">
                                     <div class="col-lg-3 col-md-4 label">Prénom</div>
-                                    <div class="col-lg-9 col-md-8">{{ app.user.prenom }}</div>
+                                    <div class="col-lg-9 col-md-8">{{ user.prenom }}</div>
                                 </div>
 
                                 <div class="row">
@@ -91,17 +91,17 @@
 
                                 <div class="row">
                                     <div class="col-lg-3 col-md-4 label">Email</div>
-                                    <div class="col-lg-9 col-md-8">{{ app.user.email }}</div>
+                                    <div class="col-lg-9 col-md-8">{{ user.email }}</div>
                                 </div>
 
                                 <div class="row">
                                     <div class="col-lg-3 col-md-4 label">Téléphone</div>
-                                    <div class="col-lg-9 col-md-8">{{ app.user.numTel }}</div>
+                                    <div class="col-lg-9 col-md-8">{{ user.numTel }}</div>
                                 </div>
 
                                 <div class="row">
                                     <div class="col-lg-3 col-md-4 label">Adresse</div>
-                                    <div class="col-lg-9 col-md-8">{{ app.user.adresse }}</div>
+                                    <div class="col-lg-9 col-md-8">{{ user.adresse }}</div>
                                 </div>
 
                                 
@@ -126,28 +126,44 @@
                                         <label  class="col-md-4 col-lg-3 col-form-label">Last Name</label>
                                         <div class="col-md-8 col-lg-9">
                                             {{ form_widget(form.nom_user, {'attr': {'class': 'form-control'}}) }}
+                                        <div class="text-danger">
+                                            {{ form_errors(form.nom_user) }}
                                         </div>
+                                        </div>
+                                        
                                     </div>
 
                                     <div class="row mb-3">
                                         <label for="{{ form.prenom.vars.id }}" class="col-md-4 col-lg-3 col-form-label">First Name</label>
                                         <div class="col-md-8 col-lg-9">
                                             {{ form_widget(form.prenom, {'attr': {'class': 'form-control'}}) }}
+                                        <div class="text-danger">
+                                            {{ form_errors(form.prenom) }}
                                         </div>
+                                        </div>
+                                        
                                     </div>
 
                                     <div class="row mb-3">
                                         <label for="{{ form.email.vars.id }}" class="col-md-4 col-lg-3 col-form-label">Email</label>
                                         <div class="col-md-8 col-lg-9">
                                             {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
+                                        <div class="text-danger">
+                                            {{ form_errors(form.email) }}
                                         </div>
+                                        </div>
+                                        
                                     </div>
 
                                     <div class="row mb-3">
                                         <label for="{{ form.numTel.vars.id }}" class="col-md-4 col-lg-3 col-form-label">Phone Number</label>
                                         <div class="col-md-8 col-lg-9">
                                             {{ form_widget(form.numTel, {'attr': {'class': 'form-control'}}) }}
+                                        <div class="text-danger">
+                                            {{ form_errors(form.numTel) }}
                                         </div>
+                                        </div>
+                                        
                                     </div>
 
                                     <div class="row mb-3">
