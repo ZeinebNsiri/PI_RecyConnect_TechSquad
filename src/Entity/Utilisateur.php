@@ -445,7 +445,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->likes->contains($like)) {
             $this->likes->add($like);
-            $like->setUeserLike($this);
+            $like->setUserLike($this);
         }
 
         return $this;
@@ -455,8 +455,8 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->likes->removeElement($like)) {
             // set the owning side to null (unless already changed)
-            if ($like->getUeserLike() === $this) {
-                $like->setUeserLike(null);
+            if ($like->getUserLike() === $this) {
+                $like->setUserLike(null);
             }
         }
 

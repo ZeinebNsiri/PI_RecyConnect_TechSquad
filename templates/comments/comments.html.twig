@@ -28,47 +28,30 @@
                             <div class="row">
                            
                                 <div class="comments-container">
+                                    <!-- Bouton Ajouter un commentaire -->
+                                    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#verticalycentered">
+                                        Ajouter un Commentaire
+                                    </button>
                                     <ul id="comments-list" class="comments-list">
-                                        <li>
-                                             <div class="comment-main-level">
-                                                <!-- Avatar -->
-                                                <div class="comment-avatar"><img src="image/images.png" alt=""></div>
-                                                <!-- Contenedor del Comentario -->
-                                                <div class="comment-box">
-                                                    <div class="comment-head">
-                                                        <h6 class="comment-name"><a href="#">Lorena Rojero</a></h6> <span><i class="fa fa-clock-o" aria-hidden="true"> January 15 , 2014 at 10:00 pm</i></span> <i class="fa fa-reply"></i> <i class="fa fa-heart"></i> </div>
-                                                    <div class="comment-content"> Lorem ipsum dolor sit amet, consectetur adipisicing elit. Velit omnis animi et iure laudantium vitae, praesentium optio, sapiente distinctio illo? </div>
+                                        {% if commentaires is empty %}
+                                            <li><p class="text-muted">Pas de commentaire pour le moment.</p></li>
+                                        {% else %}
+                                        {% for commentaire in commentaires %}
+                                            <li>
+                                                <div class="comment-main-level">
+                                                    <div class="comment-avatar"><img src="{{ asset('image/images.png') }}" alt=""></div>
+                                                    <div class="comment-box">
+                                                        <div class="comment-head">
+                                                            <h6 class="comment-name"><a href="#">{{ commentaire.UserCom.NomUser }}</a></h6> 
+                                                            <span><i class="fa fa-clock-o" aria-hidden="true">{{ commentaire.DateCom|date('F j, Y, g:i a') }}</i></span>
+                                                            <i class="fa fa-reply"></i>
+                                                        </div>
+                                                        <div class="comment-content">{{ commentaire.ContenuCom }}</div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                                
-                                      
-                                            <ul class="comments-list reply-list">
-                                                <li>
-                                                    <div class="comment-avatar"><img src="image/images.png" alt=""></div>
-                                                    <div class="comment-box">
-                                                        <div class="comment-head">
-                                                            <h6 class="comment-name"><a href="#">Lorena Rojero</a></h6> <span><i class="fa fa-clock-o" aria-hidden="true"> January 15 , 2014 at 10:00 pm</i></span> <i class="fa fa-reply"></i>  </div>
-                                                        <div class="comment-content"> Lorem ipsum dolor sit amet, consectetur adipisicing elit. Velit omnis animi et iure laudantium vitae, praesentium optio, sapiente distinctio illo? </div>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="comment-avatar"><img src="image/images.png" alt=""></div>
-                                                    <div class="comment-box">
-                                                        <div class="comment-head">
-                                                            <h6 class="comment-name by-author"><a href="#">Agustin Ortiz</a></h6> <span><i class="fa fa-clock-o" aria-hidden="true"> January 15 , 2014 at 10:00 pm</i></span> <i class="fa fa-reply"></i>  </div>
-                                                        <div class="comment-content"> Lorem ipsum dolor sit amet, consectetur adipisicing elit. Velit omnis animi et iure laudantium vitae, praesentium optio, sapiente distinctio illo? </div>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="comment-avatar"><img src="image/images.png" alt=""></div>
-                                                    <div class="comment-box">
-                                                        <div class="comment-head">
-                                                            <h6 class="comment-name"><a href="#">Lorena Rojero</a></h6> <span><i class="fa fa-clock-o" aria-hidden="true"> January 15 , 2014 at 10:00 pm</i></span> <i class="fa fa-reply"></i> </div>
-                                                        <div class="comment-content"> Lorem ipsum dolor sit amet, consectetur adipisicing elit. Velit omnis animi et iure laudantium vitae, praesentium optio, sapiente distinctio illo? </div>
-                                                    </div>
-                                                </li>
-                                            </ul>
-                                        </li>
+                                            </li>
+                                        {% endfor %}
+                                        {% endif %}
                                         <li>
                                             <div class="comment-main-level">
                                                 <!-- Avatar -->
@@ -76,7 +59,7 @@
                                                 <!-- Contenedor del Comentario -->
                                                 <div class="comment-box">
                                                     <div class="comment-head">
-                                                        <h6 class="comment-name"><a href="#">Lorena Rojero</a></h6> <span><i class="fa fa-clock-o" aria-hidden="true"> January 15 , 2014 at 10:00 pm</i></span> <i class="fa fa-reply"></i> <i class="fa fa-heart"></i> </div>
+                                                        <h6 class="comment-name"><a href="#">Lorena Rojero</a></h6> <span><i class="fa fa-clock-o" aria-hidden="true"> January 15 , 2014 at 10:00 pm</i></span> <i class="fa fa-reply"></i>  </div>
                                                     <div class="comment-content"> Lorem ipsum dolor sit amet, consectetur adipisicing elit. Velit omnis animi et iure laudantium vitae, praesentium optio, sapiente distinctio illo? </div>
                                                 </div>
                                             </div>
@@ -88,14 +71,84 @@
                             </div>
                         </div>
                     </div>
+
+
+                    <div class="modal fade" id="verticalycentered" tabindex="-1">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Ajouter un commentaire</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="comment-form" method="post" action="{{ path('commentaire_ajout', { 'id': post.id }) }}">
+                                        <input type="hidden" name="post_com" value="{{ post.id }}">
+                                        <div class="mb-3">
+                                            <label for="contenu_com" class="form-label">Commentaire</label>
+                                            <textarea class="form-control" id="contenu_com" name="contenu_com" rows="4" required></textarea>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                                            <button type="submit" class="btn btn-primary">Publier</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 {% endblock %}
 
     {% block javascripts %}
         
        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js')}}"></script>
-        <script src="{{asset('js/jquery-3.1.1.min.js')}}"></script>
-        <script src="{{asset('js/bootstrap.min.js')}}"></script>
-        <script src="{{asset('js/npm.js')}}"></script>
+        <script src="{{asset('Posts/js/jquery-3.1.1.min.js')}}"></script>
+        <script src="{{asset('Posts/js/bootstrap.min.js')}}"></script>
+        <script src="{{asset('Posts/js/npm.js')}}"></script>
+        
+         <script>
+            $(document).ready(function() {
+                // Intercepter la soumission du formulaire
+                $('#comment-form').on('submit', function(e) {
+                    e.preventDefault(); // Empêcher la soumission normale du formulaire
+
+                    // Récupérer les données du formulaire
+                    var formData = $(this).serialize();
+
+                    // Envoyer les données via AJAX
+                    $.ajax({
+                        url: $(this).attr('action'),
+                        method: 'POST',
+                        data: formData,
+                        success: function(response) {
+                            // Fermer le modal
+                            $('#verticalycentered').modal('hide');
+
+                            // Recharger la page pour afficher le nouveau commentaire
+                            location.reload();
+                        },
+                        error: function(xhr, status, error) {
+                            // Gérer les erreurs
+                            console.error('Erreur lors de l\'ajout du commentaire:', error);
+                            alert('Une erreur est survenue lors de l\'ajout du commentaire.');
+                        }
+                    });
+                });
+            });
+        </script>
+        
+
+          <!-- Vendor JS Files -->
+        <script src="{{asset('backOffice/assets/vendor/apexcharts/apexcharts.min.js')}}"></script>
+        <script src="{{asset('backOffice/assets/vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+        <script src="{{asset('backOffice/vendor/chart.js/chart.umd.js')}}"></script>
+        <script src="{{asset('backOffice/assets/vendor/echarts/echarts.min.js')}}"></script>
+        <script src="{{asset('backOffice/assets/vendor/quill/quill.js')}}"></script>
+        <script src="{{asset('backOffice/assets/vendor/simple-datatables/simple-datatables.js')}}"></script>
+        <script src="{{asset('backOffice/assets/vendor/tinymce/tinymce.min.js')}}"></script>
+        <script src="{{asset('backOffice/assets/vendor/php-email-form/validate.js')}}"></script>
+
+        <!-- Template Main JS File -->
+        <script src="assets/js/main.js"></script>
 
     {% endblock %}
    
