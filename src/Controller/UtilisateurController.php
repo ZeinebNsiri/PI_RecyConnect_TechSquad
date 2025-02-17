@@ -26,6 +26,59 @@ final class UtilisateurController extends AbstractController
         ]);
     }
 
+    #[Route('/profileadmin/{id}', name: 'app_profileadmin')]
+    public function profileadmin(Request $req,ManagerRegistry $manager,UtilisateurRepository $repository,$id, SluggerInterface $slugger,
+    #[Autowire('%kernel.project_dir%/public/uploads/profile_dir')] string $brochuresDirectory
+    ): Response
+    {   
+        $em=$manager->getManager();
+        $user = $repository -> find($id);
+
+
+        
+
+
+        // modifier le profile
+
+        $form = $this->createForm(UpdateUserType::class,$user);
+        $form->handleRequest($req);
+        if($form->isSubmitted()&& $form->isValid())
+
+                    {
+                        $photo_profil = $form->get('photo_profil')->getData();
+
+                        
+                        if ($photo_profil) {
+                            $originalFilename = pathinfo($photo_profil->getClientOriginalName(), PATHINFO_FILENAME);
+                            
+                            $safeFilename = $slugger->slug($originalFilename);
+                            $newFilename = $safeFilename.'-'.uniqid().'.'.$photo_profil->guessExtension();
+
+                            
+                            try {
+                                $photo_profil->move($brochuresDirectory, $newFilename);
+                            } catch (FileException $e) {
+                               
+                            }
+
+                            
+                            $user-> setPhotoProfil($newFilename);
+                        }
+
+
+                    $em->persist($user);
+                    $em->flush();
+
+                    return $this->redirectToRoute('app_profileadmin', ['id' => $id]);
+
+                    }
+
+        
+        return $this->render('utilisateur/profile.html.twig', [
+            'form'=>$form->createView()
+        ]);
+    }
+
     #[Route('/profile/{id}', name: 'app_profile')]
     public function profile(Request $req,ManagerRegistry $manager,UtilisateurRepository $repository,$id, SluggerInterface $slugger,
     #[Autowire('%kernel.project_dir%/public/uploads/profile_dir')] string $brochuresDirectory
@@ -34,11 +87,11 @@ final class UtilisateurController extends AbstractController
         $em=$manager->getManager();
         $user = $repository -> find($id);
 
+
         
 
 
-
-
+        // modifier le profile
         if(in_array('ROLE_PROFESSIONNEL',$this->getUser()->getRoles(),true)){
         
             $form = $this->createForm(UpdateUserproType::class,$user);
@@ -47,23 +100,21 @@ final class UtilisateurController extends AbstractController
 
                     {   $photo_profil = $form->get('photo_profil')->getData();
 
-                        // this condition is needed because the 'brochure' field is not required
-                        // so the PDF file must be processed only when a file is uploaded
+                        
                         if ($photo_profil) {
                             $originalFilename = pathinfo($photo_profil->getClientOriginalName(), PATHINFO_FILENAME);
-                            // this is needed to safely include the file name as part of the URL
+                            
                             $safeFilename = $slugger->slug($originalFilename);
                             $newFilename = $safeFilename.'-'.uniqid().'.'.$photo_profil->guessExtension();
 
-                            // Move the file to the directory where brochures are stored
+                            
                             try {
                                 $photo_profil->move($brochuresDirectory, $newFilename);
                             } catch (FileException $e) {
-                                // ... handle exception if something happens during file upload
+                                
                             }
 
-                            // updates the 'brochureFilename' property to store the PDF file name
-                            // instead of its contents
+                            
                             $user-> setPhotoProfil($newFilename);
                         }
 
@@ -75,14 +126,12 @@ final class UtilisateurController extends AbstractController
 
                     }
 
-            return $this->render('utilisateur/profile.html.twig', [
-            'form'=>$form->createView()
-            ]);
+           
         }
     
        
         
-       
+        if(in_array('ROLE_USER',$this->getUser()->getRoles(),true)){
         $form = $this->createForm(UpdateUserType::class,$user);
         $form->handleRequest($req);
         if($form->isSubmitted()&& $form->isValid())
@@ -90,23 +139,21 @@ final class UtilisateurController extends AbstractController
                     {
                         $photo_profil = $form->get('photo_profil')->getData();
 
-                        // this condition is needed because the 'brochure' field is not required
-                        // so the PDF file must be processed only when a file is uploaded
+                        
                         if ($photo_profil) {
                             $originalFilename = pathinfo($photo_profil->getClientOriginalName(), PATHINFO_FILENAME);
-                            // this is needed to safely include the file name as part of the URL
+                            
                             $safeFilename = $slugger->slug($originalFilename);
                             $newFilename = $safeFilename.'-'.uniqid().'.'.$photo_profil->guessExtension();
 
-                            // Move the file to the directory where brochures are stored
+                            
                             try {
                                 $photo_profil->move($brochuresDirectory, $newFilename);
                             } catch (FileException $e) {
-                                // ... handle exception if something happens during file upload
+                               
                             }
 
-                            // updates the 'brochureFilename' property to store the PDF file name
-                            // instead of its contents
+                            
                             $user-> setPhotoProfil($newFilename);
                         }
 
@@ -117,10 +164,12 @@ final class UtilisateurController extends AbstractController
                     return $this->redirectToRoute('app_profile', ['id' => $id]);
 
                     }
-
+                }
         
-        return $this->render('utilisateur/profile.html.twig', [
+        return $this->render('utilisateur/profileUser.html.twig', [
             'form'=>$form->createView()
         ]);
     }
 }
+
+

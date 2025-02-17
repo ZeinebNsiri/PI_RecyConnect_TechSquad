@@ -3,27 +3,29 @@
 namespace App\Controller;
 
 use App\Entity\Utilisateur;
-use App\Form\ProfessionnelRegistrationType;
+use Doctrine\ORM\EntityManager;
 use App\Form\RegistrationFormType;
+use Symfony\Component\Mime\Address;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
+use App\Form\ProfessionnelRegistrationType;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mime\Address;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
-
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class RegistrationController extends AbstractController
 {
     
 
     #[Route('/register', name: 'app_register')]
-    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager): Response
+    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, ManagerRegistry $manager): Response
     {   
         $user = new Utilisateur();
-
+        $em=$manager->getManager();
        
         $type = $request->query->get('type', 'particulier'); 
 
@@ -36,8 +38,13 @@ class RegistrationController extends AbstractController
             $user->setPassword($userPasswordHasher->hashPassword($user, $form->get('password')->getData()));
             $user->setRoles(['ROLE_PROFESSIONNEL']);
             $user->setStatus(true);
-            $entityManager->persist($user);
-            $entityManager->flush();
+            try{      
+                $em->persist($user);
+                $em->flush();
+            } catch (UniqueConstraintViolationException $e) {
+                $this->addFlash('danger', 'Cet email est déjà utilisé.');
+                return $this->redirectToRoute('app_register');
+            }
 
             return $this->redirectToRoute('app_login');
         }
@@ -49,9 +56,13 @@ class RegistrationController extends AbstractController
             $user->setPassword($userPasswordHasher->hashPassword($user, $form->get('password')->getData()));
             $user->setRoles(['ROLE_USER']);
             $user->setStatus(true);
-            $entityManager->persist($user);
-            $entityManager->flush();
-
+          try{      
+            $em->persist($user);
+            $em->flush();
+        } catch (UniqueConstraintViolationException $e) {
+            $this->addFlash('danger', 'Cet email est déjà utilisé.');
+            return $this->redirectToRoute('app_register');
+        }
             return $this->redirectToRoute('app_login');
         }
         }

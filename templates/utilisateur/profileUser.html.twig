@@ -1,9 +1,10 @@
-{% extends 'base2.html.twig' %}
+{% extends 'basecnx.html.twig' %}
 
 {% block title %}Profile{% endblock %}
 
 {% block body %}
-<main id="main" class="main">
+<!-- Favicons -->
+       
 
     <div class="pagetitle">
         <h1>Profile</h1>
@@ -11,6 +12,12 @@
     </div><!-- End Page Title -->
 
     <section class="section profile">
+     <link href="{{asset('backOffice/assets/img/favicon.png')}}" rel="icon">
+        
+
+         <!-- Template Main CSS File -->
+        <link href="{{asset('backOffice/assets/css/style.css')}}" rel="stylesheet">
+
         <div class="row">
             <div class="col-xl-4">
                 <div class="card">
@@ -64,11 +71,18 @@
                                     <div class="col-lg-3 col-md-4 label">Nom</div>
                                     <div class="col-lg-9 col-md-8">{{ app.user.nomUser }}</div>
                                 </div>
-
+                                {% if 'ROLE_USER' in app.user.roles %}
                                 <div class="row">
                                     <div class="col-lg-3 col-md-4 label">Prénom</div>
                                     <div class="col-lg-9 col-md-8">{{ app.user.prenom }}</div>
                                 </div>
+                                {% endif %}
+                                {% if 'ROLE_PROFESSIONNEL' in app.user.roles %}
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-4 label">Matricule Fiscale</div>
+                                    <div class="col-lg-9 col-md-8">{{ app.user.matriculeFiscale }}</div>
+                                </div>
+                                {% endif %}
 
                                 <div class="row">
                                     <div class="col-lg-3 col-md-4 label">Role</div>
@@ -109,6 +123,7 @@
 
                             <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
                                 <!-- Profile Edit Form -->
+                                {% if 'ROLE_USER' in app.user.roles %}
                                 {{ form_start(form,{attr:{novalidate:'novalidate'}}) }}
 
                                    
@@ -161,6 +176,56 @@
                                         {{ form_widget(form.submit, {'attr': {'class': 'btn btn-success'}}) }}
                                     </div>
                                 {{ form_end(form) }}
+                                {% endif %}
+                                {% if 'ROLE_PROFESSIONNEL' in app.user.roles %}
+                                {{ form_start(form,{attr:{novalidate:'novalidate'}}) }}
+
+                                   
+                                    
+
+                                    <div class="row mb-3">
+                                        <label for="{{ form.photo_profil.vars.id }}" class="col-md-4 col-lg-3 col-form-label">Profile Photo</label>
+                                        
+                                        <div class="col-md-8 col-lg-9">
+                                            {{ form_widget(form.photo_profil, {'attr': {'class': 'form-control', 'placeholder': 'Choisir une image', 'accept': 'image/*'}}) }}
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <label  class="col-md-4 col-lg-3 col-form-label">Last Name</label>
+                                        <div class="col-md-8 col-lg-9">
+                                            {{ form_widget(form.nom_user, {'attr': {'class': 'form-control'}}) }}
+                                        </div>
+                                    </div>
+
+                                    
+
+                                    <div class="row mb-3">
+                                        <label for="{{ form.email.vars.id }}" class="col-md-4 col-lg-3 col-form-label">Email</label>
+                                        <div class="col-md-8 col-lg-9">
+                                            {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <label for="{{ form.numTel.vars.id }}" class="col-md-4 col-lg-3 col-form-label">Phone Number</label>
+                                        <div class="col-md-8 col-lg-9">
+                                            {{ form_widget(form.numTel, {'attr': {'class': 'form-control'}}) }}
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <label for="{{ form.adresse.vars.id }}" class="col-md-4 col-lg-3 col-form-label">Address</label>
+                                        <div class="col-md-8 col-lg-9">
+                                            {{ form_widget(form.adresse, {'attr': {'class': 'form-control'}}) }}
+                                        </div>
+                                    </div>
+
+                                    <div class="text-center ">
+                                        {{ form_widget(form.submit, {'attr': {'class': 'btn btn-success'}}) }}
+                                    </div>
+                                {{ form_end(form) }}
+                                {% endif %}
                             </div>
 
 
@@ -195,5 +260,5 @@
             </div>
         </div>
     </section>
-</main>
+
 {% endblock %}

@@ -11,35 +11,64 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\Length;
 
 class ProfessionnelRegistrationType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-        ->add('nom_user', TextType::class, [
-            'constraints' => [new NotBlank(['message' => 'Veuillez entrer votre nom'])],
-        ])
-        ->add('matricule_fiscale', TextType::class, [
-            'constraints' => [new NotBlank(['message' => 'Veuillez entrer votre matricule fiscale'])],
-        ])
-        ->add('numTel', TelType::class, [
-            'constraints' => [new NotBlank(['message' => 'Veuillez entrer votre numéro de téléphone'])],
-        ])
-        ->add('email', EmailType::class, [
-            'constraints' => [new NotBlank(['message' => 'Veuillez entrer votre email'])],
-        ])
-        ->add('password', RepeatedType::class, [
-            'type' => PasswordType::class,
-            'first_options' => ['label' => 'Mot de passe'],
-            'second_options' => ['label' => 'Confirmer le mot de passe'],
-            'invalid_message' => 'Les mots de passe ne correspondent pas.',
-        ])
-        ->add('submit', SubmitType::class, ['label' => "S'inscrire"]);
-
-        
+            ->add('nom_user', TextType::class, [
+                'constraints' => [new NotBlank(['message' => 'Veuillez entrer votre nom'])],
+            ])
+            ->add('matricule_fiscale', TextType::class, [
+                'constraints' => [
+                    new NotBlank(['message' => 'Veuillez entrer votre matricule fiscale']),
+                    new Regex([
+                        'pattern' => '/^[A-Za-z0-9]{13}$/',
+                        'message' => 'Le matricule fiscale doit contenir exactement 13 caractères alphanumériques.',
+                    ]),
+                ],
+            ])
+            ->add('numTel', TelType::class, [
+                'constraints' => [
+                    new NotBlank(['message' => 'Veuillez entrer votre numéro de téléphone']),
+                    new Regex([
+                        'pattern' => '/^[0-9]{8}$/',
+                        'message' => 'Le numéro de téléphone doit contenir exactement 8 chiffres.',
+                    ]),
+                ],
+            ])
+            ->add('email', EmailType::class, [
+                'constraints' => [
+                    new NotBlank(['message' => 'Veuillez entrer votre email']),
+                    new Email(['message' => 'Veuillez entrer une adresse email valide.']),
+                ],
+            ])
+            ->add('password', RepeatedType::class, [
+                'type' => PasswordType::class,
+                'first_options' => ['label' => 'Mot de passe'],
+                'second_options' => ['label' => 'Confirmer le mot de passe'],
+                'invalid_message' => 'Les mots de passe ne correspondent pas.',
+                'constraints' => [
+                    new NotBlank(['message' => 'Veuillez entrer un mot de passe']),
+                    new Length([
+                        'min' => 8,
+                        'minMessage' => 'Votre mot de passe doit contenir au moins {{ limit }} caractères.',
+                        // max length allowed by Symfony for security reasons
+                        'max' => 4096,
+                    ]),
+                    new Regex([
+                        'pattern' => '/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/',
+                        'message' => 'Votre mot de passe doit contenir au moins une lettre, un chiffre et un caractère spécial.',
+                    ]),
+                ],
+            ])
+            ->add('submit', SubmitType::class, ['label' => "S'inscrire"]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
