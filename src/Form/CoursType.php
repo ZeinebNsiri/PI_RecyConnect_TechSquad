@@ -12,6 +12,8 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 
 class CoursType extends AbstractType
@@ -19,11 +21,16 @@ class CoursType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-        ->add('titreCours')
-        ->add('descriptionCours')
+        ->add('titreCours',  TextType::class, [
+            'empty_data' => '',
+        ])
+        ->add('descriptionCours',  TextareaType::class, [
+            'empty_data' => '',
+        ])
         ->add('video', FileType::class, [
             'label'    => 'Vidéo du cours (optionnelle)',
             'mapped'   => false,
+            'empty_data' => '',
             'required' => false, // Allow optional uploads
             'constraints' => [
                 new File([
@@ -43,7 +50,8 @@ class CoursType extends AbstractType
         
         ->add('imageCours', FileType::class, [
             'label' => 'Image du cours',
-            'mapped' => false, // Not mapped to entity directly
+            'mapped' => false, 
+            'empty_data' => '',// Not mapped to entity directly
             'required' => true, // Ensure it's mandatory
             'constraints' => [
                 new NotBlank([
@@ -65,7 +73,8 @@ class CoursType extends AbstractType
         
         ->add('categorieC', EntityType::class, [
             'class' => CategorieCours::class,
-            'choice_label' => 'nomCategorie', 
+            'choice_label' => 'nomCategorie',
+            'empty_data' => '', 
             'placeholder' => 'Sélectionnez une catégorie',
             'required' => true
         ])
