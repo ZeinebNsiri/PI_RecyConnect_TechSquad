@@ -16,28 +16,29 @@ class CoursRepository extends ServiceEntityRepository
         parent::__construct($registry, Cours::class);
     }
 
-//    /**
-//     * @return Cours[] Returns an array of Cours objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('c.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    /**
+     * Récupère la liste (unique) des catégories à partir de l’association `categorieC`.
+     */
+    public function findUniqueCategories(): array
+    {
+        return $this->createQueryBuilder('c')
+            ->leftJoin('c.categorieC', 'cat')  // Jointure avec l'entité liée
+            ->select('DISTINCT cat.nomCategorie AS nomCategorie') 
+            ->orderBy('cat.nomCategorie', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 
-//    public function findOneBySomeField($value): ?Cours
-//    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    /**
+     * Récupère tous les cours d’une catégorie donnée.
+     */
+    public function findByCategory(string $category): array
+    {
+        return $this->createQueryBuilder('c')
+            ->leftJoin('c.categorieC', 'cat')
+            ->where('cat.nomCategorie = :category')
+            ->setParameter('category', $category)
+            ->getQuery()
+            ->getResult();
+    }
 }

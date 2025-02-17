@@ -57,6 +57,7 @@
             </div>
 
             <div class="col-12">
+            
                 {{ form_label(form.video, 'Vidéo du cours (optionnelle)') }}
                 {{ form_widget(form.video, {'attr': {'class': 'form-control'}}) }}
                 {% for error in form.video.vars.errors %}

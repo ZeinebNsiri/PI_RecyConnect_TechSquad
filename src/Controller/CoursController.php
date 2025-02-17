@@ -81,56 +81,102 @@ final class CoursController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-                    //edit
-                    #[Route('/updatecours{id}', name: 'app_editcours')]
-                    public function edit(
-                        Request $request,
-                        ManagerRegistry $manager,
-                        CoursRepository $repo,
-                        #[Autowire('%photo_dir%')] string $photoDir,
-                        #[Autowire('%video_dir%')] string $videoDir,
-                        $id
-                    ): Response {
-                        $cours = $repo->find($id);
+    #[Route('/updatecours/{id}', name: 'app_editcours')]
+    public function edit(
+        Request $request,
+        ManagerRegistry $manager,
+        CoursRepository $repo,
+        #[Autowire('%photo_dir%')] string $photoDir,
+        #[Autowire('%video_dir%')] string $videoDir,
+        int $id
+    ): Response {
+        $cours = $repo->find($id);
+        if (!$cours) {
+            throw $this->createNotFoundException('Cours non trouvé');
+        }
+    
+        // Keep track of the old image name
+        $oldImage = $cours->getImageCours();
+    
+        $form = $this->createForm(CoursType::class, $cours);
+        $form->handleRequest($request);
+    
+        if ($form->isSubmitted() && $form->isValid()) {
+            // PHOTO
+            $photoFile = $form->get('imageCours')->getData();
+            if ($photoFile) {
+                // The user uploaded a new image
+                $fileName = $photoFile->getClientOriginalName();
+                $photoFile->move($photoDir, $fileName);
+                $cours->setImageCours($fileName);
+    
+                // Optionally delete the old file from disk if you want:
+                if ($oldImage && file_exists($photoDir.'/'.$oldImage)) {
+                    unlink($photoDir.'/'.$oldImage);
+                }
+            } else {
+                // No new file => restore the old one
+                $cours->setImageCours($oldImage);
+            }
+    
+            // VIDEO
+            $videoFile = $form->get('video')->getData();
+            if ($videoFile) {
+                $videoName = $videoFile->getClientOriginalName();
+                $videoFile->move($videoDir, $videoName);
+                $cours->setVideo($videoName);
+            }
+    
+            $em = $manager->getManager();
+            $em->flush();
+    
+            $this->addFlash('success', 'Le cours a été modifié avec succès.');
+            return $this->redirectToRoute('app_allcours');
+        }
+    
+        return $this->render('cours/edit-cours.html.twig', [
+            'form'  => $form->createView(),
+            'cours' => $cours
+        ]);
+    }
 
-                        if (!$cours) {
-                            throw $this->createNotFoundException('Cours non trouvé');
-                        }
 
-                        $form = $this->createForm(CoursType::class, $cours);
-                        $form->handleRequest($request);
 
-                        if ($form->isSubmitted() && $form->isValid()) {
-                            // Handling Image Upload
-                            $photoFile = $form->get('imageCours')->getData();
-                            if ($photoFile) {
-                                $fileName = $photoFile->getClientOriginalName();
-                                $photoFile->move($photoDir, $fileName);
-                                $cours->setImageCours($fileName);
-                            }
+//                     #[Route('/admin/events/edit/{id}', name: 'edit_event', methods: ['GET', 'POST'])]
+// public function edit(Request $request, Evenement $event, EntityManagerInterface $entityManager): Response
+// {
+//     $oldImage = $event->getImageEvent();
 
-                            // Handling Video Upload
-                            $videoFile = $form->get('video')->getData();
-                            if ($videoFile) {
-                                $fileName = $videoFile->getClientOriginalName();
-                                $videoFile->move($videoDir, $fileName);
-                                $cours->setVideo($fileName);
-                            }
+//     $form = $this->createForm(EventType::class, $event);
+//     $form->handleRequest($request);
 
-                            $em = $manager->getManager();
-                            $em->flush();
+//     if ($form->isSubmitted() && $form->isValid()) {
+//         $imageFile = $form->get('imageEvent')->getData();
 
-                            $this->addFlash('success', 'Le cours a été modifié avec succès.');
+//         if ($imageFile) {
+//             $newFilename = $imageFile->getClientOriginalName();
 
-                            return $this->redirectToRoute('app_allcours');
-                        }
+//             $imageFile->move(
+//                 $this->getParameter('photo_dir'),
+//                 $newFilename
+//             );
 
-                        return $this->render('cours/edit-cours.html.twig', [
-                            'form' => $form->createView(),
-                            'cours' => $cours
-                        ]);
-                    }
+//             $event->setImageEvent($newFilename);
 
+//             if ($oldImage && file_exists($this->getParameter('photo_dir').'/'.$oldImage)) {
+//                 unlink($this->getParameter('photo_dir').'/'.$oldImage);
+//             }
+//         } else {
+//             $event->setImageEvent($oldImage);
+//         }
+
+//         $entityManager->flush();
+
+//         $this->addFlash('success', 'L\'événement a été mis à jour avec succès.');
+//         return $this->redirectToRoute('admin_events');
+//     }
+
+                    //delete
                     #[Route('/deletecours/{id}', name: 'app_deletecours')]
                     public function deleteCours(ManagerRegistry $manager, CoursRepository $repo, $id )
                     {
@@ -142,5 +188,47 @@ final class CoursController extends AbstractController
                 
                         return $this->redirectToRoute('app_allcours');
                     }
+
+                    #[Route('/workshops', name: 'app_workshops')]
+                    public function showWorkshops(CoursRepository $coursRepository, Request $request): Response
+                    {
+                        // On récupère toutes les catégories distinctes
+                        $categories = $coursRepository->findUniqueCategories();
+                        
+                        // Récupération de la catégorie choisie via ?category=...
+                        $selectedCategory = $request->query->get('category');
+                    
+                        // Si une catégorie est choisie, on filtre, sinon on affiche tout
+                        if ($selectedCategory) {
+                            $workshops = $coursRepository->findByCategory($selectedCategory);
+                        } else {
+                            $workshops = $coursRepository->findAll();
+                        }
+                    
+                        // On extrait seulement le champ 'nomCategorie' pour construire un simple tableau de chaînes
+                        return $this->render('cours/courscnx_front.html.twig', [
+                            'workshops'        => $workshops,
+                            'categories'       => array_column($categories, 'nomCategorie'), 
+                            'selectedCategory' => $selectedCategory,
+                        ]);
+                    }
+
+                    #[Route('/workshops/{id}', name: 'appworkshop_details')]
+                    public function showWorkshopDetails(int $id, CoursRepository $coursRepository): Response
+                    {
+                        // Fetch the workshop by its ID
+                        $workshop = $coursRepository->find($id);
+
+                        // If the workshop is not found, throw a 404 error
+                        if (!$workshop) {
+                            throw $this->createNotFoundException('Workshop not found');
+                        }
+
+                        return $this->render('cours/detailscours_front.html.twig', [
+                            'workshop' => $workshop,
+                        ]);
+                    }
+
+                    
 
 }
