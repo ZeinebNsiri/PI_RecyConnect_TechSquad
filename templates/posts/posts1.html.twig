@@ -10,10 +10,25 @@
     <!-- <link href="{{asset('Posts/css/animate.css')}}" rel="stylesheet" type="text/css"> -->
     <link href="{{asset('Posts/css/font-awesome.min.css')}}" rel="stylesheet" type="text/css"> 
     <link href="{{asset('Posts/css/post.css')}}" rel="stylesheet" type="text/css">
+
+
+
+  
+
+ 
 {% endblock %}
 
 
 {% block body %}
+    <!-- Page Header Start -->
+    <div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s">
+        <div class="container text-center py-5">
+            <h1 class="display-3 text-white mb-4 animated slideInDown">RecyConnect Forum</h1>
+           
+        </div>
+    </div>
+    <!-- Page Header End -->
+
     <!-- ======content section/body=====-->
     <section class="main-content920">
         <div class="container">
@@ -26,8 +41,8 @@
                         <label for="tab2">Les Posts Les Plus Lickés</label>
                         <input id="tab3" type="radio" name="tabs">
                         <label for="tab3">Mes Posts </label>
-                        <input id="tab3" type="radio" name="tabs">
-                        <label for="tab3"> Enregistrés </label>
+                        <input id="tab4" type="radio" name="tabs">
+                        <label for="tab4"> Enregistrés </label>
                        <!-- Create Post Button -->
                         <button onclick="window.location.href='{{ path('post_create') }}'" class="btn btn-primary create-post-btn">Créer Une Publication</button>
                         
@@ -80,7 +95,7 @@
                                                 data-post-id="{{ postData.post.id }}">
                                                     {{ postData.post.getLikesPost()|length }}
                                                 </a>
-                                                <a href="#" class="fa fa-comment" aria-hidden="true"> 5</a> 
+                                                <a href="{{ path('app_comments', { 'id': postData.post.id }) }}" class="fa fa-comment" aria-hidden="true"> {{ postData.post.getCommentairesPost()|length }}</a> 
                                             </div>
                                         </div>
                                     </div>

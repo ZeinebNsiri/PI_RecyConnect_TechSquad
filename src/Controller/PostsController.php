@@ -167,7 +167,7 @@ final class PostsController extends AbstractController
     }
 
     #[Route('/admin/deletePost/{id}', name: 'admin_post_delete')]
-    public function delete(Post $post, EntityManagerInterface $entityManager): Response
+    public function deleteAdmin(Post $post, EntityManagerInterface $entityManager): Response
     {
         // Supprimer les fichiers médias associés
         $mediaPosts = $entityManager->getRepository(MediaPost::class)->findBy(['post' => $post]);
@@ -178,6 +178,30 @@ final class PostsController extends AbstractController
         $entityManager->remove($post);
         $entityManager->flush();
         return $this->redirectToRoute('admin_posts');
+    }
+
+
+    #[Route('/post/delete/{id}', name: 'post_delete')]
+    public function delete(Post $post, EntityManagerInterface $entityManager): Response
+    {
+        $user = $this->getUser(); // Récupèrer l'utilisateur connecté
+
+        if (!$user || $post->getUserP() !== $user) {
+            $this->addFlash('error', 'Vous n\'êtes pas autorisé à supprimer ce post.');
+            return $this->redirectToRoute('app_posts');
+        }
+
+     
+        $mediaPosts = $entityManager->getRepository(MediaPost::class)->findBy(['post' => $post]);
+        foreach ($mediaPosts as $mediaPost) {
+            $entityManager->remove($mediaPost);
+        }
+
+        $entityManager->remove($post);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Post supprimé avec succès !');
+        return $this->redirectToRoute('app_posts');
     }
 
 

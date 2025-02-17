@@ -18,6 +18,7 @@
     <!-- <link href="css/animate.css')}}" rel="stylesheet" type="text/css"> -->
     <link href="{{asset('css/font-awesome.min.css')}}" rel="stylesheet" type="text/css">
     <link href="{{asset('css/responsive.css')}}" rel="stylesheet" type="text/css">
+    <link href="{{asset('Posts/css/comments.css')}}" rel="stylesheet" type="text/css">
     
 {% endblock %}
 
@@ -28,6 +29,9 @@
                             <div class="row">
                            
                                 <div class="comments-container">
+                                    <a href="{{ path('app_posts') }}" class="btn btn-secondary mb-3">
+                                        <i class="fa fa-arrow-left"></i>
+                                    </a>
                                     <!-- Bouton Ajouter un commentaire -->
                                     <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#verticalycentered">
                                         Ajouter un Commentaire
@@ -44,12 +48,54 @@
                                                         <div class="comment-head">
                                                             <h6 class="comment-name"><a href="#">{{ commentaire.UserCom.NomUser }}</a></h6> 
                                                             <span><i class="fa fa-clock-o" aria-hidden="true">{{ commentaire.DateCom|date('F j, Y, g:i a') }}</i></span>
-                                                            <i class="fa fa-reply"></i>
+                                                            <i data-bs-toggle="modal" data-bs-target="#replyModal-{{ commentaire.id }}" class="fa fa-reply"></i>
                                                         </div>
                                                         <div class="comment-content">{{ commentaire.ContenuCom }}</div>
                                                     </div>
                                                 </div>
                                             </li>
+
+                                            <div class="modal fade" id="replyModal-{{ commentaire.id }}" tabindex="-1">
+                                                <div class="modal-dialog modal-dialog-centered">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Répondre au commentaire de {{ commentaire.UserCom.NomUser }}</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <form id="reply-form-{{ commentaire.id }}" method="post" action="{{ path('comment_reply', { 'id': commentaire.id }) }}">
+                                                                <input type="hidden" name="post_com" value="{{ post.id }}">
+                                                                <input type="hidden" name="parent_id" value="{{ commentaire.id }}">
+                                                                <div class="mb-3">
+                                                                    <label for="contenu_com_{{ commentaire.id }}" class="form-label">Votre réponse</label>
+                                                                    <textarea class="form-control" id="contenu_com_{{ commentaire.id }}" name="contenu_com" rows="4" required></textarea>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                                                                    <button type="submit" class="btn btn-primary">Répondre</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {# Afficher les réponses directement dans Twig #}
+                                            {% for reply in commentaire.replies %}
+                                                <li class="comment-reply">
+                                                    <div class="comment-main-level">
+                                                        <div class="comment-avatar"><img src="{{ asset('image/images.png') }}" alt=""></div>
+                                                        <div class="comment-box">
+                                                            <div class="comment-head">
+                                                                <h6 class="comment-name"><a href="#">{{ reply.UserCom.NomUser }}</a></h6> 
+                                                                <span><i class="fa fa-clock-o" aria-hidden="true">{{ reply.DateCom|date('F j, Y, g:i a') }}</i></span>
+                                                            </div>
+                                                            <div class="comment-content">{{ reply.ContenuCom }}</div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            {% endfor %}
+
                                         {% endfor %}
                                         {% endif %}
                                         <li>
@@ -96,6 +142,10 @@
                             </div>
                         </div>
                     </div>
+
+
+                    
+
 {% endblock %}
 
     {% block javascripts %}
