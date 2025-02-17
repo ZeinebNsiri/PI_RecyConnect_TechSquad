@@ -26,48 +26,57 @@ class ArticleType extends AbstractType
     {
         $builder
             ->add('nom_article', TextType::class, [
+                'empty_data' => '',
+                'required' => true,
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Le nom de l\'article est obligatoire',
-                        'groups' => ['create']
+                        'groups' => ['create', 'update']
                     ])
                 ]
             ])
             ->add('description_article', TextType::class, [
+                'empty_data' => '',
+                'required' => true,
                 'constraints' => [
                     new NotBlank([
                         'message' => 'La description de l\'article est obligatoire',
-                        'groups' => ['create']
+                        'groups' => ['create', 'update']
                     ])
                 ]
             ])
             ->add('quantite_article', IntegerType::class, [
+                'required' => true,
+                'empty_data' => '0',
                 'constraints' => [
                     new NotBlank([
                         'message' => 'La quantité de l\'article est obligatoire',
-                        'groups' => ['create']
+                        'groups' => ['create', 'update']
                     ]),
                     new Range([
                         'min' => 1,
                         'notInRangeMessage' => 'La quantité ne peut pas être un nombre négatif ou 0',
-                        'groups' => ['create']
+                        'groups' => ['create', 'update']
                     ])
                 ]
             ])
             ->add('prix', NumberType::class, [
+                'required' => true,
+                'empty_data' => '0',
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Le prix de l\'article est obligatoire',
-                        'groups' => ['create']
+                        'groups' => ['create', 'update']
                     ]),
                     new Range([
                         'min' => 0,
                         'notInRangeMessage' => 'La quantité ne peut pas être un nombre négatif',
-                        'groups' => ['create']
+                        'groups' => ['create', 'update']
                     ])
                 ]
             ])
             ->add('image_article', FileType::class, [
+                
                 'label' => 'Inserez une image pour l\'article (des images uniquement)',
 
                 // unmapped means that this field is not associated to any entity property
@@ -96,10 +105,12 @@ class ArticleType extends AbstractType
                 ],
             ])
             ->add('localisation_article', TextType::class, [
+                'empty_data' => '',
+                'required' => true,
                 'constraints' => [
                     new NotBlank([
                         'message' => 'La localisation de l\'article est obligatoire',
-                        'groups' => ['create']
+                        'groups' => ['create', 'update']
                     ])
                 ]
             ])

@@ -4,15 +4,16 @@ namespace App\Controller;
 
 use App\Entity\CategorieArticle;
 use App\Form\CategoriArticleType;
+use App\Repository\ArticleRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\CategorieArticleRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class CategorieArticleController extends AbstractController
 {
@@ -26,7 +27,7 @@ final class CategorieArticleController extends AbstractController
 
     #[Route('/categorie/article/add', name: 'app_addCategorieArticle')]
     public function addCategorieArticle(ManagerRegistry $manager, Request $req, CategorieArticleRepository $repository, SluggerInterface $slugger,
-    #[Autowire('%kernel.project_dir%/public/uploads/photo_dir')] string $brochuresDirectory)
+    #[Autowire('%kernel.project_dir%/public/uploads/photo_dir')] string $brochuresDirectory, ArticleRepository $articleRepo,)
     {
         $em= $manager->getManager();
 
@@ -73,6 +74,13 @@ final class CategorieArticleController extends AbstractController
             
         }
         $categories= $repository-> findAll();
+        //calcule des nb articles par categorie
+        $articleCounts = [];
+
+        foreach ($categories as $category) {
+            $articleCounts[$category->getId()] = $articleRepo->countArticlesInCategory($category->getId());
+        }
+
 
         if ($form->isSubmitted() && !$form->isValid()) {
             // Récupérer les erreurs
@@ -85,7 +93,8 @@ final class CategorieArticleController extends AbstractController
         return $this->render('categorie_article/index.html.twig',[
             
             'form'=>$form->createView(),
-            'categories' => $categories
+            'categories' => $categories,
+            'articleCounts' => $articleCounts,
 
         ]);
        

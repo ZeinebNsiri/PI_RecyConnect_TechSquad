@@ -20,9 +20,6 @@
 {% endfor %}
 
 
-    <div class="pagetitle">
-        <h4>Tous les articles proposés chez RecyConnect</h4>
-    </div><!-- End Page Title -->
 
     <section class="section dashboard">
         <div class="row">
@@ -30,7 +27,7 @@
                 <div class="card top-selling overflow-auto">
 
                     <div class="card-body pb-0">
-                        
+                        <h5 class="card-title">Tous les articles proposés chez RecyConnect</h5>
                         <table class="table table-borderless">
                             <thead>
                                 <tr>
@@ -58,6 +55,10 @@
                                         <td>
                                             <a href='{{ path ('app_deleteArticleAdmin' , { 'id':article.id } ) }}' class="btn btn-danger">Ban</a>
                                         </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="3" class="text-center">Aucun article trouvé</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>

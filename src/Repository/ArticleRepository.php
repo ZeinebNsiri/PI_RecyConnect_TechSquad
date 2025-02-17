@@ -49,4 +49,17 @@ class ArticleRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function countArticlesInCategory($categoryId)
+    {
+    return $this->createQueryBuilder('a')
+        ->select('COUNT(a.id) as article_count')
+        ->andWhere('a.categorie = :cat') 
+        ->setParameter('cat', $categoryId)
+        ->getQuery()
+        ->getSingleScalarResult();
+    }
+
+    
+
 }

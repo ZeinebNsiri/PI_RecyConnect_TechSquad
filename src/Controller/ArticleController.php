@@ -127,11 +127,11 @@ final class ArticleController extends AbstractController
         $em= $manager->getManager();
         $Article = $repo->find($id);
 
-      $form = $this->createForm(ArticleType::class,$Article);
+      $form = $this->createForm(ArticleType::class,$Article, ['validation_groups' => ['update']]);
 
       $form->handleRequest($req);
 
-      if($form->isSubmitted())
+      if($form->isSubmitted()&& $form->isValid())
 
       {
         $image_article = $form->get('image_article')->getData();
@@ -158,10 +158,16 @@ final class ArticleController extends AbstractController
 
       $em->flush();
       $this->addFlash('success', 'L\'article est modifié avec succès!');
-
+            
       return $this->redirectToRoute('app_article_mine');
 
       }
+
+      if ($form->isSubmitted() && !$form->isValid()) {
+        foreach ($form->getErrors(true) as $error) {
+            $this->addFlash('error', $error->getMessage());
+        }
+        }
       return $this->render('article/addArticle.html.twig',[
 
         'form'=>$form->createView(),
