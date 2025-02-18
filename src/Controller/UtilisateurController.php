@@ -17,13 +17,55 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 final class UtilisateurController extends AbstractController
 {
-    #[Route('/Liste/utilisateurs', name: 'app_Listeutilisateur')]
-    public function Listeutilisateur(UtilisateurRepository $repository): Response
-    {
-        $users=$repository->findusers();
+    #[Route('/Liste/utilisateurs/{type?}', name: 'app_Listeutilisateur')]
+    public function Listeutilisateur(?string $type,UtilisateurRepository $repository): Response
+    {   
+        
+        if ($type == 'particuliers') {
+            $users = $repository->findByRole('ROLE_USER');
+        } elseif ($type == 'professionnels') {
+            $users = $repository->findByRole('ROLE_PROFESSIONNEL');
+        } else {
+            $users = $repository->findusers();
+        }
+    
+
         return $this->render('utilisateur/index.html.twig', [
             'users' => $users,
         ]);
+    }
+    #[Route('/activer/user/{id}', name: 'app_Activer')]
+    public function activer($id,UtilisateurRepository $repository,ManagerRegistry $manager): Response
+    {   
+        $user = $repository -> find($id);
+        $em=$manager->getManager();
+        if ($user->isStatus() == true) {
+            $this->addFlash('danger', 'Ce compte est déja activé.');
+        } else {
+            $user-> setStatus(true);
+            $em->flush();
+            $this->addFlash('danger', 'Compte activé avec succès.');
+        } 
+    
+
+        return $this->redirectToRoute('app_Listeutilisateur');
+    }
+
+    #[Route('/desactiver/user/{id}', name: 'app_Desactiver')]
+    public function deactiver($id,UtilisateurRepository $repository,ManagerRegistry $manager): Response
+    {   
+        $user = $repository -> find($id);
+        $em=$manager->getManager();
+        if ($user->isStatus() == false) {
+            $this->addFlash('danger', 'Ce compte est déja désactivé.');
+        } else {
+            $user-> setStatus(false);
+            $em->flush();
+            $this->addFlash('danger', 'Compte désactivé avec succès.');
+        } 
+    
+
+        return $this->redirectToRoute('app_Listeutilisateur');
     }
 
     #[Route('/profileadmin/{id}', name: 'app_profileadmin')]

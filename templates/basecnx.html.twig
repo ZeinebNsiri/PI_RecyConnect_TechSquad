@@ -105,21 +105,37 @@
                 <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
                   <img src="{{ asset(app.user.PhotoProfil ? 'uploads/profile_dir/' ~ app.user.PhotoProfil : 'backOffice/assets/img/profile.jpg') }}" alt="Profile" class="rounded-circle">
                   {% if 'ROLE_USER' in app.user.roles %}
+                  {% if user is defined %}
+                  <span class="d-none d-md-block dropdown-toggle ps-2">{{user.prenom}} {{user.nomUser}}</span>
+                  {% else %}
                   <span class="d-none d-md-block dropdown-toggle ps-2">{{app.user.prenom}} {{app.user.nomUser}}</span>
                   {% endif %}
+                  {% endif %}
                   {% if 'ROLE_PROFESSIONNEL' in app.user.roles %}
-                  <span class="d-none d-md-block dropdown-toggle ps-2">{{app.user.nomUser}}</span>
+                  {% if user is defined %}
+                  <span class="d-none d-md-block dropdown-toggle ps-2">{{user.nomUser}}</span>
+                  {% else %}
+                <span class="d-none d-md-block dropdown-toggle ps-2">{{app.user.nomUser}}</span>
+                  {% endif %}
                   {% endif %}
                 </a><!-- End Profile Iamge Icon -->
       
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                   <li class="dropdown-header">
                     {% if 'ROLE_USER' in app.user.roles %}
+                    {% if user is defined %}
+                    <h6>{{user.prenom}} {{user.nomUser}}</h6>
+                    {% else %}
                     <h6>{{app.user.prenom}} {{app.user.nomUser}}</h6>
+                    {% endif %}
                     {% endif %}
 
                     {% if 'ROLE_PROFESSIONNEL' in app.user.roles %}
+                    {% if user is defined %}
+                    <h6>{{user.nomUser}}</h6>
+                    {% else %}
                     <h6>{{app.user.nomUser}}</h6>
+                    {% endif %}
                     {% endif %}
 
                 
