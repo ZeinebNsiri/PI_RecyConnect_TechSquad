@@ -30,7 +30,7 @@
     <!-- Page Header End -->
 
     <!-- ======content section/body=====-->
-    <section class="main-content920">
+    <section class="text-center mx-auto wow fadeInUp">
         <div class="container">
             <div class="row">
                 <div class="col-md-9">
@@ -47,7 +47,7 @@
                         <button onclick="window.location.href='{{ path('post_create') }}'" class="btn btn-primary create-post-btn">Créer Une Publication</button>
                         
                     
-                        
+                        <!-- All Posts Content -->
                         <section id="content1">
                                <!--Recent Question Content Section -->
                             {% for postData in postsWithMedia %}
@@ -132,11 +132,64 @@
                                     </a>
                                   </li>
                                 </ul>
-                              </nav>
+                            </nav>
                         </section>
                         <!--  End of content-1 -->
-                     
-               
+
+
+
+                         <!-- My Posts Content (Mes Posts) -->
+                        <section id="content3">
+                            {% for postData in myPostsWithMedia %}
+                            <div class="question-type2033">
+                                <div class="row">
+                                    <div class="col-md-1">
+                                        <div class="left-user12923 left-user12923-repeat">
+                                            <a href="#"><img src="{{ asset('frontOffice/img/team-2.jpg') }}" alt="User Profile"></a>
+                                            <a href="#" class="user-name">{{ postData.post.userP.nomUser }}</a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <div class="right-description893">
+                                            <div id="que-hedder2983">
+                                                <span class="fa fa-clock-o" aria-hidden="true"> {{ postData.post.datePublication|date('d/m/Y H:i') }}</span>
+                                            </div>
+                                            <div class="ques-details10018">
+                                                <p class="post-content" id="post-content-{{ postData.post.id }}">{{ postData.post.contenu }}</p>
+                                                <textarea class="edit-content d-none" id="edit-content-{{ postData.post.id }}">{{ postData.post.contenu }}</textarea>
+                                            </div>
+
+                                            <!-- Media associated with the post -->
+                                            {% if postData.medias is not empty %}
+                                            <div class="post-media">
+                                                {% for media in postData.medias|slice(0, 3) %}
+                                                <img src="{{ asset('posts/uploads/' ~ media.chemin) }}" alt="Post Image" class="clickable-image" data-post-id="{{ postData.post.id }}">
+                                                {% endfor %}
+                                                {% if postData.medias|length > 3 %}
+                                                <div class="more-images-overlay clickable-image" data-post-id="{{ postData.post.id }}" data-remaining="{{ postData.medias|length - 3 }}">
+                                                    +{{ postData.medias|length - 3 }}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            {% endif %}
+
+                                            <hr>
+                                           
+
+                                            <!-- Post Modification and Deletion -->
+                                            <div class="post-actions">
+                                                <button class="btn  edit-btn" data-post-id="{{ postData.post.id }}">Modifier</button>
+                                                <a href="{{ path('post_delete', { 'id': postData.post.id }) }}" class="fa fa-trash"> Supprimer</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <p>Aucun post disponible.</p>
+                            {% endfor %}
+                        </section>
+                
                     </div>
                 </div>
               

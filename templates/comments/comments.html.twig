@@ -48,9 +48,19 @@
                                                         <div class="comment-head">
                                                             <h6 class="comment-name"><a href="#">{{ commentaire.UserCom.NomUser }}</a></h6> 
                                                             <span><i class="fa fa-clock-o" aria-hidden="true">{{ commentaire.DateCom|date('F j, Y, g:i a') }}</i></span>
+                                                            
                                                             <i data-bs-toggle="modal" data-bs-target="#replyModal-{{ commentaire.id }}" class="fa fa-reply"></i>
+                                                         
                                                         </div>
                                                         <div class="comment-content">{{ commentaire.ContenuCom }}</div>
+                                                        {% if commentaire.UserCom  %}
+                                                                <!-- Bouton de suppression -->
+                                                                <form method="post" action="{{ path('comment_delete', { 'id': commentaire.id }) }}" style="display: inline;">
+                                                                    <button type="submit" class="btn btn-link text-danger" title="Supprimer le commentaire">
+                                                                        <i class="fa fa-trash"></i>
+                                                                    </button>
+                                                                </form>
+                                                            {% endif %}
                                                     </div>
                                                 </div>
                                             </li>
@@ -80,7 +90,7 @@
                                                 </div>
                                             </div>
 
-                                            {# Afficher les réponses directement dans Twig #}
+                                            
                                             {% for reply in commentaire.replies %}
                                                 <li class="comment-reply">
                                                     <div class="comment-main-level">
@@ -89,8 +99,10 @@
                                                             <div class="comment-head">
                                                                 <h6 class="comment-name"><a href="#">{{ reply.UserCom.NomUser }}</a></h6> 
                                                                 <span><i class="fa fa-clock-o" aria-hidden="true">{{ reply.DateCom|date('F j, Y, g:i a') }}</i></span>
+                                                                
                                                             </div>
                                                             <div class="comment-content">{{ reply.ContenuCom }}</div>
+                                                            
                                                         </div>
                                                     </div>
                                                 </li>
@@ -98,18 +110,7 @@
 
                                         {% endfor %}
                                         {% endif %}
-                                        <li>
-                                            <div class="comment-main-level">
-                                                <!-- Avatar -->
-                                                <div class="comment-avatar"><img src="image/images.png" alt=""></div>
-                                                <!-- Contenedor del Comentario -->
-                                                <div class="comment-box">
-                                                    <div class="comment-head">
-                                                        <h6 class="comment-name"><a href="#">Lorena Rojero</a></h6> <span><i class="fa fa-clock-o" aria-hidden="true"> January 15 , 2014 at 10:00 pm</i></span> <i class="fa fa-reply"></i>  </div>
-                                                    <div class="comment-content"> Lorem ipsum dolor sit amet, consectetur adipisicing elit. Velit omnis animi et iure laudantium vitae, praesentium optio, sapiente distinctio illo? </div>
-                                                </div>
-                                            </div>
-                                        </li>
+                                        
                                            
                                     </ul>
                         

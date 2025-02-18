@@ -4,28 +4,73 @@
 
 {% block stylesheets %}
    
-    <link href="{{asset('Posts/css/form.css')}}" rel="stylesheet" type="text/css">
+      <link href="{{asset('frontOffice/css/bootstrap.css')}}" rel="stylesheet" type="text/css">
+    <link href="{{asset('frontOffice/css/style.css')}}" rel="stylesheet" type="text/css">
+    <link href="{{asset('frontOffice/css/editor.css')}}" rel="stylesheet" type="text/css">
+    <!-- <link href="css/animate.css')}}" rel="stylesheet" type="text/css"> -->
+    <link href="{{asset('frontOffice/css/font-awesome.min.css')}}" rel="stylesheet" type="text/css"> </head>
+    <link href="{{asset('frontOffice/css/responsive.css')}}" rel="stylesheet" type="text/css"> </head>
     
 {% endblock %}
 
 {% block body %}
-    <div class="form-container">
-        <h1>Créer un Post</h1>
-
-        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'class': 'post-form', novalidate:'novalidate' }}) }}
-            <div class="form-group">
-                {{ form_label(form.contenu) }}
-                {{ form_widget(form.contenu, {'attr': {'class': 'form-control'}}) }}
+    <div class="container-fluid py-5">
+        <div class="container">
+            <div class="text-center mx-auto wow fadeInUp" data-wow-delay="0.1s" style="max-width: 500px;">
+                <p class="fs-5 fw-bold text-primary">Créer un Post</p>
+                <h1 class="display-5 mb-5">Publier un Nouveau Post</h1>
             </div>
 
-            <div class="form-group">
-                {{ form_label(form.media) }}
-                {{ form_widget(form.media, {'attr': {'class': 'form-control-file'}}) }}
+             {% for error in form.vars.errors %}
+                <div class="alert alert-danger">{{ error.message }}</div>
+            {% endfor %}
+
+            <div class="row justify-content-center">
+                <div class="col-lg-7">
+                    <div class="bg-light rounded p-4 p-sm-5 wow fadeInUp" data-wow-delay="0.1s">
+                        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'class': 'post-form', novalidate:'novalidate' }}) }}
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    {{ form_widget(form.contenu, {'attr': {'class': 'form-control border-0', 'placeholder': 'Contenu du post'}}) }}
+                                    {{ form_label(form.contenu) }}
+                                    {% if form.contenu.vars.errors|length > 0 %}
+                                        <div class="alert alert-danger mt-2">
+                                            {{ form_errors(form.contenu) }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    {{ form_widget(form.media, {'attr': {'class': 'form-control border-0'}}) }}
+                                    {{ form_label(form.media) }}
+                                    {% if form.media.vars.errors|length > 0 %}
+                                        <div class="alert alert-danger mt-2">
+                                            {{ form_errors(form.media) }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-12 text-center">
+                                <button type="submit" class="btn btn-primary py-3 px-4">Publier</button>
+                            </div>
+                        </div>
+                        {{ form_end(form) }}
+                        {# Afficher les messages flash #}
+                        {% for message in app.flashes('success') %}
+                            <div class="alert alert-success">
+                            <span class="icon">✅</span>
+                        {{ message }}
+                            <span class="close" onclick="this.parentElement.style.display='none';">&times;</span>
+                            </div>
+                        {% endfor %}
+                        <div class="col-12 text-center mt-3">
+                            <a href="{{ path('app_posts') }}" class="btn btn-secondary py-3 px-4">Retour</a>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <button type="submit" class="btnf btnf-primary">Publier</button>
-        {{ form_end(form) }}
-
-        <a href="{{ path('app_posts') }}" class="btnf btnf-secondary">Retour</a>
+        </div>
     </div>
 {% endblock %}

@@ -37,9 +37,22 @@ final class PostsController extends AbstractController
             ];
         }
 
+        $myPostsWithMedia = [];
+        foreach ($posts as $post) {
+            if ($post->getUserP() === $user) {
+                $medias = $mediaPostRepository->findBy(['post' => $post]);
+                $myPostsWithMedia[] = [
+                    'post' => $post,
+                    'medias' => $medias,
+                    
+                ];
+            }
+        }
+
         return $this->render('posts/posts1.html.twig', [
             'postsWithMedia' => $postsWithMedia,
             'user' => $user,
+            'myPostsWithMedia' => $myPostsWithMedia,
         ]);
     }
 
@@ -48,7 +61,7 @@ final class PostsController extends AbstractController
     public function create(Request $request, EntityManagerInterface $entityManager, #[Autowire('%kernel.project_dir%/public/posts/uploads')] string $uploadsDir): Response
     {
         $post = new Post();
-        $form = $this->createForm(PostType::class, $post);
+        $form = $this->createForm(PostType::class, $post, ['validation_groups' => ['create']]);
         $form->handleRequest($request);
         
 
@@ -65,7 +78,7 @@ final class PostsController extends AbstractController
 
 
             // Gestion du fichier média
-            $mediaFiles = $form->get('media')->getData(); // Supposons que "media" est un champ de type file multiple
+            $mediaFiles = $form->get('media')->getData();
             dump($mediaFiles);
             foreach ($mediaFiles as $mediaFile) {
                 $newFilename = uniqid() . '.' . $mediaFile->guessExtension();
@@ -95,6 +108,14 @@ final class PostsController extends AbstractController
 
             $this->addFlash('success', 'Post ajouté avec succès !');
             return $this->redirectToRoute('app_posts');
+        }
+
+        if ($form->isSubmitted() && !$form->isValid()) {
+            // Récupérer les erreurs
+            foreach ($form->getErrors() as $error) {
+                // Ajouter le message d'erreur
+                $this->addFlash('error', $error->getMessage());
+            }
         }
 
         return $this->render('posts/ajoutPost.html.twig', [
@@ -184,7 +205,7 @@ final class PostsController extends AbstractController
     #[Route('/post/delete/{id}', name: 'post_delete')]
     public function delete(Post $post, EntityManagerInterface $entityManager): Response
     {
-        $user = $this->getUser(); // Récupèrer l'utilisateur connecté
+        $user = $entityManager->getRepository(Utilisateur::class)->findOneBy([]);
 
         if (!$user || $post->getUserP() !== $user) {
             $this->addFlash('error', 'Vous n\'êtes pas autorisé à supprimer ce post.');
@@ -203,6 +224,10 @@ final class PostsController extends AbstractController
         $this->addFlash('success', 'Post supprimé avec succès !');
         return $this->redirectToRoute('app_posts');
     }
+
+
+    
+
 
 
 }

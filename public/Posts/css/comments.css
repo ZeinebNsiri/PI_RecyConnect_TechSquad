@@ -109,3 +109,15 @@
     padding-left: 15px;
     margin-top: 15px;
 }
+
+
+/* Icône de suppression */
+.comment-delete {
+    color: red;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.comment-delete:hover {
+    color: darkred;
+}

@@ -96,5 +96,33 @@ final class CommentsController extends AbstractController
         return $this->redirectToRoute('app_comments', ['id' => $comment->getPostCom()->getId()]);
     }
         
+    #[Route('/comment/supprimer/{id}', name: 'comment_delete')]
+    public function supprimer(int $id, EntityManagerInterface $entityManager): Response
+    {
+        $comment = $entityManager->getRepository(Commentaire::class)->find($id);
+
+        if (!$comment) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Commentaire non trouvé.'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+   
+        if ($comment->getUserCom() === $this->getUser()) {
+            foreach ($comment->getReplies() as $reply) {
+                $entityManager->remove($reply); // Supprimez chaque réponse
+            }
+            // Supprimez le commentaire
+            $entityManager->remove($comment);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Commentaire supprimé avec succès!');
+        } else {
+            $this->addFlash('error', 'Vous ne pouvez supprimer que vos propres commentaires.');
+        }
+
+        return $this->redirectToRoute('app_posts');
+    }
 
 }

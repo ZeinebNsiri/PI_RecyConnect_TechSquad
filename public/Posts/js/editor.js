@@ -728,35 +728,7 @@ You should have received a copy of the GNU General Public License along with thi
 												return false;
 											}},
 
-						   'insert_img'	: { "modal": true,
-						   					"modalId": "InsertImage", 
-											"icon":"fa fa-picture-o", 
-											"tooltip": "Insert Image", 
-											"modalHeader": "Insert Image",
-											"modalBody": methods.imageWidget.apply(this),
-											"beforeLoad":function(){ 
-												$('#imageURL').val("");
-												$("#uploadImageBar :input").val("");
-												$('#imageList').data('current',"");																																				
-											},
-											"onSave": function(){
-												methods.restoreSelection.apply(this);												
-												if($('#imageList').data('current')){
-													if(navigator.userAgent.match(/MSIE/i)){
-														var imageStr = '<img src="'+$('#imageList').data('current')+'"/>'
-														methods.restoreSelection.apply(this,[imageStr,'html'])
-													}
-													else{
-														document.execCommand('insertimage', false, $('#imageList').data('current'));
-													}
-												}
-												else{
-													methods.showMessage.apply(this,["imgErrMsg","Please select an image"]);
-													return false;
-												}
-												$("#InsertImage").modal("hide");
-												$(this).data("editor").focus();
-											}},
+						  
 
 						'insert_table'	: { "modal": true,
 					   						"modalId": "InsertTable", 

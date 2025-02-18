@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class CommentaireType extends AbstractType
 {
@@ -19,6 +20,12 @@ class CommentaireType extends AbstractType
             ->add('contenu_com', TextareaType::class, [
                 'label' => 'Votre commentaire',
                 'attr' => ['class' => 'form-control', 'rows' => 4],
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Le contenu du post est obligatoire.',
+                        'groups' => ['create','update']
+                    ]),
+                ],
             ])
             
         ;
