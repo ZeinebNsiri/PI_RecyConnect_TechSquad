@@ -3,6 +3,7 @@
 {% block title %} Liste des Workshops {% endblock %}
 
 {% block body %}
+<main id="main" class="main">
 
 {% for message in app.session.flashBag.get('success') %}
     <div class="alert alert-success bg-success text-light border-0 alert-dismissible fade show" role="alert">
@@ -96,4 +97,5 @@
         <!-- Fin de la Table -->
     </div>
 </div>
+</main>
 {% endblock %}

@@ -3,6 +3,7 @@
 {% block title %} Modifier Workshop {% endblock %}
 
 {% block body %}
+<main id="main" class="main">
   <div class="card">
         <div class="card-body">
             <h5 class="card-title">Modifier Workshop</h5>
@@ -76,6 +77,7 @@
             Votre navigateur ne supporte pas la lecture des vidéos.
         </video>
     {% endif %}
+    
 </div>
 
 
@@ -89,4 +91,5 @@
             {{ form_end(form) }}
         </div>
    </div>
+   </main>
 {% endblock %}
