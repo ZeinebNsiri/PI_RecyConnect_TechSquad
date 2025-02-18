@@ -1,55 +1,60 @@
-{% extends 'base.html.twig' %}
+{% extends 'basecnx.html.twig' %}
 
-{% block title %}{{ evenement.nomEvent }}{% endblock %}
+{% block title %}Nos Événements{% endblock %}
 
 {% block body %}
-<!-- Page Header Start -->
-<div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s" style="background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('{{ asset('uploads/images/carousel-1.jpg') }}') center/cover no-repeat;">
-  <div class="container text-center py-5">
-    <h1 class="display-3 text-white mb-3 fw-bold animated fadeInDown">{{ evenement.nomEvent }}</h1>
-    <nav aria-label="breadcrumb">
-      <ol class="breadcrumb justify-content-center bg-transparent p-2 rounded animated fadeInUp">
-        <li class="breadcrumb-item">
-          <a href="{{ path('events_list') }}" class="text-decoration-none text-light fw-semibold">Événements</a>
-        </li>
-        <li class="breadcrumb-item text-light active" aria-current="page">{{ evenement.nomEvent }}</li>
-      </ol>
-    </nav>
+  <!-- Page Header Start -->
+  <div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s" style="background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('{{ asset('uploads/images/carousel-1.jpg') }}') center/cover no-repeat;">
+    <div class="container text-center py-5">
+      <h1 class="display-3 text-white mb-4 animated slideInDown">Nos Événements</h1>
+      <nav aria-label="breadcrumb animated slideInDown">
+        <ol class="breadcrumb justify-content-center mb-0">
+          <li class="breadcrumb-item"><a href="{{ path('events_list') }}">Événements</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Nos Événements</li>
+        </ol>
+      </nav>
+    </div>
   </div>
-</div>
-<!-- Page Header End -->
+  <!-- Page Header End -->
 
-
-  <!-- Event Detail Section Start -->
-  <section id="event-detail" class="event-detail section">
+  <section id="events" class="events section">
     <div class="container" data-aos="fade-up">
-      <div class="row">
-        <div class="col-lg-8">
-          <div class="event-detail-img">
-            <img src="{{ asset('uploads/images/' ~ evenement.imageEvent) }}" alt="{{ evenement.nomEvent }}">
+      <div class="row g-4">
+        {% for event in events %}
+          <div class="col-lg-6 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+            <div class="card">
+              <div class="card-img">
+                <img src="{{ asset(event.getImageEvent() ? 'uploads/images/' ~ event.getImageEvent() : 'img/default.jpg') }}" alt="{{ event.getNomEvent() }}" class="img-fluid">
+              </div>
+              <div class="card-body">
+                <h5 class="card-title">
+                  <a href="{{ path('event_show', {'id': event.getId()}) }}">{{ event.getNomEvent() }}</a>
+                </h5>
+                <p class="fst-italic text-center">{{ event.getDateEvent()|date('l d F \\à H\\hi') }}</p>
+                <p class="card-text">{{ event.getDescriptionEvent() }}</p>
+              </div>
+            </div>
           </div>
-          <div class="event-detail-content">
-            <h2>{{ evenement.nomEvent }}</h2>
-            <p class="event-date">{{ evenement.dateEvent|date('l j F Y') }} à {{ evenement.heureEvent|date('H:i') }}</p>
-            <p>{{ evenement.descriptionEvent }}</p>
-            <p>Ne manquez pas cette occasion de faire la différence ! Inscrivez-vous dès maintenant pour réserver votre place.</p>
-            <a href="{{ path('events_list', {'id': evenement.id}) }}" class="btn btn-primary">S'inscrire</a>
-            <a href="{{ path('events_list') }}" class="btn btn-secondary">Retour à la liste</a>          </div>  
-        </div>
-        <div class="col-lg-4">
-          <div class="event-detail-sidebar">
-            <h3>Détails de l'événement</h3>
-            <ul>
-              <li><strong>Date :</strong> {{ evenement.dateEvent|date('d-m-Y') }}</li>
-              <li><strong>Heure :</strong> {{ evenement.heureEvent|date('H:i') }}</li>
-              <li><strong>Lieu :</strong> {{ evenement.lieuEvent }}</li>
-              <li><strong>Capacité :</strong> {{ evenement.capacite }}</li>
-              <li><strong>Places restantes :</strong> {{ evenement.nbRestant }}</li>
-             
-            </ul>
-          </div>
-        </div>
+        {% else %}
+          <p class="text-center">Aucun événement disponible pour le moment.</p>
+        {% endfor %}
       </div>
     </div>
   </section>
+
+  <style>
+    .card-img img {
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+    }
+    .card {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .card-body {
+      flex: 1;
+    }
+  </style>
 {% endblock %}

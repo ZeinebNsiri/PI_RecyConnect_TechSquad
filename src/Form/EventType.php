@@ -11,30 +11,95 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class EventType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('nomEvent', TextType::class)
-            ->add('descriptionEvent', TextareaType::class)
-            ->add('lieuEvent', TextType::class)
-            ->add('dateEvent', DateType::class, ['widget' => 'single_text'])
-            ->add('heureEvent', TimeType::class, ['widget' => 'single_text'])
-            ->add('capacite', IntegerType::class)
+            ->add('nomEvent', TextType::class, [
+                'empty_data' => '',
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'Le nom de l\'événement est requis.']),
+                    new Assert\Length(['max' => 255, 'maxMessage' => 'Le nom ne peut pas dépasser 255 caractères.']),
+                ]
+            ])
+            ->add('descriptionEvent', TextareaType::class, [
+                'empty_data' => '',
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'La description est requise.']),
+                ]
+            ])
+            ->add('lieuEvent', TextType::class, [
+                'empty_data' => '',
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'Le lieu de l\'événement est requis.']),
+                ]
+            ])
+            ->add('dateEvent', DateType::class, [
+                'widget' => 'single_text',
+                'empty_data' => null,  // Set this to null to allow empty values
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'La date de l\'événement est requise.']),
+                    new Assert\GreaterThanOrEqual([
+                        'value' => 'today',
+                        'message' => 'La date doit être future ou aujourd\'hui.',
+                    ]),
+                ]
+            ])   
+            ->add('heureEvent', TimeType::class, [
+                'widget' => 'single_text', // Use a single text input for time
+                'required' => true, // Make it required
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'L\'heure de l\'événement est requise.']),
+                ],
+            ])
+
+            ->add('capacite', IntegerType::class, [
+                'empty_data' => '',
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'La capacité est requise.']),
+                    new Assert\Positive(['message' => 'La capacité doit être un nombre positif.']),
+                ]
+            ])
             ->add('imageEvent', FileType::class, [
                 'label' => 'Image de l\'événement',
                 'mapped' => false,
-                'required' => false, 
-                'data_class' => null, 
+                'empty_data' => '',
+                'required' => true,
+                'constraints' => [
+                    new  Assert\NotBlank([
+                        'message' => 'Veuillez télécharger une image',
+                        'groups' => ['create']
+                    ]),
+                    new Assert\File([
+                        'maxSize' => '2M',
+                        'mimeTypes' => [
+                            'image/jpeg',
+                            'image/png',
+                            'image/webp',
+                        ],
+                        'mimeTypesMessage' => 'Veuillez télécharger une image valide (JPG, PNG, WebP)',
+                    ]),
+                ],
+               
+            ])
+        
+            ->add('submit', SubmitType::class, [
+                'label' => 'Créer l\'événement',
+                'attr' => ['class' => 'btn btn-primary'],
             ]);
-    }
-
+        }
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Evenement::class,
         ]);
     }
+    
 }

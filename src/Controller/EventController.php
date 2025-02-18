@@ -1,20 +1,15 @@
 <?php
+
 namespace App\Controller;
 
 use App\Entity\Evenement;
-use App\Entity\Reservation;
 use App\Form\EventType;
-use App\Form\RegistrationType;
 use App\Repository\EvenementRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
-
 
 class EventController extends AbstractController
 {
@@ -42,104 +37,110 @@ class EventController extends AbstractController
         ]);
     }
 
-#[Route('/admin/events', name: 'admin_events')]
-public function adminIndex(EntityManagerInterface $entityManager): Response 
-{
-    $events = $entityManager->getRepository(Evenement::class)->findAll();
+    #[Route('/admin/events', name: 'admin_events')]
+    public function adminIndex(EntityManagerInterface $entityManager): Response
+    {
+        $events = $entityManager->getRepository(Evenement::class)->findAll();
 
-    return $this->render('event/admin_events.html.twig', [
-        'events' => $events,
-    ]);
-}
-
-#[Route('/admin/events/create', name: 'create_event', methods: ['GET', 'POST'])]
-
-public function create(Request $request, EntityManagerInterface $entityManager): Response
-{
-$event = new Evenement();
-$form = $this->createForm(EventType::class, $event);
-$form->handleRequest($request);
-
-if ($form->isSubmitted() && $form->isValid()) {
-    $imageFile = $form->get('imageEvent')->getData();
-
-    if ($imageFile) {
-      
-        $newFilename = $imageFile->getClientOriginalName();
-        $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/images';
-
-    if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0777, true);
-}
-
-        $imageFile->move(
-            $this->getParameter('photo_dir'),
-            $newFilename
-        );
-
-        $event->setImageEvent($newFilename);
+        return $this->render('event/admin_events.html.twig', [
+            'events' => $events,
+        ]);
     }
-    $event->setNbRestant($event->getCapacite());
 
-    $entityManager->persist($event);
-    $entityManager->flush();
+    #[Route('/admin/events/create', name: 'create_event', methods: ['GET', 'POST'])]
+    public function create(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $event = new Evenement();
+        $form = $this->createForm(EventType::class, $event);
+        $form->handleRequest($request);
 
-    $this->addFlash('success', 'L\'événement a été créé avec succès.');
+        if ($form->isSubmitted() && $form->isValid()) {
+            $imageFile = $form->get('imageEvent')->getData();
 
-    return $this->redirectToRoute('admin_events');
-}
+            if ($imageFile) {
+                $newFilename = uniqid() . '.' . $imageFile->guessExtension();
+                $uploadDir = $this->getParameter('images_directory');
 
-return $this->render('event/create.html.twig', [
-    'form' => $form->createView(),
-]);
-}
+                if (!file_exists($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
+                }
 
-#[Route('/admin/events/edit/{id}', name: 'edit_event', methods: ['GET', 'POST'])]
-public function edit(Request $request, Evenement $event, EntityManagerInterface $entityManager): Response
-{
-    $oldImage = $event->getImageEvent();
-
-    $form = $this->createForm(EventType::class, $event);
-    $form->handleRequest($request);
-
-    if ($form->isSubmitted() && $form->isValid()) {
-        $imageFile = $form->get('imageEvent')->getData();
-
-        if ($imageFile) {
-            $newFilename = $imageFile->getClientOriginalName();
-
-            $imageFile->move(
-                $this->getParameter('photo_dir'),
-                $newFilename
-            );
-
-            $event->setImageEvent($newFilename);
-
-            if ($oldImage && file_exists($this->getParameter('photo_dir').'/'.$oldImage)) {
-                unlink($this->getParameter('photo_dir').'/'.$oldImage);
+                $imageFile->move($uploadDir, $newFilename);
+                $event->setImageEvent($newFilename);
             }
-        } else {
-            $event->setImageEvent($oldImage);
+
+            $event->setNbRestant($event->getCapacite());
+
+            $entityManager->persist($event);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'L\'événement a été créé avec succès.');
+            return $this->redirectToRoute('admin_events');
         }
 
-        $entityManager->flush();
-
-        $this->addFlash('success', 'L\'événement a été mis à jour avec succès.');
-        return $this->redirectToRoute('admin_events');
+        return $this->render('event/create.html.twig', [
+            'form' => $form->createView(),
+        ]);
     }
 
-    return $this->render('event/edit.html.twig', [
-        'form' => $form->createView(),
-        'event' => $event,
-    ]);
-}
+    #[Route('/admin/events/edit/{id}', name: 'edit_event', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Evenement $event, EntityManagerInterface $entityManager): Response
+    {
+        $oldImage = $event->getImageEvent();
 
-#[Route('/admin/events/delete/{id}', name: 'delete_event', methods: ['POST'])]
-public function delete(Evenement $event, EntityManagerInterface $entityManager): Response
-{
-    $entityManager->remove($event);
-    $entityManager->flush();
+        $form = $this->createForm(EventType::class, $event);
+        $form->handleRequest($request);
 
-    return $this->redirectToRoute('admin_events');
-}
+        if ($form->isSubmitted() && $form->isValid()) {
+            $imageFile = $form->get('imageEvent')->getData();
+
+            if ($imageFile) {
+                $newFilename = uniqid() . '.' . $imageFile->guessExtension();
+                $uploadDir = $this->getParameter('images_directory');
+
+                $imageFile->move($uploadDir, $newFilename);
+                $event->setImageEvent($newFilename);
+
+                if ($oldImage && file_exists($uploadDir . '/' . $oldImage)) {
+                    unlink($uploadDir . '/' . $oldImage);
+                }
+            } else {
+                $event->setImageEvent($oldImage);
+            }
+
+            $entityManager->flush();
+
+            $this->addFlash('success', 'L\'événement a été mis à jour avec succès.');
+            return $this->redirectToRoute('admin_events');
+        }
+
+        return $this->render('event/edit.html.twig', [
+            'form' => $form->createView(),
+            'event' => $event,
+        ]);
+    }
+
+    #[Route('/admin/events/delete/{id}', name: 'delete_event_confirm', methods: ['GET'])]
+    public function deleteConfirmEvent(Evenement $event): Response
+    {
+        return $this->render('event/delete_confirm.html.twig', [
+            'event' => $event,
+        ]);
+    }
+
+    #[Route('/admin/events/delete/{id}/confirm', name: 'delete_event', methods: ['POST'])]
+    public function deleteEvent(Request $request, Evenement $event, EntityManagerInterface $entityManager): Response
+    {
+        $submittedToken = $request->request->get('_token');
+        if (!$this->isCsrfTokenValid('delete' . $event->getId(), $submittedToken)) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+            return $this->redirectToRoute('admin_events');
+        }
+
+        $entityManager->remove($event);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'L\'événement a été supprimé avec succès.');
+        return $this->redirectToRoute('admin_events');
+    }
 }

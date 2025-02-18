@@ -1,0 +1,28 @@
+{% extends 'base2.html.twig' %}
+
+{% block title %}Confirmer la Suppression{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">Confirmer la Suppression</h1>
+
+        <div class="card p-4 shadow-sm">
+            <h4>Êtes-vous sûr de vouloir supprimer cet reservation ?</h4>
+            <p><strong>reservation pour l'evenement:</strong> {{ reservation.event.getNomEvent() }}</p>
+            <p><strong>Nom participant:</strong> {{ reservation.getNom() }}</p>
+            <p><strong>Nombre de places reservée:</strong> {{ reservation.getNbPlaces()}}</p>
+
+            <p><strong>Status:</strong> {{ reservation.getStatus()}}</p>
+
+            <form action="{{ path('admin_reservation_delete', {'id': reservation.id}) }}" method="POST" class="mt-4">
+                <input type="hidden" name="_method" value="POST">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reservation.id) }}">
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-danger">Oui, supprimer</button>
+                    <a href="{{ path('admin_reservations_list') }}" class="btn btn-secondary">Non, annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'basecnx.html.twig' %}
+
+{% block title %}Mes Réservations{% endblock %}
+
+{% block body %}
+    <section id="reservations" class="reservations section">
+        <div class="container" data-aos="fade-up">
+            <h2 class="text-center mb-4">Mes Réservations</h2>
+
+            {% if reservations is empty %}
+                <p class="text-center">Aucune réservation trouvée.</p>
+            {% else %}
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Événement</th>
+                                <th>Nom</th>
+                                <th>Date</th>
+                                <th>Lieu</th>
+                                <th>Places réservées</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reservation in reservations %}
+                                <tr>
+                                    <td>{{ reservation.getEventId().getNomEvent() }}</td>
+                                    <td>{{ reservation.getNom() }}</td>
+                                    <td>{{ reservation.getEventId().getNomEvent() }}</td>
+                                    <td>{{ reservation.getEventId().getDateEvent()|date('d/m/Y') }} à {{ reservation.getEventId().getHeureEvent()|date('H:i') }}</td>
+                                    <td>{{ reservation.getEventId().getLieuEvent() }}</td>
+                                    <td>{{ reservation.getNbPlaces() }}</td>
+                                    <td>
+                                        <a href="{{ path('reservation_edit', {'id': reservation.id}) }}" class="btn btn-primary btn-sm">Modifier</a>
+                                        <a href="{{ path('reservation_cancel_confirm', {'id': reservation.id}) }}" class="btn btn-danger">
+                                            <i class="fas fa-times"></i> Annuler
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

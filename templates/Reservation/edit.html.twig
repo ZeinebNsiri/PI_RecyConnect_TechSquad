@@ -1,0 +1,114 @@
+{% extends 'basecnx.html.twig' %}
+
+{% block title %}Modifier Réservation{% endblock %}
+
+{% block body %}
+    <section id="edit-reservation" class="edit-reservation section">
+        <div class="container" data-aos="fade-up">
+            <h2 class="text-center mb-4">Modifier Réservation</h2>
+
+            <div class="card p-4 shadow-sm border-0">
+                {{ form_start(form, {'attr': {'class': 'form', 'novalidate': 'novalidate'}}) }}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form_label(form.nom, 'Nom complet') }}
+                                {{ form_widget(form.nom, {
+                                    'attr': {
+                                        'required': 'required',
+                                        'minlength': '2',
+                                        'maxlength': '255',
+                                        'class': 'form-input'
+                                    }
+                                }) }}
+                                <div class="invalid-feedback">
+                                    Veuillez entrer un nom valide (entre 2 et 255 caractères).
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form_label(form.email, 'Adresse email') }}
+                                {{ form_widget(form.email, {
+                                    'attr': {
+                                        'required': 'required',
+                                        'type': 'email',
+                                        'class': 'form-input'
+                                    }
+                                }) }}
+                                <div class="invalid-feedback">
+                                    Veuillez entrer une adresse email valide.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form_label(form.num_tel, 'Numéro de téléphone') }}
+                                {{ form_widget(form.num_tel, {
+                                    'attr': {
+                                        'required': 'required',
+                                        'pattern': '^[0-9]{8,15}$',
+                                        'class': 'form-input'
+                                    }
+                                }) }}
+                                <div class="invalid-feedback">
+                                    Veuillez entrer un numéro de téléphone valide (8 à 15 chiffres).
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form_label(form.nb_places, 'Nombre de places') }}
+                                {{ form_widget(form.nb_places, {
+                                    'attr': {
+                                        'required': 'required',
+                                        'min': 1,
+                                        'max': reservation.getEventId().getNbRestant() + reservation.getNbPlaces(),
+                                        'class': 'form-input'
+                                    }
+                                }) }}
+                                <div class="invalid-feedback">
+                                    Veuillez entrer un nombre de places valide.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                {{ form_label(form.demandes_speciales, 'Demandes spéciales') }}
+                                {{ form_widget(form.demandes_speciales, {
+                                    'attr': {
+                                        'rows': 4,
+                                        'class': 'form-input'
+                                    }
+                                }) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-success">Enregistrer</button>
+                        <a href="{{ path('reservations_list') }}" class="btn btn-secondary">Retour</a>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // JavaScript for client-side validation
+        (function () {
+            'use strict';
+
+            // Fetch the form and apply validation
+            const form = document.querySelector('.form');
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+
+                form.classList.add('was-validated');
+            }, false);
+        })();
+    </script>
+{% endblock %}

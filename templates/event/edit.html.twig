@@ -1,29 +1,94 @@
 {% extends 'base2.html.twig' %}
 
-{% block title %}Modifier l'Événement{% endblock %}
+{% block title %} Modifier Événement {% endblock %}
 
 {% block body %}
-    
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Modifier Événement</h5>
 
-        <div class="card p-4 shadow-sm border-0">
-            {{ form_start(form) }}
-                <div class="row g-3">
-                    {% for field in form %}
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                {{ form_label(field) }}
-                                {{ form_widget(field, {'attr': {'class': 'form-control'}}) }}
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-                
-                <div class="text-center mt-4">
-                    <button type="submit" class="btn btn-primary btn-lg">
-                        <i class="fas fa-save"></i> Mettre à jour
-                    </button>
-                </div>
-            {{ form_end(form) }}
+      {{ form_start(form, {
+          'attr': {
+              'novalidate': 'novalidate',
+              'class': 'row g-3',
+              'enctype': 'multipart/form-data'
+          }
+      }) }}
+
+      {% if form.vars.errors|length > 0 %}
+        <div class="alert alert-danger">
+          {% for error in form.vars.errors %}
+            <p>{{ error.message }}</p>
+          {% endfor %}
         </div>
+      {% endif %}
+
+      <div class="col-12">
+        {{ form_label(form.nomEvent) }}
+        {{ form_widget(form.nomEvent, {'attr': {'class': 'form-control'}}) }}
+        {% for error in form.nomEvent.vars.errors %}
+          <div class="alert alert-danger">{{ error.message }}</div>
+        {% endfor %}
+      </div>
+
+      <div class="col-12">
+        {{ form_label(form.descriptionEvent) }}
+        {{ form_widget(form.descriptionEvent, {'attr': {'class': 'form-control'}}) }}
+        {% for error in form.descriptionEvent.vars.errors %}
+          <div class="alert alert-danger">{{ error.message }}</div>
+        {% endfor %}
+      </div>
+
+      <div class="col-12">
+        {{ form_label(form.lieuEvent) }}
+        {{ form_widget(form.lieuEvent, {'attr': {'class': 'form-control'}}) }}
+        {% for error in form.lieuEvent.vars.errors %}
+          <div class="alert alert-danger">{{ error.message }}</div>
+        {% endfor %}
+      </div>
+
+      <div class="col-12">
+        {{ form_label(form.dateEvent) }}
+        {{ form_widget(form.dateEvent, {'attr': {'class': 'form-control'}}) }}
+        {% for error in form.dateEvent.vars.errors %}
+          <div class="alert alert-danger">{{ error.message }}</div>
+        {% endfor %}
+      </div>
+         <div class="col-12">
+        {{ form_label(form.heureEvent) }}
+        {{ form_widget(form.heureEvent, {'attr': {'class': 'form-control'}}) }}
+        {% for error in form.heureEvent.vars.errors %}
+          <div class="alert alert-danger">{{ error.message }}</div>
+        {% endfor %}
+      </div>
+
+      <div class="col-12">
+        {{ form_label(form.imageEvent) }}
+        {{ form_widget(form.imageEvent, {'attr': {'class': 'form-control'}}) }}
+        {% for error in form.imageEvent.vars.errors %}
+          <div class="alert alert-danger">{{ error.message }}</div>
+        {% endfor %}
+
+        {% if event.imageEvent %}
+          <p>Image actuelle :</p>
+          <img src="{{ asset('uploads/images/' ~ event.imageEvent) }}" alt="Image de l'événement" height="90px" width="100px">
+        {% endif %}
+      </div>
+
+      <div class="col-12">
+        {{ form_label(form.capacite) }}
+        {{ form_widget(form.capacite, {'attr': {'class': 'form-control'}}) }}
+        {% for error in form.capacite.vars.errors %}
+          <div class="alert alert-danger">{{ error.message }}</div>
+        {% endfor %}
+      </div>
+
+      <div class="col-12 text-center d-flex justify-content-center gap-2 mt-3">
+        {{ form_widget(form.submit, {'label': 'Modifier', 'attr': {'class': 'btn btn-success'}}) }}
+        <a href="{{ path('admin_events') }}" class="btn btn-secondary">Annuler</a>
+      </div>
+
+      {{ form_end(form) }}
     </div>
+  </div>
 {% endblock %}

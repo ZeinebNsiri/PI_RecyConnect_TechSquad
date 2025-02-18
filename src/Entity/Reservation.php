@@ -6,6 +6,8 @@ use App\Repository\ReservationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
 #[ORM\Entity(repositoryClass: ReservationRepository::class)]
 class Reservation
 {
@@ -15,21 +17,94 @@ class Reservation
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: 'Le nombre de places est obligatoire.')]
+    #[Assert\Positive(message: 'Le nombre de places doit être un nombre positif.')]
     private ?int $nb_places = null;
 
     #[ORM\ManyToOne(inversedBy: 'reservations')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Evenement $event_id = null;
+    private ?Evenement $event = null;
 
     #[ORM\ManyToOne(inversedBy: 'reservations')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Utilisateur $user_id = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $created_atRes = null;
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Le nom est obligatoire.')]
+    #[Assert\Length(
+        min: 2,
+        max: 255,
+        minMessage: 'Le nom doit comporter au moins {{ limit }} caractères.',
+        maxMessage: 'Le nom ne peut pas dépasser {{ limit }} caractères.'
+    )]
+    private ?string $nom = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $updated_atRes = null;
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'L\'email est obligatoire.')]
+    #[Assert\Email(message: 'L\'email "{{ value }}" n\'est pas valide.')]
+    private ?string $email = null;
+
+    #[ORM\Column(length: 20)]
+    #[Assert\NotBlank(message: 'Le numéro de téléphone est obligatoire.')]
+    #[Assert\Regex(
+        pattern: '/^[0-9]{8,15}$/',
+        message: 'Le numéro de téléphone doit contenir entre 8 et 15 chiffres.'
+    )]
+    private ?string $num_tel = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $demandes_speciales = null;
+
+    #[ORM\Column(type: 'string', length: 20)]
+    private string $status = 'active';
+
+    public function getNom(): ?string
+    {
+        return $this->nom;
+    }
+
+    public function setNom(string $nom): static
+    {
+        $this->nom = $nom;
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): static
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    public function getNumTel(): ?string
+    {
+        return $this->num_tel;
+    }
+
+    public function setNumTel(string $num_tel): static
+    {
+        $this->num_tel = $num_tel;
+
+        return $this;
+    }
+
+    public function getDemandesSpeciales(): ?string
+    {
+        return $this->demandes_speciales;
+    }
+
+    public function setDemandesSpeciales(?string $demandes_speciales): static
+    {
+        $this->demandes_speciales = $demandes_speciales;
+
+        return $this;
+    }
 
     public function getId(): ?int
     {
@@ -50,12 +125,12 @@ class Reservation
 
     public function getEventId(): ?Evenement
     {
-        return $this->event_id;
+        return $this->event;
     }
 
-    public function setEventId(?Evenement $event_id): static
+    public function setEventId(?Evenement $event): static
     {
-        $this->event_id = $event_id;
+        $this->event = $event;
 
         return $this;
     }
@@ -70,29 +145,22 @@ class Reservation
         $this->user_id = $user_id;
 
         return $this;
+    return $this;
     }
 
-    public function getCreatedAtRes(): ?\DateTimeInterface
+  
+    public function getStatus(): string
     {
-        return $this->created_atRes;
+        return $this->status;
     }
 
-    public function setCreatedAtRes(\DateTimeInterface $created_atRes): static
+    public function setStatus(string $status): self
     {
-        $this->created_atRes = $created_atRes;
-
+        $this->status = $status;
         return $this;
     }
 
-    public function getUpdatedAtRes(): ?\DateTimeInterface
-    {
-        return $this->updated_atRes;
-    }
+    
+  
 
-    public function setUpdatedAtRes(?\DateTimeInterface $updated_atRes): static
-    {
-        $this->updated_atRes = $updated_atRes;
-
-        return $this;
-    }
 }

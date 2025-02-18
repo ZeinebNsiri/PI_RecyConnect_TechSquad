@@ -1,0 +1,118 @@
+{% extends 'basecnx.html.twig' %}
+
+{% block title %}Inscription à l'événement - RecyConnect{% endblock %}
+
+{% block body %}
+    <section id="inscription" class="inscription section">
+        <div class="container" data-aos="fade-up">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="inscription-form">
+                        <h2>Inscription à l'événement : {{ evenement.nomEvent }}</h2>
+                        <p>Date : {{ evenement.dateEvent|date('d/m/Y') }} à {{ evenement.heureEvent|date('H:i') }}</p>
+                        <p>Lieu : {{ evenement.lieuEvent }}</p>
+                        <p>Places restantes : {{ evenement.nbRestant }}</p>
+
+                        {{ form_start(form, {'attr': {'class': 'form', 'novalidate': 'novalidate'}}) }}
+                            <!-- Personal Information -->
+                            <div class="form-group">
+                                {{ form_label(form.nom, 'Nom complet') }}
+                                {{ form_widget(form.nom, {
+                                    'attr': {
+                                        'placeholder': 'Entrez votre nom complet',
+                                        'required': 'required',
+                                        'minlength': 2,
+                                        'maxlength': 255
+                                    }
+                                }) }}
+                                <div class="invalid-feedback">
+                                    Veuillez entrer un nom valide (2 à 255 caractères).
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_label(form.email, 'Adresse email') }}
+                                {{ form_widget(form.email, {
+                                    'attr': {
+                                        'placeholder': 'Entrez votre adresse email',
+                                        'required': 'required',
+                                        'type': 'email'
+                                    }
+                                }) }}
+                                <div class="invalid-feedback">
+                                    Veuillez entrer une adresse email valide.
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_label(form.num_tel, 'Numéro de téléphone') }}
+                                {{ form_widget(form.num_tel, {
+                                    'attr': {
+                                        'placeholder': 'Entrez votre numéro de téléphone',
+                                        'required': 'required',
+                                        'pattern': '^[0-9]{8,15}$',
+                                        'title': 'Le numéro de téléphone doit contenir entre 8 et 15 chiffres.'
+                                    }
+                                }) }}
+                                <div class="invalid-feedback">
+                                    Veuillez entrer un numéro de téléphone valide (8 à 15 chiffres).
+                                </div>
+                            </div>
+
+                            <!-- Number of Places -->
+                            <div class="form-group">
+                                {{ form_label(form.nb_places, 'Nombre de places à réserver') }}
+                                {{ form_widget(form.nb_places, {
+                                    'attr': {
+                                        'placeholder': 'Entrez le nombre de places',
+                                        'required': 'required',
+                                        'min': 1,
+                                        'max': evenement.nbRestant
+                                    }
+                                }) }}
+                                <div class="invalid-feedback">
+                                    Veuillez entrer un nombre de places valide (entre 1 et {{ evenement.nbRestant }}).
+                                </div>
+                            </div>
+
+                            <!-- Special Requests -->
+                            <div class="form-group">
+                                {{ form_label(form.demandes_speciales, 'Demandes spéciales') }}
+                                {{ form_widget(form.demandes_speciales, {
+                                    'attr': {
+                                        'placeholder': 'Avez-vous des demandes spéciales ?',
+                                        'rows': 4
+                                    }
+                                }) }}
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="form-group text-center mt-4">
+                                <button type="submit" class="btn btn-primary">S'inscrire</button>
+                                <a href="{{ path('event_show', {'id': evenement.id}) }}" class="btn btn-secondary">Retour</a>
+                            </div>
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Add JavaScript for enhanced client-side validation -->
+    <script>
+        (function () {
+            'use strict';
+
+            // Fetch the form we want to apply custom validation styles to
+            const form = document.querySelector('.form');
+
+            // Prevent submission if there are invalid fields
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+
+                form.classList.add('was-validated');
+            }, false);
+        })();
+    </script>
+{% endblock %}
