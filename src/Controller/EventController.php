@@ -66,8 +66,13 @@ class EventController extends AbstractController
                 }
 
                 $imageFile->move($uploadDir, $newFilename);
-                $event->setImageEvent($newFilename);
-            }
+                $event->setImageEvent( $newFilename);
+            } else {
+                $event -> setImageEvent('uploads/images/defaultpng');  
+                }
+            
+
+
 
             $event->setNbRestant($event->getCapacite());
 

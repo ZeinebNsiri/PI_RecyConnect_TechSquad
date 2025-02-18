@@ -35,7 +35,11 @@
                             <td>{{ event.lieuEvent }}</td>
                             <td>{{ event.dateEvent|date('Y-m-d') }}</td>
                             <td>{{ event.heureEvent|date('H:i') }}</td>
-                            <td>{{ event.imageEvent }}</td>
+                            <td> 
+                            <div class="col-md-12">
+                    <img id="previewImage" src="#" alt="Aperçu de l'image" class="img-thumbnail d-none" style="max-width: 200px; max-height: 200px;">
+                </div>
+            </div>
     
                             <td>
                                 <a href="{{ path('edit_event', {'id': event.id}) }}" class="btn btn-warning btn-sm">

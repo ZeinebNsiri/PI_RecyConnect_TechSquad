@@ -17,21 +17,28 @@
   </div>
   <!-- Page Header End -->
 
-  <section id="events" class="events section">
-    <div class="container" data-aos="fade-up">
+  <!-- Events Section Start -->
+  <div class="container-xxl py-5">
+    <div class="container">
+      <div class="text-center mx-auto wow fadeInUp" data-wow-delay="0.1s" style="max-width: 500px;">
+        <p class="fs-5 fw-bold text-primary">Nos Événements</p>
+        <h1 class="display-5 mb-5">Découvrez Nos Événements</h1>
+      </div>
       <div class="row g-4">
         {% for event in events %}
-          <div class="col-lg-6 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
-            <div class="card">
-              <div class="card-img">
-                <img src="{{ asset(event.getImageEvent() ? 'uploads/images/' ~ event.getImageEvent() : 'img/default.jpg') }}" alt="{{ event.getNomEvent() }}" class="img-fluid">
+          <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+            <div class="service-item rounded d-flex h-100">
+              <div class="service-img rounded">
+                <img class="img-fluid" src="{{ asset(event.getImageEvent() ? 'uploads/images/' ~ event.getImageEvent() : 'img/default.jpg') }}" alt="{{ event.getNomEvent() }}">
               </div>
-              <div class="card-body">
-                <h5 class="card-title">
-                  <a href="{{ path('event_show', {'id': event.getId()}) }}">{{ event.getNomEvent() }}</a>
-                </h5>
+              <div class="service-text rounded p-5">
+                <div class="btn-square rounded-circle mx-auto mb-3">
+                  <img class="img-fluid" src="{{ asset('uploads/images/mainlogo.png') }}" alt="Icon">
+                </div>
+                <h4 class="mb-3">{{ event.getNomEvent() }}</h4>
+                <p class="mb-4">{{ event.getDescriptionEvent() }}</p>
                 <p class="fst-italic text-center">{{ event.getDateEvent()|date('l d F \\à H\\hi') }}</p>
-                <p class="card-text">{{ event.getDescriptionEvent() }}</p>
+                <a class="btn btn-sm" href="{{ path('event_show', {'id': event.getId()}) }}"><i class="fa fa-plus text-primary me-2"></i>En savoir plus</a>
               </div>
             </div>
           </div>
@@ -40,20 +47,21 @@
         {% endfor %}
       </div>
     </div>
-  </section>
+  </div>
+  <!-- Events Section End -->
 
   <style>
-    .card-img img {
+    .service-img img {
       width: 100%;
-      height: auto;
+      height: 200px; /* Adjust height as needed */
       object-fit: cover;
     }
-    .card {
+    .service-item {
       display: flex;
       flex-direction: column;
       height: 100%;
     }
-    .card-body {
+    .service-text {
       flex: 1;
     }
   </style>

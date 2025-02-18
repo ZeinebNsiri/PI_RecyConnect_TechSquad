@@ -67,7 +67,7 @@ class EventType extends AbstractType
                     new Assert\Positive(['message' => 'La capacité doit être un nombre positif.']),
                 ]
             ])
-            ->add('imageEvent', FileType::class, [
+            ->add('imageEvent', FileType::class,[      
                 'label' => 'Image de l\'événement',
                 'mapped' => false,
                 'empty_data' => '',
