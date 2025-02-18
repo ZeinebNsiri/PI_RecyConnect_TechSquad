@@ -277,11 +277,12 @@
                         <i class="bi bi-circle"></i><span>Articles</span>
                         </a>
                     </li>
-                    <li>
-                        <a href="forms-validation.html">
+                   <li>
+                    <a href="{{ path('liste_commandes') }}">
                         <i class="bi bi-circle"></i><span>Commandes</span>
-                        </a>
-                    </li>
+                    </a>
+                </li>
+
                     </ul>
                 </li><!-- End Forms Nav -->
 
@@ -323,9 +324,9 @@
                 </ul>
 
             </aside><!-- End Sidebar-->
-            <main id="main" class="main">
+            
                  {% block body %}{% endblock %}
-            </main>
+            
                     <!-- ======= Footer ======= -->
             <footer id="footer" class="footer">
                 <div class="copyright">
