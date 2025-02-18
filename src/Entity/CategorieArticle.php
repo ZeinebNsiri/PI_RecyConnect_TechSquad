@@ -2,12 +2,15 @@
 
 namespace App\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
 use App\Repository\CategorieArticleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: CategorieArticleRepository::class)]
+#[UniqueEntity(fields: ['nom_categorie'], message: 'Ce nom de la catégorie existe déjà!')]
 class CategorieArticle
 {
     #[ORM\Id]
@@ -15,7 +18,7 @@ class CategorieArticle
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $nom_categorie = null;
 
     #[ORM\Column(length: 255)]
@@ -105,4 +108,11 @@ class CategorieArticle
 
         return $this;
     }
+
+    public function __toString()
+{
+    return $this->getNomCategorie();
+}
+
+
 }

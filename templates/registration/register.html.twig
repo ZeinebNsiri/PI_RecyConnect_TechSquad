@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription</title>
+    
+    <!-- Fichiers CSS propres à cette page -->
+    <link rel="stylesheet" href="{{ asset('login_signup/css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('login_signup/vendors/css/vendor.bundle.base.css') }}">
+    <link rel="shortcut icon" href="{{ asset('login_signup/images/favicon.png') }}" />
+    <link rel="stylesheet" href="{{ asset('login_signup/vendors/mdi/css/materialdesignicons.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('login_signup/vendors/css/vendor.bundle.base.css') }}">
+</head>
+<body>
+    <div class="container-scroller">
+      <div class="container-fluid page-body-wrapper full-page-wrapper">
+        <div class="row w-100 m-0">
+          <div class="content-wrapper full-page-wrapper d-flex align-items-center auth login-bg">
+            <div class="card col-lg-4 mx-auto">
+              <div class="card-body px-5 py-5">
+                <h3 class="card-title text-left mb-3">S'inscrire</h3>
+                {% for type, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ type }} alert-dismissible fade show d-flex justify-content-between align-items-center" role="alert">
+                            <span>{{ message }}</span>
+                            <span class="close-icon" style="cursor: pointer; margin-left: 10px;" data-bs-dismiss="alert" aria-label="Close">
+                                X
+                            </span>
+
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+
+                <!-- Boutons radio pour choisir le type d'utilisateur -->
+                <div class="form-group d-flex justify-content-center">
+                
+                    <label class="form-check-label mx-3">
+                        <input type="radio" name="typeUtilisateur" value="particulier"
+                               {% if type == 'particulier' %}checked{% endif %}
+                               onclick="switchForm('particulier')">
+                        Particulier
+                    </label>
+                    <label class="form-check-label mx-3">
+                        <input type="radio" name="typeUtilisateur" value="professionnel"
+                               {% if type == 'professionnel' %}checked{% endif %}
+                               onclick="switchForm('professionnel')">
+                        Professionnel
+                    </label>
+                </div>
+
+                <!-- Formulaire -->
+                <div id="form-container">
+                    {{ form_start(form,{attr:{novalidate:'novalidate'}}) }}
+
+                    <!-- Champs Nom et Prénom (uniquement pour Particulier) -->
+                    {% if type == 'particulier' %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Nom</label>
+                                    {{ form_widget(form.nom_user, { 'attr': {'class': 'form-control p_input'} }) }}
+                                    <div class="text-danger">
+                                     {{ form_errors(form.nom_user) }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Prénom</label>
+                                    {{ form_widget(form.prenom, { 'attr': {'class': 'form-control p_input'} }) }}
+                                    <div class="text-danger">
+                                    {{ form_errors(form.prenom) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% if type == 'professionnel' %}
+                    <div class="form-group">
+                        <label>Nom</label>
+                        {{ form_widget(form.nom_user, { 'attr': {'class': 'form-control p_input'} }) }}
+                        <div class="text-danger">
+                            {{ form_errors(form.nom_user) }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+
+                    <!-- Champ Matricule Fiscale (uniquement pour Professionnel) -->
+                    {% if type == 'professionnel' %}
+                        <div class="form-group">
+                            <label>Matricule fiscale</label>
+                            {{ form_widget(form.matricule_fiscale, { 'attr': {'class': 'form-control p_input'} }) }}
+                            <div class="text-danger">
+                            {{ form_errors(form.matricule_fiscale) }}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <!-- Champ Téléphone -->
+                    <div class="form-group">
+                        <label>Numéro de téléphone</label>
+                        {{ form_widget(form.numTel, { 'attr': {'class': 'form-control p_input', 'placeholder': 'Ex: +216 12 345 678'} }) }}
+                        <div class="text-danger">
+                            {{ form_errors(form.numTel) }}
+                        </div>
+                    </div>
+
+                    <!-- Champ Email -->
+                    <div class="form-group">
+                        <label>Email</label>
+                        {{ form_widget(form.email, { 'attr': {'class': 'form-control p_input'} }) }}
+                        <div class="text-danger">
+                            {{ form_errors(form.email) }}
+                        </div>
+                    </div>
+
+                    <!-- Champ Mot de passe -->
+                    <div class="form-group">
+                        <label>Mot de passe</label>
+                        {{ form_widget(form.password.first, { 'attr': {'class': 'form-control p_input'} }) }}
+                    </div>
+
+                    <!-- Champ Confirmation du mot de passe -->
+                    <div class="form-group">
+                        <label>Confirmer le mot de passe</label>
+                        {{ form_widget(form.password.second, { 'attr': {'class': 'form-control p_input'} }) }}
+                    </div>
+                    <div class="text-danger">
+                            {{ form_errors(form.password.first) }}
+                    </div>
+
+                    <!-- Bouton S'inscrire -->
+                    <div class="text-center">
+                        {{ form_widget(form.submit, { 'attr': {'class': 'btn btn-primary btn-block enter-btn'} }) }}
+                    </div>
+                    
+
+                    {{ form_end(form) }}
+                </div>
+                {% if type == 'particulier' %}
+                <!-- Boutons Facebook et Google -->
+                <div class="d-flex mt-3">
+                    <button class="btn btn-facebook col mr-2">
+                        <i class="mdi mdi-facebook"></i> Facebook
+                    </button>
+                    <button class="btn btn-google col">
+                        <i class="mdi mdi-google"></i> Google
+                    </button>
+                </div>
+                {% endif %}
+
+                <!-- Lien vers la connexion -->
+                <p class="sign-up text-center mt-3" style="color: #205719;">
+                    Vous avez déjà un compte? <a href="{{ path('app_login') }}">Se Connecter</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    
+    <script>
+        
+        function switchForm(type) {
+            window.location.href = "{{ path('app_register') }}?type=" + type;
+            
+        }
+    </script>
+
+    <!-- Scripts JavaScript spécifiques -->
+    <script src="{{ asset('login_signup/vendors/js/vendor.bundle.base.js') }}"></script>
+    <script src="{{ asset('login_signup/js/misc.js') }}"></script>
+    
+
+   
+</body>
+</html>

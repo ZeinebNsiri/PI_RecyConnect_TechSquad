@@ -1,0 +1,154 @@
+{% extends 'basecnx.html.twig' %}
+
+{% block title %}Hello ArticleController!{% endblock %}
+
+{% block body %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+</style>
+
+
+{% for message in app.flashes('success') %}
+    <div class="alert alert-success alert-dismissible fade show d-flex justify-content-between align-items-center" role="alert">
+        <span>{{ message }}</span>
+        <span class="close-icon" style="cursor: pointer;" data-bs-dismiss="alert" aria-label="Close">
+            X
+        </span>
+    </div>
+{% endfor %}
+<div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s">
+        <div class="container text-center py-5">
+          <p class="fs-5 fw-bold text-white">CHEZ RECYCONNECT</p>
+          <h1 class="display-3 text-white mb-4 animated slideInDown">Vous trouverez une grande variété d'articles à recycler</h1>
+        </div>
+</div>
+
+
+<div class="container-xxl py-5">
+  <div class="container">
+      <div class="text-center mx-auto wow fadeInUp" data-wow-delay="0.1s" style="max-width: 500px;">
+          <a class="btn btn-primary py-3 px-4" href={{ path('app_addArticle') }} style="margin-bottom: 50px;">Proposez un article </a>
+          <a class="btn btn-primary py-3 px-4" href={{ path('app_article_mine') }} style="margin-bottom: 50px;">Mes articles </a>
+      </div>
+      
+        {% set selectedCategory = selectedCategory|default(null) %}
+
+        <div class="row wow fadeInUp" data-wow-delay="0.3s">
+            <div class="col-12 text-center">
+                <ul class="list-inline rounded mb-5" id="portfolio-flters">
+                    <li class="mx-2 {% if selectedCategory is null %}active{% endif %}" data-filter="*">
+                        <a href="{{ path('app_articles_by_category') }}">Tous les articles</a>
+                    </li>
+                    {% for categorie in categories %}
+                        <li class="mx-2 {% if selectedCategory == categorie.id %}active{% endif %}">
+                            <a href="{{ path('app_articles_by_category', { 'categoryId': categorie.id }) }}">{{ categorie.nomCategorie }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        
+        <section >  
+        <div class="container" data-aos="fade-up">
+            <div class="row g-4">
+                {% for article in articles %}
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-img">
+                                <img src="{{ asset('uploads/photo_dir/' ~ article.imageArticle ) }}" alt="{{ article.nomArticle }}" class="img-fluid">
+                            </div>
+                            <div class="card-body">
+                               <h5 class="card-title">
+                                        {{ article.nomArticle }} <br> PU: {{ article.prix }} TN/Kg | {{ article.quantiteArticle }} Kg
+                                </h5>
+                                <td><a class="detail-button" href='{{ path ('detail_article' , { 'id':article.id } ) }}'>Details<i class="fas fa-info-circle"></i></a><td>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="text-center">Aucun article disponible pour le moment.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+
+    </div>
+</div>
+<!-- Projects End -->
+
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .card-img img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+  .card:hover {
+    transform: scale(1.05); /* Agrandit légèrement la carte */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); /* Ajoute une ombre plus marquée */
+  }
+
+  .card-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    width: 100%;
+  }
+
+  .card-title a {
+    text-decoration: none;
+    color: green;
+    font-weight: bold;
+    font-size: 18px;
+  }
+
+  .detail-button {
+    background-color: green;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s;
+  }
+
+  .detail-button:hover {
+    background-color: darkgreen;
+  }
+
+  .detail-button i {
+    margin-left: 5px;
+  }
+
+  .row.g-4 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    justify-content: center;
+  }
+
+  .col-lg-6.col-md-6 {
+    width: 100%;
+  }
+</style>
+
+
+{% endblock %}

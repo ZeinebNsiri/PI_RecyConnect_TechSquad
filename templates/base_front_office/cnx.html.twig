@@ -10,7 +10,9 @@
 
 <div class="example-wrapper">
     <h1>Hello {{ controller_name }}! ✅</h1>
-
+    {% for role in app.user.roles %}
+    {{role}}
+    {% endfor %}
     This friendly message is coming from:
     <ul>
         <li>Your controller at <code>C:/Users/azizz/OneDrive/Bureau/Recyconnect/src/Controller/Base2backOfficeController.php</code></li>

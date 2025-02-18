@@ -11,6 +11,7 @@ final class BaseFrontOfficeController extends AbstractController
     #[Route('/base/front/office', name: 'app_base_front_office')]
     public function index(): Response
     {
+        
         return $this->render('base_front_office/index.html.twig', [
             'controller_name' => 'BaseFrontOfficeController',
         ]);
@@ -19,6 +20,7 @@ final class BaseFrontOfficeController extends AbstractController
     #[Route('/base/front/office/cnx', name: 'app_base_front_office_cnx')]
     public function cnx(): Response
     {
+        
         return $this->render('base_front_office/cnx.html.twig', [
             'controller_name' => 'BaseFrontOfficeController',
         ]);

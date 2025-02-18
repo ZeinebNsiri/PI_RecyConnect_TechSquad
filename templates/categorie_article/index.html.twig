@@ -1,0 +1,136 @@
+{% extends 'base2.html.twig' %}
+
+{% block title %}Hello CategorieArticleController!{% endblock %}
+
+{% block body %}
+
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+</style>
+
+<main id="main" class="main">
+
+{% for message in app.flashes('success') %}
+    <div class="alert alert-success alert-dismissible fade show d-flex justify-content-between align-items-center" role="alert">
+        <span>{{ message }}</span>
+        <span class="close-icon" style="cursor: pointer;" data-bs-dismiss="alert" aria-label="Close">
+            X
+        </span>
+    </div>
+{% endfor %}
+
+{% for error in form.vars.errors %}
+    <div class="alert alert-danger">{{ error.message }}</div>
+{% endfor %}
+
+
+
+    <div class="pagetitle">
+        <h4>Les catégories des articles proposés</h4>
+    </div><!-- End Page Title -->
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Ajouter une nouvelle catégorie</h5>
+
+            <!-- Floating Labels Form -->
+            {{ form_start(form, {'attr': {'class': 'row g-3', 'novalidate': 'novalidate', 'enctype': 'multipart/form-data'} }) }}
+            
+            <div class="col-md-12">
+                <div class="form-floating">
+                    {{ form_widget(form.nom_categorie, {'attr': {'class': 'form-control', 'placeholder': 'Nom de la catégorie', 'id': 'floatingName'}}) }}
+                      {% if form.nom_categorie.vars.errors|length > 0 %}
+                        <div class="alert alert-danger mt-2">
+                            {{ form_errors(form.nom_categorie) }}
+                        </div>
+                    {% endif %}
+                    
+                    <label for="floatingName">Nom de la catégorie</label>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-floating">
+                    {{ form_widget(form.description_categorie, {'attr': {'class': 'form-control', 'placeholder': 'Description', 'id': 'floatingTextarea', 'style': 'height: 100px;'}}) }}
+                    {% if form.description_categorie.vars.errors|length > 0 %}
+                        <div class="alert alert-danger mt-2">
+                            {{ form_errors(form.description_categorie) }}
+                        </div>
+                    {% endif %}
+                    <label for="floatingTextarea">Description</label>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-floating">
+                    {{ form_widget(form.image_categorie, {'attr': {'class': 'form-control', 'id': 'floatingImage', 'accept': 'image/*'}}) }}
+                    {% if form.image_categorie.vars.errors|length > 0 %}
+                        <div class="alert alert-danger mt-2">
+                            {{ form_errors(form.image_categorie) }}
+                        </div>
+                    {% endif %}
+                    <label for="floatingImage">Image</label>
+                </div>
+                
+            </div>
+
+            <div class="text-center">
+                {{ form_widget(form.Confirmer, {'attr': {'class': 'btn btn-success ' }}) }}
+                {{ form_widget(form.Annuler, {'attr': {'class': 'btn btn-secondary', 'type': 'reset'}}) }}
+            </div>
+
+            {{ form_end(form) }}
+            <!-- End floating Labels Form -->
+
+        </div>
+    </div>
+
+    <section class="section dashboard">
+        <div class="row">
+            <div class="col-12">
+                <div class="card top-selling overflow-auto">
+
+                    <div class="card-body pb-0">
+                        <h5 class="card-title">Toutes les catégories</h5>
+                        <table class="table table-borderless">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Id</th>
+                                    <th scope="col">Logo</th>
+                                    <th scope="col">Catégorie</th>
+                                    <th scope="col">Nombre d'articles</th>
+                                    <th scope="col"></th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for categorie in categories %}
+                                    <tr>
+                                        <td> {{categorie.id}} </td>
+                                        <td><img src="{{ asset('uploads/photo_dir/' ~ categorie.imageCategorie) }}" alt="Image" height: 60px width: 70px  ></td>
+                                        <td>{{ categorie.nomCategorie }} </td>
+                                        <td>{{ articleCounts[categorie.id] }}</td>
+                                        <td class="fw-bold">
+                                            <a href='{{ path ('pp_updateCategorieArticle' , { 'id':categorie.id } ) }}' class="btn btn-success">Modifier</a>
+                                        </td>
+                                        <td>
+                                            <a href='{{ path ('app_deleteCategorieArticle' , { 'id':categorie.id } ) }}' class="btn btn-danger">Supprimer</a>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="3" class="text-center">Aucune catégorie trouvée</td>
+                                    </tr>
+                                
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+{% endblock %}

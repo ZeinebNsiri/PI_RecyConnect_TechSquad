@@ -82,7 +82,7 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <div class="navbar-nav ms-auto p-4 p-lg-0">
                 <a href="index.html" class="nav-item nav-link active">Acceuil</a>
-                <a href="about.html" class="nav-item nav-link">Nos produits</a>
+                <a href={{ path('app_article') }} class="nav-item nav-link">Nos produits</a>
                 <a href="service.html" class="nav-item nav-link">Évènements</a>
                 <a href="{{ path('app_workshops') }}"class="nav-item nav-link">Workshops</a>
                 
@@ -103,21 +103,56 @@
                  
 
                 <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-                  <img src="{{asset('frontOffice/img/team-1.jpg')}}" alt="Profile" class="rounded-circle">
-                  <span class="d-none d-md-block dropdown-toggle ps-2">Samar Touil</span>
+                  <img src="{{ asset(app.user.PhotoProfil ? 'uploads/profile_dir/' ~ app.user.PhotoProfil : 'backOffice/assets/img/profile.jpg') }}" alt="Profile" class="rounded-circle">
+                  {% if 'ROLE_USER' in app.user.roles %}
+                  {% if user is defined %}
+                  <span class="d-none d-md-block dropdown-toggle ps-2">{{user.prenom}} {{user.nomUser}}</span>
+                  {% else %}
+                  <span class="d-none d-md-block dropdown-toggle ps-2">{{app.user.prenom}} {{app.user.nomUser}}</span>
+                  {% endif %}
+                  {% endif %}
+                  {% if 'ROLE_PROFESSIONNEL' in app.user.roles %}
+                  {% if user is defined %}
+                  <span class="d-none d-md-block dropdown-toggle ps-2">{{user.nomUser}}</span>
+                  {% else %}
+                <span class="d-none d-md-block dropdown-toggle ps-2">{{app.user.nomUser}}</span>
+                  {% endif %}
+                  {% endif %}
                 </a><!-- End Profile Iamge Icon -->
       
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                   <li class="dropdown-header">
-                    <h6>Samar Touil</h6>
-                    <span>Particulier</span>
+                    {% if 'ROLE_USER' in app.user.roles %}
+                    {% if user is defined %}
+                    <h6>{{user.prenom}} {{user.nomUser}}</h6>
+                    {% else %}
+                    <h6>{{app.user.prenom}} {{app.user.nomUser}}</h6>
+                    {% endif %}
+                    {% endif %}
+
+                    {% if 'ROLE_PROFESSIONNEL' in app.user.roles %}
+                    {% if user is defined %}
+                    <h6>{{user.nomUser}}</h6>
+                    {% else %}
+                    <h6>{{app.user.nomUser}}</h6>
+                    {% endif %}
+                    {% endif %}
+
+                
+                    {% if 'ROLE_USER' in app.user.roles %}
+                    <span class="checked">Particulier</span>
+                    {% endif %}
+                    
+                    {% if 'ROLE_PROFESSIONNEL' in app.user.roles %}
+                    <span class="checked">Professionnel</span>
+                    {% endif %}
                   </li>
                   <li>
                     <hr class="dropdown-divider">
                   </li>
       
                   <li>
-                    <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
+                    <a class="dropdown-item d-flex align-items-center" href="{{path('app_profile',{ 'id':app.user.id })}}">
                       <i class="bi bi-person"></i>
                       <span>Mon Profil</span>
                     </a>
@@ -142,7 +177,7 @@
                   </li>
       
                   <li>
-                    <a class="dropdown-item d-flex align-items-center" href="#">
+                    <a class="dropdown-item d-flex align-items-center" href="{{path('app_logout')}}">
                       <i class="bi bi-box-arrow-right"></i>
                       <span>Se Déconnecter</span>
                     </a>

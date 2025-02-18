@@ -1,0 +1,105 @@
+{% extends 'base2.html.twig' %}
+
+{% block title %}Recyconnect{% endblock %}
+
+{% block body %}
+<main id="main" class="main">
+<section class="section dashboard">
+        <div class="row">
+            <div class="col-12">
+                {% for type, messages in app.flashes %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ type }} alert-dismissible fade show d-flex justify-content-between align-items-center" role="alert">
+                                <span>{{ message }}</span>
+                                <span class="close-icon" style="cursor: pointer; margin-left: 10px;" data-bs-dismiss="alert" aria-label="Close">
+                                    X
+                                </span>
+
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                <div class="card top-selling overflow-auto">
+
+                    <div class="card-body pb-0">
+                        <h5 class="card-title">Liste des utilisateurs</h5>
+                        <div class="col-md-2">
+                  
+                <select id="inputState" class="form-select" onchange="filterUsers(this.value)">
+                    <option value="all">Tous les utilisateurs</option>
+                    <option value="particuliers">Les particuliers</option>
+                    <option value="professionnels">Les professionnels</option>
+                </select>
+
+
+                </div>
+
+                        <table class="table table-borderless" id="userTable">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Nom utilisateur</th>
+                                    <th scope="col">Prénom_utilisateur</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Role</th>
+                                    <th scope="col">Matricule_fiscale</th>
+                                    <th scope="col">Etat</th>
+                                    <th scope="col"></th>
+                                    <th scope="col"></th>
+                                    
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                    <tr>
+                                        <th scope="row">{{ loop.index }}</th>
+
+                                        <td>{{user.nomUser}}</td>
+                                        <td>{{user.prenom}}</td>
+                                        <td>{{user.email}}</td>
+                                        {% if 'ROLE_PROFESSIONNEL' in user.roles %}
+                                        <td>Professionnel</td>
+                                        {% endif %}
+                                        {% if 'ROLE_USER' in user.roles %}
+                                        <td>Particulier</td>
+                                        {% endif %}
+                                        <td>{{user.matriculeFiscale}}</td>
+                                        {% if user.Status == true %}
+                                        <td>Activé</td>
+                                        {% endif %}
+                                        {% if user.Status == false %}
+                                        <td>Désactivé</td>
+                                        {% endif %}
+                                        <td class="fw-bold">
+                                            <a href='{{path('app_Activer',{ 'id':user.id })}}' class="btn btn-success">Activer</a>
+                                        </td>
+                                        <td>
+                                            <a href='{{path('app_Desactiver',{ 'id':user.id })}}' class="btn btn-danger">Désactiver</a>
+                                        </td>
+                                        
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    </main>
+
+    <script>
+        function filterUsers(type) {
+            fetch('/Liste/utilisateurs/' + type)
+                .then(response => response.text())
+                .then(data => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(data, 'text/html');
+                    const newTable = doc.querySelector('#userTable').innerHTML;
+                    document.querySelector('#userTable').innerHTML = newTable;
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
+
+    
+{% endblock %}
