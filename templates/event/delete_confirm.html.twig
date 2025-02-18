@@ -1,0 +1,26 @@
+{% extends 'base2.html.twig' %}
+
+{% block title %}Confirmer la Suppression{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">Confirmer la Suppression</h1>
+
+        <div class="card p-4 shadow-sm">
+            <h4>Êtes-vous sûr de vouloir supprimer cet événement ?</h4>
+            <p><strong>Événement:</strong> {{ event.nomEvent }}</p>
+            <p><strong>Date:</strong> {{ event.dateEvent|date('d/m/Y') }}</p>
+            <p><strong>Lieu:</strong> {{ event.lieuEvent }}</p>
+
+            <form action="{{ path('delete_event', {'id': event.id}) }}" method="POST" class="mt-4">
+                <input type="hidden" name="_method" value="POST">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event.id) }}">
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-danger">Oui, supprimer</button>
+                    <a href="{{ path('admin_events') }}" class="btn btn-secondary">Non, annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

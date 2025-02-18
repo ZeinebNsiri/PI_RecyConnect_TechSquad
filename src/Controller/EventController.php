@@ -59,7 +59,7 @@ class EventController extends AbstractController
 
             if ($imageFile) {
                 $newFilename = uniqid() . '.' . $imageFile->guessExtension();
-                $uploadDir = $this->getParameter('images_directory');
+                $uploadDir = $this->getParameter('photo_dir');
 
                 if (!file_exists($uploadDir)) {
                     mkdir($uploadDir, 0777, true);
@@ -96,7 +96,7 @@ class EventController extends AbstractController
 
             if ($imageFile) {
                 $newFilename = uniqid() . '.' . $imageFile->guessExtension();
-                $uploadDir = $this->getParameter('images_directory');
+                $uploadDir = $this->getParameter('photo_dir');
 
                 $imageFile->move($uploadDir, $newFilename);
                 $event->setImageEvent($newFilename);

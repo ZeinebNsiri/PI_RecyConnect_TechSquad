@@ -8,7 +8,7 @@
 
         <div class="card p-4 shadow-sm">
             <h4>Êtes-vous sûr de vouloir supprimer cet reservation ?</h4>
-            <p><strong>reservation pour l'evenement:</strong> {{ reservation.event.getNomEvent() }}</p>
+            <p><strong>reservation pour l'evenement:</strong> {{ reservation.getEventId().getNomEvent() }}</p>
             <p><strong>Nom participant:</strong> {{ reservation.getNom() }}</p>
             <p><strong>Nombre de places reservée:</strong> {{ reservation.getNbPlaces()}}</p>
 
@@ -23,6 +23,6 @@
                     <a href="{{ path('admin_reservations_list') }}" class="btn btn-secondary">Non, annuler</a>
                 </div>
             </form>
-        </div>
+    </div>
     </div>
 {% endblock %}
