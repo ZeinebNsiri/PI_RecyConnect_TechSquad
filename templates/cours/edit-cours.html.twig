@@ -25,7 +25,7 @@
 
 
              <div class="col-12">
-                {{ form_label(form.imageCours, 'Image du cours') }}
+                {{ form_label(form.imageCours, 'Image du workshop') }}
                 {{ form_widget(form.imageCours, {'attr': {'class': 'form-control'}}) }}
                 {% for error in form.imageCours.vars.errors %}
                     <div class="alert alert-danger">{{ error.message }}</div>
@@ -38,7 +38,7 @@
             </div>
 
             <div class="col-12">
-                {{ form_label(form.titreCours, 'Nom du cours') }}
+                {{ form_label(form.titreCours, 'Titre du workshop') }}
                 {{ form_widget(form.titreCours, {'attr': {'class': 'form-control'}}) }}
                 {% for error in form.titreCours.vars.errors %}
                     <div class="alert alert-danger">{{ error.message }}</div>
@@ -46,7 +46,7 @@
             </div>
 
             <div class="col-12">
-                {{ form_label(form.categorieC, 'Catégorie du cours') }}
+                {{ form_label(form.categorieC, 'Catégorie du workshop') }}
                 {{ form_widget(form.categorieC, {'attr': {'class': 'form-select'}}) }}
                 {% for error in form.categorieC.vars.errors %}
                     <div class="alert alert-danger">{{ error.message }}</div>
@@ -54,19 +54,20 @@
             </div>
 
             <div class="col-12">
-                {{ form_label(form.descriptionCours, 'Description du cours') }}
+                {{ form_label(form.descriptionCours, 'Description du workshop') }}
                 {{ form_widget(form.descriptionCours, {'attr': {'class': 'form-control'}}) }}
                 {% for error in form.descriptionCours.vars.errors %}
                     <div class="alert alert-danger">{{ error.message }}</div>
                 {% endfor %}
             </div>
 
-            <div class="col-12">
-    {{ form_label(form.video, 'Vidéo du cours (optionnelle)') }}
-    {{ form_widget(form.video, {'attr': {'class': 'form-control'}}) }}
-    {% for error in form.video.vars.errors %}
-        <div class="alert alert-danger">{{ error.message }}</div>
-    {% endfor %}
+                <div class="col-12">
+                {{ form_label(form.video, 'Vidéo du workshop (optionnelle)') }}
+                {{ form_widget(form.video, {'attr': {'class': 'form-control'}}) }}
+                {% for error in form.video.vars.errors %}
+                    <div class="alert alert-danger">{{ error.message }}</div>
+                {% endfor %}
+                
 
     {% if cours.video %}
         <p>Vidéo actuelle :</p>

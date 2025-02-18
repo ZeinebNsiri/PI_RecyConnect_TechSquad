@@ -68,7 +68,7 @@ class CategoriecoursController extends AbstractController
                     $em = $manager->getManager();
                     $em->flush();
 
-                    // Ajouter le message flash SEULEMENT si la modification a eu lieu
+                    
                     $this->addFlash('success', 'La catégorie a été modifiée avec succès.');
 
                     return $this->redirectToRoute('app_allcategoriecours');
@@ -80,7 +80,7 @@ class CategoriecoursController extends AbstractController
             }
 
     
-
+        //delete
         #[Route('/deletecategorie/{id}', name: 'app_deletecategoriecours')]
         public function deleteCategorie(ManagerRegistry $manager, CategorieCoursRepository $repo, $id )
         {
