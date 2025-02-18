@@ -15,12 +15,24 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 final class CoursController extends AbstractController
 {
     #[Route('/cours', name: 'app_allcours')]
-    public function getAllcours(CoursRepository $repo)
+    public function getAllcours(CoursRepository $repo, Request $request): Response
     {
-        $cours= $repo->findAll();
-        return $this->render('cours/index.html.twig',
-        ['cours'=>$cours]);
+    $selectedCategory = $request->query->get('category'); // Get the selected category from URL
+    $categories = $repo->findUniqueCategories(); // Fetch all unique categories
+
+    if ($selectedCategory) {
+        $cours = $repo->findByCategory($selectedCategory); // Filter courses if category is selected
+    } else {
+        $cours = $repo->findAll(); // Otherwise, get all courses
     }
+
+    return $this->render('cours/index.html.twig', [
+        'cours' => $cours,
+        'categories' => array_column($categories, 'nomCategorie'), // Extract category names
+        'selectedCategory' => $selectedCategory,
+    ]);
+    }
+
 
     //add
     #[Route('/add-cours', name: 'appcours_add')]
@@ -198,6 +210,8 @@ final class CoursController extends AbstractController
                         ]);
                     }
 
+
+                
                     #[Route('/workshopsg', name: 'app_workshopsg')]
                     public function showWorkshopsguest(CoursRepository $coursRepository, Request $request): Response
                     {
