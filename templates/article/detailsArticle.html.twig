@@ -22,8 +22,9 @@
                 <h5 class=" ">{{ article.localisationArticle }}</h5>
                 <img class="img-fluid rounded" data-wow-delay="0.1s" src="{{ asset('uploads/photo_dir/' ~ article.imageArticle ) }}">
             </div>
-            <div class="col-lg-6 col-md-7 wow fadeInUp" data-wow-delay="0.3s">
-                <h1 class="display-5 mb-4">Description de l'article</h1>
+            <div class="col-lg-6 col-md-7 wow fadeInUp" >
+                <h1 class="display-6 mb-4">Propriétaire: {{ article.utilisateur.nomUser }} {{ article.utilisateur.prenom }}</h1>
+                <h3 class="display-7 mb-4">Description de l'article</h3>
                 <p class="mb-4">{{ article.descriptionArticle }}</p>
                 <a class="btn btn-primary py-3 px-4" href="">Commander</a>
             </div>

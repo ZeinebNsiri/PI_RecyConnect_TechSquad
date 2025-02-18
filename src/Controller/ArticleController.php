@@ -209,17 +209,44 @@ final class ArticleController extends AbstractController
         return $this-> redirectToRoute('app_article_admin'); 
     }
 
-#[Route('/articles/{categoryId}', name: 'app_articles_by_category')]
-public function articlesByCategory(ArticleRepository $articleRepository, $categoryId, CategorieArticleRepository $repository): Response
-{
-    $articles = $articleRepository->findBy(['categorie' => $categoryId]);
+    #[Route('/articles/{categoryId?}', name: 'app_articles_by_category')]
+    public function articlesByCategory(ArticleRepository $articleRepository, $categoryId = null, CategorieArticleRepository $repository): Response
+    {
+        if ($categoryId) {
+            $articles = $articleRepository->findByCategory($categoryId);
+        } else {
+            $articles = $articleRepository->findAll(); 
+        }
     
-    $categories = $repository -> findAll();
+        $categories = $repository->findAll();
+    
+        return $this->render('article/index.html.twig', [
+            'articles' => $articles,
+            'categories' => $categories,
+            'selectedCategory' => $categoryId,
+        ]);
+    }
 
-    return $this->render('article/index.html.twig', [
-        'articles' => $articles,
-        'categories' => $categories,
-    ]);
-}
+    #[Route('/mesarticles/{categoryId?}', name: 'app_articles_by_category2')]
+    public function articlesByCategorymes(ArticleRepository $articleRepository, $categoryId = null, CategorieArticleRepository $repository): Response
+    {
+        if ($categoryId) {
+            $articles = $articleRepository->findByCategory($categoryId);
+        } else {
+            $articles = $articleRepository->findAll(); 
+        }
+    
+        $categories = $repository->findAll();
+    
+        return $this->render('article/mesArticle.html.twig', [
+            'articles' => $articles,
+            'categories' => $categories,
+            'selectedCategory' => $categoryId,
+        ]);
+    }
+    
+    
+    
+    
     
 }

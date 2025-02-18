@@ -119,11 +119,11 @@ final class CategorieArticleController extends AbstractController
         $em= $manager->getManager();
         $categorieArticle = $repo->find($id);
 
-      $form = $this->createForm(CategoriArticleType::class,$categorieArticle);
+      $form = $this->createForm(CategoriArticleType::class,$categorieArticle , ['validation_groups' => ['update']]);
 
       $form->handleRequest($req);
 
-      if($form->isSubmitted())
+      if($form->isSubmitted() && $form->isValid())
 
       {
         $image_categorie = $form->get('image_categorie')->getData();
@@ -154,6 +154,11 @@ final class CategorieArticleController extends AbstractController
       return $this->redirectToRoute('app_addCategorieArticle');
 
       }
+      if ($form->isSubmitted() && !$form->isValid()) {
+        foreach ($form->getErrors(true) as $error) {
+            $this->addFlash('error', $error->getMessage());
+        }
+        }
       return $this->render('categorie_article/updateCatArt.html.twig',[
 
         'form'=>$form->createView(),

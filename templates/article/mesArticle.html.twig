@@ -27,16 +27,22 @@
           
       </div>
       
-      <div class="row wow fadeInUp" data-wow-delay="0.3s">
-          <div class="col-12 text-center">
-              <ul class="list-inline rounded mb-5" id="portfolio-flters">
-                  <li class="mx-2 active" data-filter="*">Tous les articles</li>
-                  {% for categorie in categories %}
-                  <li class="mx-2" >{{ categorie.nomCategorie }}</li>
-                  {% endfor %}
-              </ul>
-          </div>
-      </div>
+        {% set selectedCategory = selectedCategory|default(null) %}
+
+        <div class="row wow fadeInUp" data-wow-delay="0.3s">
+            <div class="col-12 text-center">
+                <ul class="list-inline rounded mb-5" id="portfolio-flters">
+                    <li class="mx-2 {% if selectedCategory is null %}active{% endif %}" data-filter="*">
+                        <a href="{{ path('app_articles_by_category2') }}">Tous les articles</a>
+                    </li>
+                    {% for categorie in categories %}
+                        <li class="mx-2 {% if selectedCategory == categorie.id %}active{% endif %}">
+                            <a href="{{ path('app_articles_by_category2', { 'categoryId': categorie.id }) }}">{{ categorie.nomCategorie }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
         
         <section >  
         <div class="container" data-aos="fade-up">
@@ -49,7 +55,7 @@
                             </div>
                             <div class="card-body">
                                <h5 class="card-title">
-                                        <a href="#">{{ article.nomArticle }} <br> PU: {{ article.prix }} TN/Kg | {{ article.quantiteArticle }} Kg</a>
+                                        {{ article.nomArticle }} <br> PU: {{ article.prix }} TN/Kg | {{ article.quantiteArticle }} Kg
                                 </h5>
                                 <td><a class="detail-button" href='{{ path ('pp_updateArticle' , { 'id':article.id } ) }}'><i class="fas fa-edit"></i></a><td>
                                 <td><a class="detail-button" href='{{ path ('app_deleteArticle' , { 'id':article.id } ) }}'><i class="fas fa-trash"></i></a><td>
@@ -77,6 +83,11 @@
     width: 100%;
     height: 100%;
     margin: 0 auto;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .card:hover {
+    transform: scale(1.05); /* Agrandit légèrement la carte */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); /* Ajoute une ombre plus marquée */
   }
 
   .card-img img {

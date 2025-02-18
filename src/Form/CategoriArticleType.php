@@ -19,18 +19,22 @@ class CategoriArticleType extends AbstractType
     {
         $builder
             ->add('nom_categorie', TextType::class, [
+                'empty_data' => '',
+                'required' => true,
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Le nom de la catégorie est obligatoire',
-                        'groups' => ['create']
+                        'groups' => ['create', 'update']
                     ])
                 ]
             ])
             ->add('description_categorie', TextType::class, [
+                'empty_data' => '',
+                'required' => true,
                 'constraints' => [
                     new NotBlank([
                         'message' => 'La description de la catégorie est obligatoire!',
-                        'groups' => ['create']
+                        'groups' => ['create', 'update']
                     ])
                 ]
             ])

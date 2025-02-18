@@ -33,16 +33,23 @@
           <a class="btn btn-primary py-3 px-4" href={{ path('app_article_mine') }} style="margin-bottom: 50px;">Mes articles </a>
       </div>
       
-      <div class="row wow fadeInUp" data-wow-delay="0.3s">
-          <div class="col-12 text-center">
-              <ul class="list-inline rounded mb-5" id="portfolio-flters">
-                  <li class="mx-2 active" data-filter="*" ><a href={{ path('app_article') }}>Tous les articles</a></li>
-                  {% for categorie in categories %}
-                    <li class="mx-2"><a href="{{ path('app_articles_by_category', { 'categoryId': categorie.id }) }}">{{ categorie.nomCategorie }}</a></li>
-                  {% endfor %}
-              </ul>
-          </div>
-      </div>
+        {% set selectedCategory = selectedCategory|default(null) %}
+
+        <div class="row wow fadeInUp" data-wow-delay="0.3s">
+            <div class="col-12 text-center">
+                <ul class="list-inline rounded mb-5" id="portfolio-flters">
+                    <li class="mx-2 {% if selectedCategory is null %}active{% endif %}" data-filter="*">
+                        <a href="{{ path('app_articles_by_category') }}">Tous les articles</a>
+                    </li>
+                    {% for categorie in categories %}
+                        <li class="mx-2 {% if selectedCategory == categorie.id %}active{% endif %}">
+                            <a href="{{ path('app_articles_by_category', { 'categoryId': categorie.id }) }}">{{ categorie.nomCategorie }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
         
         <section >  
         <div class="container" data-aos="fade-up">
@@ -55,9 +62,9 @@
                             </div>
                             <div class="card-body">
                                <h5 class="card-title">
-                                        <a href="#">{{ article.nomArticle }} <br> PU: {{ article.prix }} TN/Kg | {{ article.quantiteArticle }} Kg</a>
+                                        {{ article.nomArticle }} <br> PU: {{ article.prix }} TN/Kg | {{ article.quantiteArticle }} Kg
                                 </h5>
-                                <td><a class="detail-button" href='{{ path ('detail_article' , { 'id':article.id } ) }}'>Detail<i class="fas fa-info-circle"></i></a><td>
+                                <td><a class="detail-button" href='{{ path ('detail_article' , { 'id':article.id } ) }}'>Details<i class="fas fa-info-circle"></i></a><td>
                             </div>
                         </div>
                     </div>
@@ -82,6 +89,7 @@
     width: 100%;
     height: 100%;
     margin: 0 auto;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
 
   .card-img img {
@@ -89,6 +97,10 @@
     height: 250px;
     object-fit: cover;
     border-radius: 10px;
+  }
+  .card:hover {
+    transform: scale(1.05); /* Agrandit légèrement la carte */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); /* Ajoute une ombre plus marquée */
   }
 
   .card-body {

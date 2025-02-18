@@ -7,6 +7,9 @@
     .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
     .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
 </style>
+{% for error in form.vars.errors %}
+    <div class="alert alert-danger">{{ error.message }}</div>
+{% endfor %}
 
 <main id="main" class="main">
 
@@ -24,7 +27,11 @@
             <div class="col-md-12">
                 <div class="form-floating">
                     {{ form_widget(form.nom_categorie, {'attr': {'class': 'form-control', 'placeholder': 'Nom de la catégorie', 'id': 'floatingName'}}) }}
-                 
+                    {% if form.nom_categorie.vars.errors|length > 0 %}
+                        <div class="alert alert-danger mt-2">
+                            {{ form_errors(form.nom_categorie) }}
+                        </div>
+                    {% endif %}
                     <label for="floatingName">Nom de la catégorie</label>
                 </div>
             </div>
@@ -32,6 +39,11 @@
             <div class="col-12">
                 <div class="form-floating">
                     {{ form_widget(form.description_categorie, {'attr': {'class': 'form-control', 'placeholder': 'Description', 'id': 'floatingTextarea', 'style': 'height: 100px;'}}) }}
+                    {% if form.description_categorie.vars.errors|length > 0 %}
+                        <div class="alert alert-danger mt-2">
+                            {{ form_errors(form.description_categorie) }}
+                        </div>
+                    {% endif %}
                     <label for="floatingTextarea">Description</label>
                 </div>
             </div>
