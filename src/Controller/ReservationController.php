@@ -146,31 +146,6 @@ class ReservationController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/reservation/{id}/edit', name: 'admin_reservation_edit', methods: ['GET', 'POST'])]
-    public function adminEditReservation(Request $request, int $id, EntityManagerInterface $entityManager): Response
-    {
-        $reservation = $entityManager->getRepository(Reservation::class)->find($id);
-
-        if (!$reservation) {
-            $this->addFlash('error', 'Réservation non trouvée.');
-            return $this->redirectToRoute('admin_reservations_list');
-        }
-
-        $form = $this->createForm(RegistrationType::class, $reservation);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            $this->addFlash('success', 'La réservation a été modifiée avec succès.');
-            return $this->redirectToRoute('admin_reservation_show', ['id' => $reservation->getId()]);
-        }
-
-        return $this->render('reservation/admin_editRes.html.twig', [
-            'form' => $form->createView(),
-            'reservation' => $reservation,
-        ]);
-    }
 
     #[Route('/admin/reservation/delete/{id}', name: 'delete_reservation_confirm', methods: ['GET'])]
     public function deleteConfirmRes(Reservation $reservation): Response

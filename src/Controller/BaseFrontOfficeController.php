@@ -23,4 +23,5 @@ final class BaseFrontOfficeController extends AbstractController
             'controller_name' => 'BaseFrontOfficeController',
         ]);
     }
+
 }

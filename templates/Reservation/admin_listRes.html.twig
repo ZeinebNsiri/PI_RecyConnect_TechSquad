@@ -4,37 +4,25 @@
 
 {% block body %}
     <div class="container mt-4">
-        <h1 class="text-center mb-4">Gestion des Réservations</h1>
+      <div class="card">
+            <div class="card-body">
+                <h1 class="card-title mb-4">Gestion des Reservations</h1>
+                
+             
 
-        <!-- Filters -->
-        <div class="mb-4">
-            <form method="GET" action="{{ path('admin_reservations_list') }}">
-                <div class="row">
-                    <div class="col-md-3">
-                        <input type="text" name="event" class="form-control" placeholder="Filtrer par événement" value="{{ app.request.query.get('event') }}">
-                    </div>
-                    <div class="col-md-3">
-                        <input type="text" name="user" class="form-control" placeholder="Filtrer par utilisateur" value="{{ app.request.query.get('user') }}">
-                    </div>
-                    <div class="col-md-3">
-                        <input type="date" name="date" class="form-control" placeholder="Filtrer par date" value="{{ app.request.query.get('date') }}">
-                    </div>
-                    <div class="col-md-3">
-                        <button type="submit" class="btn btn-primary">Filtrer</button>
-                        <a href="{{ path('admin_reservations_list') }}" class="btn btn-secondary">Réinitialiser</a>
-                    </div>
-                </div>
-            </form>
-        </div>
 
         <!-- Reservations Table -->
         <div class="table-responsive">
-            <table class="table table-bordered table-striped">
-                <thead>
+            <table class="table table-hover">
+                <thead class="text-center bg-light">
                     <tr>
-                        <th>ID</th>
+                        <th>#</th>
                         <th>Événement</th>
                         <th>Utilisateur</th>
+                        <th>Email</th>
+                        <th>Numéro de téléphone</th>
+                        <th>demandes speciales</th>
+                        <th>Statut</th>
                         <th>Places</th>
                         <th>Actions</th>
                     </tr>
@@ -42,14 +30,18 @@
                 <tbody>
                     {% for reservation in reservations %}
                         <tr>
-                            <td>{{ reservation.id }}</td>
+                            <th>{{ loop.index }}</th>
                             <td>{{ reservation.getEventId().getNomEvent() }}</td>
                             <td>{{ reservation.getUserId() ? reservation.getUserId().getNom() : 'N/A' }}</td>
+                            <td>{{reservation.getEmail()}}</td>
+                            <td>{{reservation.getNumTel()}}</td>
+                            <td>{{reservation.getDemandesSpeciales( )}}</td>
+
+                            <td>{{reservation.getStatus()}}</td>
+
                             <td>{{ reservation.getNbPlaces() }}</td>
                             <td>
-                                <a href="{{ path('admin_reservation_show', {'id': reservation.id}) }}" class="btn btn-info btn-sm">Voir</a>
-                                <a href="{{ path('admin_reservation_edit', {'id': reservation.id}) }}" class="btn btn-warning btn-sm">Modifier</a>
-                                 <a href="{{ path('delete_reservation_confirm', {'id': reservation.id}) }}" class="btn btn-danger btn-sm">
+                                    <a href="{{ path('delete_reservation_confirm', {'id': reservation.id}) }}" class="btn btn-danger btn-sm">
                                     <i class="fas fa-trash"></i> Supprimer
                                 </a>
                             </td>

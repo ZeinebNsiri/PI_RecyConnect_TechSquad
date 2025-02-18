@@ -51,10 +51,14 @@ class EventController extends AbstractController
     public function create(Request $request, EntityManagerInterface $entityManager): Response
     {
         $event = new Evenement();
-        $form = $this->createForm(EventType::class, $event);
+        $form = $this->createForm(EventType::class, $event,[
+            'validation_groups' => ['create']
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+
             $imageFile = $form->get('imageEvent')->getData();
 
             if ($imageFile) {
@@ -82,6 +86,14 @@ class EventController extends AbstractController
             $this->addFlash('success', 'L\'événement a été créé avec succès.');
             return $this->redirectToRoute('admin_events');
         }
+
+        if ($form->isSubmitted() && !$form->isValid()) {
+            // Récupérer les erreurs
+            foreach ($form->getErrors() as $error) {
+                // Ajouter le message d'erreur
+                $this->addFlash('error', $error->getMessage());
+            }
+            }
 
         return $this->render('event/create.html.twig', [
             'form' => $form->createView(),

@@ -25,20 +25,23 @@ class EventType extends AbstractType
             ->add('nomEvent', TextType::class, [
                 'empty_data' => '',
                 'constraints' => [
-                    new Assert\NotBlank(['message' => 'Le nom de l\'événement est requis.']),
+                    new Assert\NotBlank(['message' => 'Le nom de l\'événement est requis.',
+                'groups' => ['create']]),
                     new Assert\Length(['max' => 255, 'maxMessage' => 'Le nom ne peut pas dépasser 255 caractères.']),
                 ]
             ])
             ->add('descriptionEvent', TextareaType::class, [
                 'empty_data' => '',
                 'constraints' => [
-                    new Assert\NotBlank(['message' => 'La description est requise.']),
+                    new Assert\NotBlank(['message' => 'La description est requise.',
+                'groups' => ['create']]),
                 ]
             ])
             ->add('lieuEvent', TextType::class, [
                 'empty_data' => '',
                 'constraints' => [
-                    new Assert\NotBlank(['message' => 'Le lieu de l\'événement est requis.']),
+                    new Assert\NotBlank(['message' => 'Le lieu de l\'événement est requis.',
+                'groups' => ['create']]),
                 ]
             ])
             ->add('dateEvent', DateType::class, [
@@ -49,21 +52,28 @@ class EventType extends AbstractType
                     new Assert\GreaterThanOrEqual([
                         'value' => 'today',
                         'message' => 'La date doit être future ou aujourd\'hui.',
+                        'groups' => ['create']
                     ]),
                 ]
             ])   
             ->add('heureEvent', TimeType::class, [
-                'widget' => 'single_text', // Use a single text input for time
-                'required' => true, // Make it required
+                'widget' => 'single_text',
+                'required' => true,
+                'data' => new \DateTime('now'), // Définit une heure par défaut
                 'constraints' => [
-                    new Assert\NotBlank(['message' => 'L\'heure de l\'événement est requise.']),
+                    new NotBlank([
+                        'message' => 'L\'heure de l\'événement est requise.',
+                        'groups' => ['create']
+                    ]),
                 ],
             ])
-
+            
             ->add('capacite', IntegerType::class, [
                 'empty_data' => '',
                 'constraints' => [
-                    new Assert\NotBlank(['message' => 'La capacité est requise.']),
+                    new Assert\NotBlank(['message' => 'La capacité est requise.',
+                    'groups' => ['create']
+                ]),
                     new Assert\Positive(['message' => 'La capacité doit être un nombre positif.']),
                 ]
             ])
@@ -73,11 +83,11 @@ class EventType extends AbstractType
                 'empty_data' => '',
                 'required' => true,
                 'constraints' => [
-                    new  Assert\NotBlank([
+                    new  NotBlank([
                         'message' => 'Veuillez télécharger une image',
                         'groups' => ['create']
                     ]),
-                    new Assert\File([
+                    new File([
                         'maxSize' => '2M',
                         'mimeTypes' => [
                             'image/jpeg',

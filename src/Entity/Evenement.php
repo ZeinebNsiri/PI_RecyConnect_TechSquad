@@ -33,8 +33,10 @@ class Evenement
 
     private ?\DateTimeInterface $dateEvent = null;
 
-    #[ORM\Column(type: Types::TIME_MUTABLE)]
+
+    #[ORM\Column(type: 'time', nullable: false)] 
     private ?\DateTimeInterface $heureEvent = null;
+    
 
     #[ORM\Column(length: 255)]
     private ?string $imageEvent = null;
@@ -56,7 +58,6 @@ class Evenement
     public function __construct()
     {
         $this->reservations = new ArrayCollection();
-        $this->heureEvent = new \DateTime('09:00:00'); 
     }
 
     public function getId(): ?int

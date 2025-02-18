@@ -3,60 +3,71 @@
 {% block title %}Gestion des Événements{% endblock %}
 
 {% block body %}
-    <div class="container mt-4">
-        <h1 class="text-center mb-4">Gestion des Événements</h1>
-        
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <a href="{{ path('create_event') }}" class="btn btn-success">
-                <i class="fas fa-plus"></i> Créer un nouvel événement
-            </a>
-        </div>
+    {% for message in app.session.flashBag.get('success') %}
+    <div class="alert alert-success bg-success text-light border-0 alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endfor %}
 
-        <div class="table-responsive">
-            <table class="table table-striped table-hover table-bordered">
-                <thead class="text-center bg-light">
-                    <tr>
-                        <th>Id</th>
-                        <th>Nom</th>
-                        <th>Description</th>
-                        <th>Lieu</th>
-                        <th>Date</th>
-                        <th>Heure</th>
-                        <th>Image</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for event in events %}
-                        <tr class="align-middle text-center">
-                            <td>{{ event.id }}</td>
-                            <td>{{ event.nomEvent }}</td>
-                            <td>{{ event.descriptionEvent }}</td>
-                            <td>{{ event.lieuEvent }}</td>
-                            <td>{{ event.dateEvent|date('Y-m-d') }}</td>
-                            <td>{{ event.heureEvent|date('H:i') }}</td>
-                            <td> 
-                            <div class="col-md-12">
-                    <img id="previewImage" src="#" alt="Aperçu de l'image" class="img-thumbnail d-none" style="max-width: 200px; max-height: 200px;">
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title mb-4">Gestion des Événements</h1>
+                
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <a href="{{ path('create_event') }}" class="btn btn-success">
+                        <i class="fas fa-plus"></i> + Ajouter événement
+                    </a>
+                </div>
+
+               
+                    <table class="table table-hover">
+                        <thead class="text-center bg-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Image</th>
+                                <th>Nom</th>
+                                <th>Lieu</th>
+                                <th>Date</th>
+                                <th>Heure</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in events %}
+                                <tr class="align-middle text-center">
+                                    <th>{{ loop.index }}</th>
+                                      <td>
+                                        {% if event.imageEvent %}
+                                            <img src="{{ asset('uploads/images/' ~ event.imageEvent) }}" alt="Event Image" height="140" width="150">
+                                        {% else %}
+                                            <span class="text-muted">No Image</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ event.nomEvent }}</td>
+                                    <td>{{ event.lieuEvent }}</td>
+                                    <td>{{ event.dateEvent|date('Y-m-d') }}</td>
+                                    <td>{{ event.heureEvent|date('H:i') }}</td>
+                                    <td>
+                                        <a href="{{ path('edit_event', {'id': event.id}) }}" class="btn btn-warning">
+                                            <i class="bi bi-pencil-square"></i> Modifier
+                                        </a>
+                                        <a href="{{ path('delete_event_confirm', {'id': event.id}) }}" class="btn btn-danger">
+                                            <i class="bi  bi-trash"></i> Supprimer
+                                             
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="8" class="text-center text-muted">Aucun événement trouvé.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
-    
-                            <td>
-                                <a href="{{ path('edit_event', {'id': event.id}) }}" class="btn btn-warning btn-sm">
-                                    <i class="fas fa-edit"></i> Modifier
-                                </a>
-                                <a href="{{ path('delete_event_confirm', {'id': event.id}) }}" class="btn btn-danger btn-sm">
-                                    <i class="fas fa-trash"></i> Supprimer
-                                </a>
-                            </td>
-                        </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="8" class="text-center text-muted">Aucun événement trouvé.</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
         </div>
-    </div>
+ 
 {% endblock %}

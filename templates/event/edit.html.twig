@@ -24,7 +24,7 @@
       {% endif %}
 
       <div class="col-12">
-        {{ form_label(form.nomEvent) }}
+        {{ form_label(form.nomEvent, 'Nom de l\'événement') }}
         {{ form_widget(form.nomEvent, {'attr': {'class': 'form-control'}}) }}
         {% for error in form.nomEvent.vars.errors %}
           <div class="alert alert-danger">{{ error.message }}</div>
@@ -32,7 +32,7 @@
       </div>
 
       <div class="col-12">
-        {{ form_label(form.descriptionEvent) }}
+        {{ form_label(form.descriptionEvent, 'Description de l\'événement') }}
         {{ form_widget(form.descriptionEvent, {'attr': {'class': 'form-control'}}) }}
         {% for error in form.descriptionEvent.vars.errors %}
           <div class="alert alert-danger">{{ error.message }}</div>
@@ -40,7 +40,7 @@
       </div>
 
       <div class="col-12">
-        {{ form_label(form.lieuEvent) }}
+        {{ form_label(form.lieuEvent, 'Lieu de l\'événement') }}
         {{ form_widget(form.lieuEvent, {'attr': {'class': 'form-control'}}) }}
         {% for error in form.lieuEvent.vars.errors %}
           <div class="alert alert-danger">{{ error.message }}</div>
@@ -48,35 +48,32 @@
       </div>
 
       <div class="col-12">
-        {{ form_label(form.dateEvent) }}
+        {{ form_label(form.dateEvent, 'Date de l\'événement') }}
         {{ form_widget(form.dateEvent, {'attr': {'class': 'form-control'}}) }}
         {% for error in form.dateEvent.vars.errors %}
           <div class="alert alert-danger">{{ error.message }}</div>
         {% endfor %}
       </div>
-         <div class="col-12">
-        {{ form_label(form.heureEvent) }}
-        {{ form_widget(form.heureEvent, {'attr': {'clwass': 'form-control'}}) }}
+
+      <div class="col-12">
+        {{ form_label(form.heureEvent, 'Heure de l\'événement') }}
+        {{ form_widget(form.heureEvent, {'attr': {'class': 'form-control'}}) }}
         {% for error in form.heureEvent.vars.errors %}
           <div class="alert alert-danger">{{ error.message }}</div>
         {% endfor %}
       </div>
 
       <div class="col-12">
-        {{ form_label(form.imageEvent) }}
+        {{ form_label(form.imageEvent, 'Image de l\'événement') }}
         {{ form_widget(form.imageEvent, {'attr': {'class': 'form-control'}}) }}
         {% for error in form.imageEvent.vars.errors %}
           <div class="alert alert-danger">{{ error.message }}</div>
         {% endfor %}
 
-        {% if event.imageEvent %}
-          <p>Image actuelle :</p>
-          <img src="{{ asset('uploads/images/' ~ event.imageEvent) }}" alt="Image de l'événement" height="90px" width="100px">
-        {% endif %}
-      </div>
+  
 
       <div class="col-12">
-        {{ form_label(form.capacite) }}
+        {{ form_label(form.capacite, 'Capacité de l\'événement') }}
         {{ form_widget(form.capacite, {'attr': {'class': 'form-control'}}) }}
         {% for error in form.capacite.vars.errors %}
           <div class="alert alert-danger">{{ error.message }}</div>
