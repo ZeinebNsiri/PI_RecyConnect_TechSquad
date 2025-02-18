@@ -9,7 +9,9 @@
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
-    justify-content: center; /* Aligne les cartes au centre */
+    justify-content: center;
+    transition: 0.3s
+     /* Aligne les cartes au centre */
 }
 
 .card {
@@ -22,6 +24,12 @@
     position: relative;
     display: flex;
     flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: scale(1.05); /* Agrandit légèrement la carte */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); /* Ajoute une ombre plus marquée */
 }
 
 .card-img-top {
@@ -107,11 +115,11 @@
 
 
 
-<div class="container-xxl py-5">
-    <div class="container">
-        <div class="text-center mb-5">
-            <p class="fs-5 fw-bold text-primary">Nos workshops</p>
-            <h1 class="fw-bold">Plongez dans nos workshops, où vidéos et détails captivants vous attendent</h1>
+        <div class="container-xxl py-5">
+        <div class="container">
+        <div class="text-center mx-auto wow fadeInUp" data-wow-delay="0.1s" style="max-width: 500px;">
+            <p class="fs-5 fw-bold text-primary">Nos workshops proposent</p>
+            <h1 class="display-5 mb-5">vidéos et guides pour redonner vie à vos produits</h1>
         </div>
 
 
@@ -134,7 +142,9 @@
 
 </center>
 
-        <div class="workshop-container">
+
+
+        <div class="workshop-container" data-aos="zoom-in" data-aos-delay="100">
             {% for workshop in workshops %}
             <div class="card">
                 <img src="{{ asset('uploads/images/' ~ workshop.imageCours) }}" class="card-img-top" alt="{{ workshop.titreCours }}">
@@ -152,4 +162,5 @@
         </div>
     </div>
 </div>
+
 {% endblock %}
