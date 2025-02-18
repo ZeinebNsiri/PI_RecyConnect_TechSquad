@@ -3,113 +3,105 @@
 namespace App\Controller;
 
 use App\Entity\Article;
+use App\Entity\Commande;
+use App\Entity\LigneCommande;
 use App\Repository\ArticleRepository;
+use App\Repository\CommandeRepository;
+use App\Repository\LigneCommandeRepository;
+use App\Repository\UtilisateurRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-
 
 final class CartController extends AbstractController
 {
     #[Route('/', name: 'app_cart')]
     public function index(SessionInterface $session, ArticleRepository $articlerepository)
     {
-      $panier = $session->get('panier',[]);
-      
-      //on initialise des variables 
-      $data = [];
-      $total = 0;
+        $panier = $session->get('panier', []);
+        
+        $data = [];
+        $total = 0;
 
-      foreach($panier as $id => $quantite){
-      $article = $articlerepository->find($id);
-
-      $data[] = [
-        'article' => $article,
-        'quantite' => $quantite
-      ];
-      $total += $article->getPrix() * $quantite; 
-
+        foreach ($panier as $id => $quantite) {
+            $article = $articlerepository->find($id);
+            if ($article) {
+                $data[] = [
+                    'article' => $article,
+                    'quantite' => $quantite
+                ];
+                $total += $article->getPrix() * $quantite;
+            }
+        }
+        
+        return $this->render('cart/index.html.twig', compact('data', 'total'));
     }
-   
-    return $this->render('cart/index.html.twig', compact('data','total'));
-    }
+
     #[Route('/cartadd/{id}', name: 'cart_add')]
-    public function add(Article $articlepanier, SessionInterface $session)
-    {
-
-        //recuperer id de l'article
+    public function add(
+        Article $articlepanier, 
+        SessionInterface $session, 
+        EntityManagerInterface $entityManager, 
+        UtilisateurRepository $utilisateurRepository, 
+        LigneCommandeRepository $ligneCommandeRepository
+    ) {
         $id = $articlepanier->getId();
-
-        //recuperer le panier existant 
-        $panier = $session->get('panier',[]);
-
-        //on ajoute l'article dans le panier
-        //sinon on incremente sa quantite 
-        if(empty($panier[$id])){
-            $panier[$id] = 1;
-        }else{
-            $panier[$id]++;
+        $panier = $session->get('panier', []);
+    
+        $utilisateur = $utilisateurRepository->find(1); // Remplace par l'utilisateur connecté
+    
+        // Récupérer la quantité disponible
+        $quantiteDisponible = $articlepanier->getQuantiteArticle(); 
+        
+        // Récupérer la ligne de commande existante
+        $ligneCommande = $ligneCommandeRepository->findLigneCommandeNonConfirmee($utilisateur, $articlepanier);
+    
+        if ($ligneCommande) {
+            $nouvelleQuantite = $ligneCommande->getQuantiteC() + 1;
+    
+            // Vérifier si on dépasse la quantité disponible
+            if ($nouvelleQuantite > $quantiteDisponible) {
+                $this->addFlash('error', "Stock insuffisant. Quantité maximale : $quantiteDisponible.");
+                return $this->redirectToRoute('app_cart');
+            }
+    
+            // Mise à jour de la quantité
+            $ligneCommande->setQuantiteC($nouvelleQuantite);
+            $ligneCommande->setPrixC($articlepanier->getPrix() * $nouvelleQuantite);
+        } else {
+            if ($quantiteDisponible < 1) {
+                $this->addFlash('error', "Stock insuffisant.");
+                return $this->redirectToRoute('app_cart');
+            }
+    
+            // Création d'une nouvelle ligne de commande
+            $ligneCommande = new LigneCommande();
+            $ligneCommande->setUserC($utilisateur);
+            $ligneCommande->setArticleC($articlepanier);
+            $ligneCommande->setQuantiteC(1);
+            $ligneCommande->setPrixC($articlepanier->getPrix());
+            $ligneCommande->setEtatC("non confirmée");
+    
+            $entityManager->persist($ligneCommande);
         }
-
+    
+        $entityManager->flush();
+    
+        // Mettre à jour le panier dans la session
+        $panier[$id] = $ligneCommande->getQuantiteC();
         $session->set('panier', $panier);
-       //on redirige vers la page du panier
-       return $this -> redirectToRoute('app_cart');
-
-
+    
+        return $this->redirectToRoute('app_cart');
     }
-    #[Route('/remove/{id}', name: 'remove')]
-    public function remove(Article $articlepanier, SessionInterface $session)
-    {
+    
+    
 
-        //recuperer id de l'article
-        $id = $articlepanier->getId();
-
-        //recuperer le panier existant 
-        $panier = $session->get('panier',[]);
-
-        //on retire l'article du panier
-        //sinon on decremente sa quantite 
-        if(!empty($panier[$id])){
-            if($panier[$id] > 1){
-             $panier[$id]--;
-        }else{
-            unset($panier[$id]);
-        }
-    }
-        $session->set('panier', $panier);
-       //on redirige vers la page du panier
-       return $this -> redirectToRoute('app_cart');
-
-
-    }
-
-    #[Route('/delete/{id}', name: 'delete')]
-    public function delete(Article $articlepanier, SessionInterface $session)
-    {
-
-        //recuperer id de l'article
-        $id = $articlepanier->getId();
-
-        //recuperer le panier existant 
-        $panier = $session->get('panier',[]);
-
-        if(!empty($panier[$id])){
-            unset($panier[$id]);
-    }
-
-        $session->set('panier', $panier);
-       //on redirige vers la page du panier
-       return $this -> redirectToRoute('app_cart');
-
-
-    }
     #[Route('/empty', name: 'empty')]
-    public function empty( SessionInterface $session)
+    public function empty(SessionInterface $session)
     {
-    $session->remove('panier');
-    return $this -> redirectToRoute('app_cart');
-
+        $session->remove('panier');
+        return $this->redirectToRoute('app_cart');
     }
-
 }

@@ -1,0 +1,130 @@
+{% extends 'basecnx.html.twig' %}
+
+{% block title %}Paiement{% endblock %}
+
+{% block body %}
+
+    {% for label, messages in app.flashes() %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label == 'error' ? 'danger' : 'success' }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+    <div class="payment-container">
+
+        <h1 class="text-center">Choisir le mode de paiement</h1>
+
+        <form method="POST" action="{{ path('traiter_paiement', {'commandeId': commande.id}) }}" class="payment-form">
+            <div class="payment-option">
+                <label class="radio-container">
+                    <input type="radio" name="mode_paiement" value="livraison" required>
+                    <span class="radio-checkmark"></span>
+                    Payer à la livraison
+                </label>
+            </div>
+
+            <div class="payment-option">
+                <label class="radio-container">
+                    <input type="radio" name="mode_paiement" value="visa" required>
+                    <span class="radio-checkmark"></span>
+                    Payer par VISA
+                </label>
+            </div>
+
+            <button type="submit" class="submit-btn">Valider le paiement</button>
+        </form>
+    </div>
+
+    <style>
+        /* Container for the payment form */
+        .payment-container {
+            width: 80%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+        }
+
+        /* Header of the payment form */
+        .payment-container h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* Style for payment options */
+        .payment-option {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+        }
+
+        /* Style for radio buttons */
+        .radio-container {
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            color: #555;
+        }
+
+        .radio-container input {
+            margin-right: 10px;
+        }
+
+        /* Custom style for radio buttons */
+        .radio-checkmark {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid #4CAF50;
+            display: inline-block;
+            position: relative;
+        }
+
+        .radio-container input:checked + .radio-checkmark::after {
+            content: "";
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 8px;
+            height: 8px;
+            background-color: #4CAF50;
+            border-radius: 50%;
+        }
+
+        /* Submit button */
+        .submit-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .payment-container {
+                width: 95%;
+                padding: 15px;
+            }
+            .submit-btn {
+                font-size: 14px;
+            }
+        }
+    </style>
+{% endblock %}

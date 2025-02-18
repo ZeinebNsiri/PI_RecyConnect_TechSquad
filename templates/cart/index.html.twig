@@ -1,51 +1,59 @@
-{% extends 'base.html.twig' %}
+{% extends 'basecnx.html.twig' %}
 
 {% block title %}Panier{% endblock %}
 
 {% block body %}
-   <main class="container">
-       <section class="row">
-           <div class="col-12">
-               <h1>Panier</h1>
+<main class="container">
 
-                   <table class="table">
-                       <thead>
-                           <tr>
-                               <th>Article</th>
-                               <th>Prix</th>
-                               <th>Quantité</th>
-                               <th>Total</th>
-                               <th>Actions</th>
-                           </tr>
-                       </thead>
-                       <tbody>
-                           {% for item in data %}
-                               <tr>
-                                   <td>{{ item.article.nomArticle }}</td>
-                                   <td>{{ item.article.prix }} Dt </td>
-                                   <td>{{ item.quantite }}</td>
-                                   <td>{{ item.quantite * item.article.prix}} Dt </td>
-                                   <td>
-                                   <a href="{{ path('cart_add',{id: item.article.id})}}" class="btn btn-success"> + </a>
-                                    <a href="{{ path('remove',{id: item.article.id})}}" class="btn btn-warning"> - </a>
-                                    <a href="{{ path('delete',{id: item.article.id})}}" class="btn btn-danger"> supprimer </a>
-                                   </td>
-                               </tr>
-                               {% else %}
-                               <tr>
-                               <td colspan="5"> Votre panier est vide </td>
-                               </tr>
-                           {% endfor %}
-                       </tbody>
-                     
-                   </table>
 
-                   <h3>Total : {{ total | number_format(2, ',', ' ') }} Dt</h3>
-                   <td>
-                   <a href="{{ path('empty')}}"  class="btn btn-danger" >Vider</a>
-                   </td>
-               
-           </div>
-       </section>
-   </main>
+    <section class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card p-4">
+                <h1 class="mb-4">Panier</h1>
+
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Produit</th>
+                            <th>Prix</th>
+                            <th>Quantité</th>
+                            <th>Total</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in data %}
+                            <tr>
+                                <td>{{ item.article.nomArticle }}</td>
+                                <td>{{ item.article.prix }} TND</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <a href="{{ path('delete', {id: item.article.id}) }}" class="btn btn-outline-secondary">-</a>
+                                        <span class="px-3">{{ item.quantite }}</span>
+                                         <a href="{{ path('cart_add', {id: item.article.id}) }}" class="btn btn-outline-secondary">+</a>
+                                    </div>
+                                </td>
+                                <td>{{ (item.quantite * item.article.prix) | number_format(3, '.', ' ') }} TND</td>
+                                <td>
+                                    <a href="{{ path('delete', {id: item.article.id}) }}" class="btn btn-danger">🗑</a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center">Votre panier est vide</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <h4>Total TTC : {{ total | number_format(3, '.', ' ') }} TND</h4>
+                    <a href="{{ path('empty') }}" class="btn btn-light">Vider</a>
+                    <a href="{{ path('proceder_paiement') }}" class="btn btn-success {% if data is empty %}disabled{% endif %}">Commander</a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+</main>
 {% endblock %}
