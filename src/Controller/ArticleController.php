@@ -32,7 +32,7 @@ final class ArticleController extends AbstractController
     #[Autowire('%kernel.project_dir%/public/uploads/photo_dir')] string $brochuresDirectory, UtilisateurRepository $UtilisateurRepository)
     {
         $em= $manager->getManager();
-        $user = $UtilisateurRepository->find(1);
+        $user = $this->getUser();
         $Article= new   Article();
         $form = $this ->createForm(ArticleType::class, $Article, [
             'validation_groups' => ['create']
@@ -99,8 +99,8 @@ final class ArticleController extends AbstractController
 
     #[Route('/Article/getMine', name: 'app_article_mine')]
     public function getMesArticle(ArticleRepository $repository, CategorieArticleRepository $repo)
-    {
-        $articles= $repository-> findAll();
+    {   $user=$this->getUser();
+        $articles= $repository-> findmine($user);
         $categories= $repo-> findAll();
         return $this->render('article/mesArticle.html.twig', [
             'articles' => $articles,
@@ -230,10 +230,11 @@ final class ArticleController extends AbstractController
     #[Route('/mesarticles/{categoryId?}', name: 'app_articles_by_category2')]
     public function articlesByCategorymes(ArticleRepository $articleRepository, $categoryId = null, CategorieArticleRepository $repository): Response
     {
+        $user = $this->getUser();
         if ($categoryId) {
-            $articles = $articleRepository->findByCategory($categoryId);
+            $articles = $articleRepository->findByCategorymine($categoryId,$user);
         } else {
-            $articles = $articleRepository->findAll(); 
+            $articles = $articleRepository->findmine($user); 
         }
     
         $categories = $repository->findAll();

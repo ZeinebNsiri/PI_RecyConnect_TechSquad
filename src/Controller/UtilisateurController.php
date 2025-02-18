@@ -75,7 +75,7 @@ final class UtilisateurController extends AbstractController
     {   
         $em=$manager->getManager();
         $user = $repository -> find($id);
-
+        $userOriginal = clone $user;
 
         
 
@@ -113,7 +113,9 @@ final class UtilisateurController extends AbstractController
 
                     return $this->redirectToRoute('app_profileadmin', ['id' => $id]);
 
-                    }
+                }else{
+                    $user=$userOriginal;
+                }
 
         
         return $this->render('utilisateur/profile.html.twig', [
@@ -142,7 +144,7 @@ final class UtilisateurController extends AbstractController
             $form->handleRequest($req);
                 if($form->isSubmitted())
                     {if($form->isValid()){
-                       $em->refresh($user);
+                       
                         $photo_profil = $form->get('photo_profil')->getData();
 
                         
@@ -183,7 +185,7 @@ final class UtilisateurController extends AbstractController
         $form->handleRequest($req);
         if($form->isSubmitted()&& $form->isValid())
             {if($form->isValid())
-                    {$em->refresh($user);
+                    {
                         $photo_profil = $form->get('photo_profil')->getData();
 
                         

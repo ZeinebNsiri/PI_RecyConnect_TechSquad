@@ -49,6 +49,25 @@ class ArticleRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    public function findByCategorymine($categoryId,$user)
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.categorie = :cat')
+            ->andWhere('a.utilisateur =:id')
+            ->setParameter('cat', $categoryId)
+            ->setParameter('id', $user)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findmine($user)
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.utilisateur = :id')
+            ->setParameter('id', $user)
+            ->getQuery()
+            ->getResult();
+    }
 
     public function countArticlesInCategory($categoryId)
     {
