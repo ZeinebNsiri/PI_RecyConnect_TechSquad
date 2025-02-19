@@ -23,5 +23,21 @@ final class BaseFrontOfficeController extends AbstractController
             'controller_name' => 'BaseFrontOfficeController',
         ]);
     }
+    #[Route('/home', name: 'home')]
+
+    public function home( ): Response
+    {
+        return $this->render('home.html.twig', [
+            'welcome_message' => 'Bienvenue sur RecyConnect!',
+        ]);
+    }
+    #[Route('/homecnx', name: 'homecnx')]
+
+    public function homecnx( ): Response
+    {
+        return $this->render('homecnx.html.twig', [
+            'welcome_message' => 'Bienvenue sur RecyConnect!',
+        ]);
+    }
 
 }
