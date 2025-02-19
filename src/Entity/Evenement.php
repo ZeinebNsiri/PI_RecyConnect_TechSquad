@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EvenementRepository::class)]
 class Evenement
@@ -17,39 +18,41 @@ class Evenement
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $nom_event = null;
+
+    private ?string $nomEvent = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    private ?string $description_event = null;
+
+    private ?string $descriptionEvent = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $lieu_event = null;
+   
+    private ?string $lieuEvent = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $date_event = null;
 
-    #[ORM\Column(type: Types::TIME_MUTABLE)]
-    private ?\DateTimeInterface $heure_event = null;
+    private ?\DateTimeInterface $dateEvent = null;
+
+
+    #[ORM\Column(type: 'time', nullable: false)] 
+    private ?\DateTimeInterface $heureEvent = null;
+    
 
     #[ORM\Column(length: 255)]
-    private ?string $image_event = null;
+    private ?string $imageEvent = null;
 
     #[ORM\Column]
     private ?int $capacite = null;
 
     #[ORM\Column]
-    private ?int $nb_restant = null;
+    private ?int $nbRestant = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $created_AT = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $updated_AT = null;
+    
 
     /**
      * @var Collection<int, Reservation>
      */
-    #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'event_id', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'event', orphanRemoval: true)]
     private Collection $reservations;
 
     public function __construct()
@@ -64,73 +67,67 @@ class Evenement
 
     public function getNomEvent(): ?string
     {
-        return $this->nom_event;
+        return $this->nomEvent;
     }
 
-    public function setNomEvent(string $nom_event): static
+    public function setNomEvent(string $nomEvent): static
     {
-        $this->nom_event = $nom_event;
-
+        $this->nomEvent = $nomEvent;
         return $this;
     }
 
     public function getDescriptionEvent(): ?string
     {
-        return $this->description_event;
+        return $this->descriptionEvent;
     }
 
-    public function setDescriptionEvent(string $description_event): static
+    public function setDescriptionEvent(string $descriptionEvent): static
     {
-        $this->description_event = $description_event;
-
+        $this->descriptionEvent = $descriptionEvent;
         return $this;
     }
 
     public function getLieuEvent(): ?string
     {
-        return $this->lieu_event;
+        return $this->lieuEvent;
     }
 
-    public function setLieuEvent(string $lieu_event): static
+    public function setLieuEvent(string $lieuEvent): static
     {
-        $this->lieu_event = $lieu_event;
-
+        $this->lieuEvent = $lieuEvent;
         return $this;
     }
 
     public function getDateEvent(): ?\DateTimeInterface
     {
-        return $this->date_event;
+        return $this->dateEvent;
     }
 
-    public function setDateEvent(\DateTimeInterface $date_event): static
+    public function setDateEvent(\DateTimeInterface $dateEvent): static
     {
-        $this->date_event = $date_event;
-
+        $this->dateEvent = $dateEvent;
         return $this;
     }
 
     public function getHeureEvent(): ?\DateTimeInterface
     {
-        return $this->heure_event;
+        return $this->heureEvent;
     }
 
-    public function setHeureEvent(\DateTimeInterface $heure_event): static
+    public function setHeureEvent(\DateTimeInterface $heureEvent): static
     {
-        $this->heure_event = $heure_event;
-
+        $this->heureEvent = $heureEvent;
         return $this;
     }
 
     public function getImageEvent(): ?string
     {
-        return $this->image_event;
+        return $this->imageEvent;
     }
 
-    public function setImageEvent(string $image_event): static
+    public function setImageEvent(string $imageEvent): static
     {
-        $this->image_event = $image_event;
-
+        $this->imageEvent = $imageEvent;
         return $this;
     }
 
@@ -142,43 +139,17 @@ class Evenement
     public function setCapacite(int $capacite): static
     {
         $this->capacite = $capacite;
-
         return $this;
     }
 
     public function getNbRestant(): ?int
     {
-        return $this->nb_restant;
+        return $this->nbRestant;
     }
 
-    public function setNbRestant(int $nb_restant): static
+    public function setNbRestant(int $nbRestant): static
     {
-        $this->nb_restant = $nb_restant;
-
-        return $this;
-    }
-
-    public function getCreatedAT(): ?\DateTimeInterface
-    {
-        return $this->created_AT;
-    }
-
-    public function setCreatedAT(\DateTimeInterface $created_AT): static
-    {
-        $this->created_AT = $created_AT;
-
-        return $this;
-    }
-
-    public function getUpdatedAT(): ?\DateTimeInterface
-    {
-        return $this->updated_AT;
-    }
-
-    public function setUpdatedAT(\DateTimeInterface $updated_AT): static
-    {
-        $this->updated_AT = $updated_AT;
-
+        $this->nbRestant = $nbRestant;
         return $this;
     }
 
@@ -203,7 +174,6 @@ class Evenement
     public function removeReservation(Reservation $reservation): static
     {
         if ($this->reservations->removeElement($reservation)) {
-            // set the owning side to null (unless already changed)
             if ($reservation->getEventId() === $this) {
                 $reservation->setEventId(null);
             }

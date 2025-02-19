@@ -1,0 +1,60 @@
+{% extends 'base2.html.twig' %}
+
+{% block title %}Gestion des Réservations{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+      <div class="card">
+            <div class="card-body">
+                <h1 class="card-title mb-4">Gestion des Reservations</h1>
+                
+             
+
+
+        <!-- Reservations Table -->
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="text-center bg-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Événement</th>
+                        <th>Utilisateur</th>
+                        <th>Email</th>
+                        <th>Numéro de téléphone</th>
+                        <th>demandes speciales</th>
+                        <th>Statut</th>
+                        <th>Places</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reservation in reservations %}
+                        <tr>
+                            <th>{{ loop.index }}</th>
+                            <td>{{ reservation.getEventId().getNomEvent() }}</td>
+                            <td>{{ reservation.getUserId() ? reservation.getUserId().getNom() : 'N/A' }}</td>
+                            <td>{{reservation.getEmail()}}</td>
+                            <td>{{reservation.getNumTel()}}</td>
+                            <td>{{reservation.getDemandesSpeciales( )}}</td>
+
+                            <td>{{reservation.getStatus()}}</td>
+
+                            <td>{{ reservation.getNbPlaces() }}</td>
+                            <td>
+                                    <a href="{{ path('delete_reservation_confirm', {'id': reservation.id}) }}" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash"></i> Supprimer
+                                </a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">Aucune réservation trouvée.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+      
+    </div>
+{% endblock %}

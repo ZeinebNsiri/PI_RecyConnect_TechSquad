@@ -1,0 +1,114 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ evenement.nomEvent }}{% endblock %}
+
+{% block body %}
+  <!-- Page Header Start -->
+  <div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s" style="background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('{{ asset('uploads/images/carousel-1.jpg') }}') center/cover no-repeat;">
+    <div class="container text-center py-5">
+      <h1 class="display-3 text-white mb-3 fw-bold animated slideInDown">{{ evenement.nomEvent }}</h1>
+      <nav aria-label="breadcrumb animated slideInDown">
+        <ol class="breadcrumb justify-content-center mb-0">
+          <li class="breadcrumb-item"><a href="{{ path('events_list') }}" class="text-white">Événements</a></li>
+          <li class="breadcrumb-item text-white active" aria-current="page">{{ evenement.nomEvent }}</li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+  <!-- Page Header End -->
+
+  <!-- Event Detail Section Start -->
+  <div class="container-xxl py-5">
+    <div class="container">
+      <div class="row g-5">
+        <!-- Main Event Content -->
+        <div class="col-lg-8 wow fadeInUp" data-wow-delay="0.1s">
+          <div class="card border-0 shadow-lg h-100">
+            <img src="{{ asset('uploads/images/' ~ evenement.imageEvent) }}" class="card-img-top rounded-top" alt="{{ evenement.nomEvent }}" style="height: 400px; object-fit: cover;">
+            <div class="card-body p-5">
+              <h2 class="card-title fw-bold mb-4">{{ evenement.nomEvent }}</h2>
+              <p class="text-muted mb-4"><i class="far fa-calendar-alt me-2"></i>{{ evenement.dateEvent|date('l j F Y') }} à {{ evenement.heureEvent|date('H:i') }}</p>
+              <p class="card-text mb-4">{{ evenement.descriptionEvent }}</p>
+              <p class="lead mb-4">Ne manquez pas cette occasion de faire la différence ! Inscrivez-vous dès maintenant pour réserver votre place.</p>
+              <div class="d-flex gap-3">
+                <a href="{{ path('event_registration', {'id': evenement.id}) }}" class="btn btn-success btn-lg px-4">S'inscrire</a>
+                <a href="{{ path('events_list') }}" class="btn btn-outline-secondary btn-lg px-4">Retour à la liste</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Event Details Sidebar -->
+        <div class="col-lg-4 wow fadeInUp" data-wow-delay="0.3s">
+          <div class="card border-0 shadow-lg h-100">
+            <div class="card-body p-5">
+              <h3 class="card-title fw-bold mb-4">Détails de l'événement</h3>
+              <ul class="list-unstyled">
+                <li class="mb-3">
+                  <i class="fas fa-calendar-day me-2 text-primary"></i>
+                  <strong>Date :</strong> {{ evenement.dateEvent|date('d-m-Y') }}
+                </li>
+                <li class="mb-3">
+                  <i class="fas fa-clock me-2 text-primary"></i>
+                  <strong>Heure :</strong> {{ evenement.heureEvent|date('H:i') }}
+                </li>
+                <li class="mb-3">
+                  <i class="fas fa-map-marker-alt me-2 text-primary"></i>
+                  <strong>Lieu :</strong> {{ evenement.lieuEvent }}
+                </li>
+                <li class="mb-3">
+                  <i class="fas fa-users me-2 text-primary"></i>
+                  <strong>Capacité :</strong> {{ evenement.capacite }}
+                </li>
+                <li class="mb-3">
+                  <i class="fas fa-ticket-alt me-2 text-primary"></i>
+                  <strong>Places restantes :</strong> {{ evenement.nbRestant }}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Event Detail Section End -->
+
+  <style>
+    .card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+    .card-img-top {
+      border-radius: 8px 8px 0 0;
+    }
+    .card-body {
+      border-radius: 0 0 8px 8px;
+    }
+    .list-unstyled li {
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .list-unstyled li:last-child {
+      border-bottom: none;
+    }
+    .btn-success {
+      background-color: #28a745; /* Bootstrap's default green */
+      border-color: #28a745;
+    }
+    .btn-success:hover {
+      background-color: #218838; /* Darker green on hover */
+      border-color: #1e7e34;
+    }
+    .btn-outline-secondary {
+      border-color: #6c757d;
+      color: #6c757d;
+    }
+    .btn-outline-secondary:hover {
+      background-color: #6c757d;
+      color: #fff;
+    }
+  </style>
+{% endblock %}

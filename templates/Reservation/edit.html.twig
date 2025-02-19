@@ -1,0 +1,142 @@
+{% extends 'basecnx.html.twig' %}
+
+{% block title %}Modifier Réservation - RecyConnect{% endblock %}
+
+{% block body %}
+    <!-- Page Header Start -->
+    <div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s">
+        <div class="container text-center py-5">
+            <h1 class="display-3 text-white mb-4 animated slideInDown">Modifier Réservation</h1>
+            <nav aria-label="breadcrumb animated slideInDown">
+                <ol class="breadcrumb justify-content-center mb-0">
+                    <li class="breadcrumb-item"><a href="{{ path('events_list') }}">Accueil</a></li>
+                    <li class="breadcrumb-item"><a href="{{ path('event_show', {'id': reservation.eventId.id}) }}">Événement</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Modifier Réservation</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    <!-- Page Header End -->
+
+    <!-- Edit Reservation Section Start -->
+    <section id="edit-reservation" class="edit-reservation section">
+        <div class="container-xxl py-5">
+            <div class="container">
+                <div class="row g-5 justify-content-center">
+                    <div class="col-lg-8 wow fadeIn" data-wow-delay="0.1s">
+                        <div class="bg-light rounded p-5">
+                            <h2 class="mb-4">Modifier Réservation pour : {{ reservation.eventId.nomEvent }}</h2>
+                            <p class="mb-3"><i class="fas fa-calendar-alt me-2"></i>Date : {{ reservation.eventId.dateEvent|date('d/m/Y') }} à {{ reservation.eventId.heureEvent|date('H:i') }}</p>
+                            <p class="mb-3"><i class="fas fa-map-marker-alt me-2"></i>Lieu : {{ reservation.eventId.lieuEvent }}</p>
+                            <p class="mb-4"><i class="fas fa-ticket-alt me-2"></i>Places restantes : {{ reservation.eventId.nbRestant + reservation.nbPlaces }}</p>
+
+                            {{ form_start(form, {'attr': {'class': 'form', 'novalidate': 'novalidate'}}) }}
+                                <!-- Personal Information -->
+                                <div class="form-group mb-4">
+                                    {{ form_label(form.nom, 'Nom complet', {'label_attr': {'class': 'form-label'}}) }}
+                                    {{ form_widget(form.nom, {
+                                        'attr': {
+                                            'class': 'form-control',
+                                            'placeholder': 'Entrez votre nom complet',
+                                            'required': 'required',
+                                            'minlength': 2,
+                                            'maxlength': 255
+                                        }
+                                    }) }}
+                                    <div class="invalid-feedback">
+                                        Veuillez entrer un nom valide (2 à 255 caractères).
+                                    </div>
+                                </div>
+                                <div class="form-group mb-4">
+                                    {{ form_label(form.email, 'Adresse email', {'label_attr': {'class': 'form-label'}}) }}
+                                    {{ form_widget(form.email, {
+                                        'attr': {
+                                            'class': 'form-control',
+                                            'placeholder': 'Entrez votre adresse email',
+                                            'required': 'required',
+                                            'type': 'email'
+                                        }
+                                    }) }}
+                                    <div class="invalid-feedback">
+                                        Veuillez entrer une adresse email valide.
+                                    </div>
+                                </div>
+                                <div class="form-group mb-4">
+                                    {{ form_label(form.num_tel, 'Numéro de téléphone', {'label_attr': {'class': 'form-label'}}) }}
+                                    {{ form_widget(form.num_tel, {
+                                        'attr': {
+                                            'class': 'form-control',
+                                            'placeholder': 'Entrez votre numéro de téléphone',
+                                            'required': 'required',
+                                            'pattern': '^[0-9]{8,15}$',
+                                            'title': 'Le numéro de téléphone doit contenir entre 8 et 15 chiffres.'
+                                        }
+                                    }) }}
+                                    <div class="invalid-feedback">
+                                        Veuillez entrer un numéro de téléphone valide (8 à 15 chiffres).
+                                    </div>
+                                </div>
+
+                                <!-- Number of Places -->
+                                <div class="form-group mb-4">
+                                    {{ form_label(form.nb_places, 'Nombre de places à réserver', {'label_attr': {'class': 'form-label'}}) }}
+                                    {{ form_widget(form.nb_places, {
+                                        'attr': {
+                                            'class': 'form-control',
+                                            'placeholder': 'Entrez le nombre de places',
+                                            'required': 'required',
+                                            'min': 1,
+                                            'max': reservation.eventId.nbRestant + reservation.nbPlaces
+                                        }
+                                    }) }}
+                                    <div class="invalid-feedback">
+                                        Veuillez entrer un nombre de places valide (entre 1 et {{ reservation.eventId.nbRestant + reservation.nbPlaces }}).
+                                    </div>
+                                </div>
+
+                                <!-- Special Requests -->
+                                <div class="form-group mb-4">
+                                    {{ form_label(form.demandes_speciales, 'Demandes spéciales', {'label_attr': {'class': 'form-label'}}) }}
+                                    {{ form_widget(form.demandes_speciales, {
+                                        'attr': {
+                                            'class': 'form-control',
+                                            'placeholder': 'Avez-vous des demandes spéciales ?',
+                                            'rows': 4
+                                        }
+                                    }) }}
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div class="form-group text-center mt-4">
+                                    <button type="submit" class="btn btn-primary py-3 px-5">Enregistrer</button>
+                                    <a href="{{ path('reservations_list') }}" class="btn btn-secondary py-3 px-5">Retour</a>
+                                </div>
+                            {{ form_end(form) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Edit Reservation Section End -->
+
+    <!-- Add JavaScript for enhanced client-side validation -->
+    <script>
+        (function () {
+            'use strict';
+
+            // Fetch the form we want to apply custom validation styles to
+            const form = document.querySelector('.form');
+
+            // Prevent submission if there are invalid fields
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+
+                form.classList.add('was-validated');
+            }, false);
+        })();
+    </script>
+{% endblock %}
