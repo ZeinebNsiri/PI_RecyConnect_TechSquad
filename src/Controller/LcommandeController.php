@@ -24,7 +24,7 @@ final class LcommandeController extends AbstractController
         UtilisateurRepository $UtilisateurRepository, 
         LigneCommandeRepository $ligneCommandeRepository
     ): Response {
-        $utilisateur = $UtilisateurRepository->find(1);
+        $utilisateur =$this->getUser();
         $panier = $session->get('panier', []);
     
         if (empty($panier)) {
@@ -67,7 +67,7 @@ final class LcommandeController extends AbstractController
         $id = $articlepanier->getId();
         $panier = $session->get('panier', []);
     
-        $utilisateur = $utilisateurRepository->find(1); // Remplace par l'utilisateur connecté
+        $utilisateur = $this->getUser(); // Remplace par l'utilisateur connecté
         $ligneCommandeRepo = $entityManager->getRepository(LigneCommande::class);
         
         $ligneCommande = $ligneCommandeRepo->findOneBy([

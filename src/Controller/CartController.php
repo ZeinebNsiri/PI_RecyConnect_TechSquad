@@ -50,7 +50,7 @@ final class CartController extends AbstractController
         $id = $articlepanier->getId();
         $panier = $session->get('panier', []);
     
-        $utilisateur = $utilisateurRepository->find(1); // Remplace par l'utilisateur connecté
+        $utilisateur = $this->getUser(); // Remplace par l'utilisateur connecté
     
         // Récupérer la quantité disponible
         $quantiteDisponible = $articlepanier->getQuantiteArticle(); 
