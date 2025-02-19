@@ -54,7 +54,7 @@ final class CommentsController extends AbstractController
             $commentaire->setPostCom($post);
 
            
-            $user = $entityManager->getRepository(Utilisateur::class)->findOneBy([]);
+            $user = $this->getUser();
             
             $commentaire->setUserCom($user);
 
@@ -74,7 +74,7 @@ final class CommentsController extends AbstractController
     #[Route('/comment/{id}/reply', name: 'comment_reply', methods: ['POST'])]
     public function reply(Request $request, Commentaire $comment, EntityManagerInterface $entityManager): Response
     {
-        $user = $entityManager->getRepository(Utilisateur::class)->findOneBy([]);
+        $user = $this->getUser();
         if (!$user) {
             return $this->redirectToRoute('app_base_front_office');
         }

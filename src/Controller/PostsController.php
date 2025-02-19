@@ -24,7 +24,7 @@ final class PostsController extends AbstractController
     #[Route('/posts', name: 'app_posts')]
     public function index(EntityManagerInterface $entityManager, MediaPostRepository $mediaPostRepository): Response
     {
-        $user = $entityManager->getRepository(Utilisateur::class)->findOneBy([]);
+        $user = $this->getUser();
 
         $posts = $entityManager->getRepository(Post::class)->findBy(['status_post' => true], ['datePublication' => 'DESC']);
         $postsWithMedia = [];
@@ -67,10 +67,10 @@ final class PostsController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $user = $entityManager->getRepository(Utilisateur::class)->findOneBy([]);
+            $user = $this->getUser();
             
             if (!$user) {
-                $this->addFlash('error', 'Aucun utilisateur trouvé dans la base. Ajoutez un utilisateur avant de tester.');
+                $this->addFlash('error', 'Aucun utilisateur connecté');
                 return $this->redirectToRoute('app_posts');
             }
 
@@ -127,7 +127,7 @@ final class PostsController extends AbstractController
     #[Route('/post/like/{id}', name: 'post_like', methods: ['POST'])]
     public function like(Post $post, EntityManagerInterface $entityManager, LikeRepository $likeRepository): JsonResponse
     {
-        $user = $entityManager->getRepository(Utilisateur::class)->findOneBy([]);
+        $user = $this->getUser();
 
         if (!$user) {
             return new JsonResponse(['message' => 'Unauthorized'], 403);
@@ -205,7 +205,7 @@ final class PostsController extends AbstractController
     #[Route('/post/delete/{id}', name: 'post_delete')]
     public function delete(Post $post, EntityManagerInterface $entityManager): Response
     {
-        $user = $entityManager->getRepository(Utilisateur::class)->findOneBy([]);
+        $user = $this->getUser();
 
         if (!$user || $post->getUserP() !== $user) {
             $this->addFlash('error', 'Vous n\'êtes pas autorisé à supprimer ce post.');

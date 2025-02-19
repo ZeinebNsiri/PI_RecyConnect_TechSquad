@@ -53,7 +53,7 @@
                                                          
                                                         </div>
                                                         <div class="comment-content">{{ commentaire.ContenuCom }}</div>
-                                                        {% if commentaire.UserCom  %}
+                                                        {% if commentaire.UserCom == app.user %}
                                                                 <!-- Bouton de suppression -->
                                                                 <form method="post" action="{{ path('comment_delete', { 'id': commentaire.id }) }}" style="display: inline;">
                                                                     <button type="submit" class="btn btn-link text-danger" title="Supprimer le commentaire">
