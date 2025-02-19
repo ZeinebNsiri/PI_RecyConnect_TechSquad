@@ -534,7 +534,25 @@ h6,
     color: var(--primary);
 }
 
+.dropdown-menu {
+    min-width: 300px;
+}
 
+.dropdown-item {
+    white-space: normal;
+}
 
+.dropdown-header {
+    font-weight: bold;
+    text-align: center;
+}
+
+.dropdown-divider {
+    margin: 0.5rem 0;
+}
+
+.dropdown-item.text-center {
+    text-align: center;
+}
 
 

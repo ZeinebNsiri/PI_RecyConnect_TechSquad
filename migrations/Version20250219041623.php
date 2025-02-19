@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250219023539 extends AbstractMigration
+final class Version20250219041623 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -23,7 +23,7 @@ final class Version20250219023539 extends AbstractMigration
         $this->addSql('CREATE TABLE article (id INT AUTO_INCREMENT NOT NULL, categorie_id INT NOT NULL, utilisateur_id INT NOT NULL, nom_article VARCHAR(255) NOT NULL, description_article LONGTEXT NOT NULL, quantite_article INT NOT NULL, prix DOUBLE PRECISION NOT NULL, image_article VARCHAR(255) NOT NULL, localisation_article VARCHAR(255) NOT NULL, INDEX IDX_23A0E66BCF5E72D (categorie_id), INDEX IDX_23A0E66FB88E14F (utilisateur_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE categorie_article (id INT AUTO_INCREMENT NOT NULL, nom_categorie VARCHAR(255) NOT NULL, description_categorie VARCHAR(255) NOT NULL, image_categorie VARCHAR(255) NOT NULL, UNIQUE INDEX UNIQ_5DB9A0C4DD8CA775 (nom_categorie), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE categorie_cours (id INT AUTO_INCREMENT NOT NULL, nom_categorie VARCHAR(255) NOT NULL, description_categorie LONGTEXT NOT NULL, UNIQUE INDEX UNIQ_8B2614CDD8CA775 (nom_categorie), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE commande (id INT AUTO_INCREMENT NOT NULL, prix_total DOUBLE PRECISION DEFAULT NULL, date_commande DATETIME NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE commande (id INT AUTO_INCREMENT NOT NULL, prix_total DOUBLE PRECISION DEFAULT NULL, date_commande DATETIME NOT NULL, statut VARCHAR(255) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE commentaire (id INT AUTO_INCREMENT NOT NULL, user_com_id INT NOT NULL, post_com_id INT NOT NULL, parent_id INT DEFAULT NULL, contenu_com LONGTEXT NOT NULL, date_com DATETIME NOT NULL, INDEX IDX_67F068BC11DE140A (user_com_id), INDEX IDX_67F068BC44AEEB52 (post_com_id), INDEX IDX_67F068BC727ACA70 (parent_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE cours (id INT AUTO_INCREMENT NOT NULL, categorie_c_id INT NOT NULL, titre_cours VARCHAR(255) NOT NULL, description_cours LONGTEXT NOT NULL, video VARCHAR(255) DEFAULT NULL, image_cours VARCHAR(255) NOT NULL, INDEX IDX_FDCA8C9CE6FE1C84 (categorie_c_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE evenement (id INT AUTO_INCREMENT NOT NULL, nom_event VARCHAR(255) NOT NULL, description_event LONGTEXT NOT NULL, lieu_event VARCHAR(255) NOT NULL, date_event DATE NOT NULL, heure_event TIME NOT NULL, image_event VARCHAR(255) NOT NULL, capacite INT NOT NULL, nb_restant INT NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');

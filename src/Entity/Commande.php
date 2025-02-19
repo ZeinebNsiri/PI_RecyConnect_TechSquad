@@ -19,7 +19,7 @@ class Commande
     /**
      * @var Collection<int, LigneCommande>
      */
-    #[ORM\OneToMany(targetEntity: LigneCommande::class, mappedBy: 'commande_id')]
+    #[ORM\OneToMany(targetEntity: LigneCommande::class, mappedBy: 'commande_id', orphanRemoval:true , cascade : ['persist'] )]
     private Collection $ligneCommandes;
 
     #[ORM\Column(nullable: true)]
@@ -27,6 +27,10 @@ class Commande
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $date_commande = null;
+
+
+    #[ORM\Column(length: 255)]
+   private ?string $statut = 'Non payé';
 
     public function __construct()
     {
@@ -88,6 +92,18 @@ class Commande
     public function setDateCommande(\DateTimeInterface $date_commande): static
     {
         $this->date_commande = $date_commande;
+
+        return $this;
+    }
+
+    public function getStatut(): ?string
+    {
+        return $this->statut;
+    }
+
+    public function setStatut(string $statut): static
+    {
+        $this->statut = $statut;
 
         return $this;
     }

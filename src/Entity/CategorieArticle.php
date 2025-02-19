@@ -33,6 +33,8 @@ class CategorieArticle
     #[ORM\OneToMany(targetEntity: Article::class, mappedBy: 'categorie', orphanRemoval: true)]
     private Collection $list_articles;
 
+   
+
     public function __construct()
     {
         $this->list_articles = new ArrayCollection();

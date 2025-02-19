@@ -1,0 +1,106 @@
+{% extends 'base2.html.twig' %}
+
+{% block body %}
+<main id="main" class="main">
+    <section class="section dashboard">
+        <div class="row">
+            <div class="col-12">
+                {% for type, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ type }} alert-dismissible fade show d-flex justify-content-between align-items-center" role="alert">
+                            <span>{{ message }}</span>
+                            <span class="close-icon" style="cursor: pointer; margin-left: 10px;" data-bs-dismiss="alert" aria-label="Close">
+                                X
+                            </span>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+
+                <div class="card top-selling overflow-auto">
+                    <div class="card-body pb-0">
+                        <h5 class="card-title">Liste des Commandes</h5>
+                        <!-- Filter Dropdown -->
+                        <div class="col-md-3 mb-4">
+                            <select id="inputState" class="form-select" onchange="filterOrders(this.value)">
+                                <option value="all">Toutes les commandes</option>
+                                <option value="paid">Payées</option>
+                                <option value="unpaid">Non payées</option>
+                            </select>
+                        </div>
+
+                        <!-- Commandes Table -->
+                        <table class="table table-striped table-bordered" id="commandeTable">
+                            <thead>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Prix Total</th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Statut</th>
+                                    <th scope="col">Articles</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for commande in commandes %}
+                                    <tr class="commande-row" data-status="{{ commande.statut }}">
+                                        <td>{{ commande.id }}</td>
+                                        <td>{{ commande.prixTotal }} DT </td>
+                                        <td>{{ commande.dateCommande|date('Y-m-d H:i') }}</td>
+                                        <td>
+                                            {% if commande.statut == 'Payé à la livraison' %}
+                                                <span class="badge bg-success" style="width: 100px; text-align: center;">Payé à la livraison</span>
+                                            {% elseif commande.statut == 'Payé par VISA' %}
+                                                <span class="badge bg-success" style="width: 100px; text-align: center;">Payé par VISA</span>
+                                            {% elseif commande.statut == 'En attente' %}
+                                                <span class="badge bg-warning" style="width: 100px; text-align: center;">En attente</span>
+                                            {% else %}
+                                                <span class="badge bg-danger" style="width: 100px; text-align: center;">Non Payée</span>
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            <ul class="list-unstyled">
+                                                {% for ligne in commande.ligneCommandes %}
+                                                    <li>{{ ligne.articleC.nomArticle }} (x{{ ligne.quantiteC }}) - {{ ligne.prixC }}DT</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+    function filterOrders(status) {
+        const rows = document.querySelectorAll('.commande-row');
+        
+        rows.forEach(row => {
+            const rowStatus = row.getAttribute('data-status').toLowerCase();
+
+            // Si le filtre est sur "all", on montre toutes les commandes
+            if (status === 'all') {
+                row.style.display = ''; // Afficher toutes les commandes
+            }
+            // Si le filtre est sur "payées", on montre uniquement les commandes "Payé à la livraison" et "Payé par VISA"
+            else if (status === 'paid' && (rowStatus === 'payé à la livraison' || rowStatus === 'payé par visa')) {
+                row.style.display = ''; // Afficher les commandes payées
+            }
+            // Si le filtre est sur "non payées", on montre les commandes "En attente"
+            else if (status === 'unpaid' && rowStatus === 'en attente') {
+                row.style.display = ''; // Afficher les commandes en attente
+            }
+            else {
+                row.style.display = 'none'; // Masquer les autres
+            }
+        });
+    }
+</script>
+
+{% endblock %}
