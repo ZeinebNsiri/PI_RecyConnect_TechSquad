@@ -1,0 +1,49 @@
+{% extends 'base2.html.twig' %}
+
+{% block title %}Gestion des Posts{% endblock %}
+
+{% block body %}
+<main id="main" class="main">
+    <h1>Gestion des Posts</h1>
+    
+    <table class="table table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>ID</th>
+                <th>Auteur</th>
+                <th>Contenu</th>
+                <th>Créé le</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for post in posts %}
+                <tr>
+                    <td>{{ post.id }}</td>
+                    <td>{{ post.userP.NomUser }}</td>
+                    <td>{{ post.contenu }}</td>
+                    <td>{{ post.datePublication|date('d/m/Y H:i') }}</td>
+                    <td>{{ post.StatusPost ? 'Approuvé' : 'En attente' }}</td>
+                {#  
+                        {% if post.StatusPost %}
+                            <span class="badge badge-success">Approuvé</span>
+                        {% else %}
+                            <span class="badge badge-warning">En attente</span>
+                        {% endif %}
+                        #}
+                    </td>
+                    <td>
+                        {% if not post.StatusPost %}
+                            <a href="{{ path('admin_post_approve', {'id': post.id}) }}" class="btn btn-success btn-sm">Approuver</a>
+                        {% else %}
+                            <a href="{{ path('admin_post_reject', {'id': post.id}) }}" class="btn btn-warning btn-sm">Rejeter</a>
+                        {% endif %}
+                        <a href="{{ path('admin_post_delete', {'id': post.id}) }}" class="btn btn-danger btn-sm" onclick="return confirm('Voulez-vous vraiment supprimer ce post ?');">Supprimer</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </main>
+{% endblock %}

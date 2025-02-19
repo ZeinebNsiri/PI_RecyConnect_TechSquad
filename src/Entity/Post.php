@@ -23,8 +23,7 @@ class Post
     #[ORM\Column(type: Types::TEXT)]
     private ?string $contenu = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $contenuMultimedia = null;
+  
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $datePublication = null;
@@ -58,6 +57,11 @@ class Post
         $this->commentaires_post = new ArrayCollection();
         $this->postEnregistres_post = new ArrayCollection();
         $this->likes_post = new ArrayCollection();
+        //par defaut
+        $this->status_post = false; 
+        $this->nbrJaime = 0; 
+        $this->datePublication = new \DateTime(); // Date actuelle
+    
     }
 
     public function getId(): ?int
@@ -89,17 +93,7 @@ class Post
         return $this;
     }
 
-    public function getContenuMultimedia(): ?string
-    {
-        return $this->contenuMultimedia;
-    }
-
-    public function setContenuMultimedia(?string $contenuMultimedia): static
-    {
-        $this->contenuMultimedia = $contenuMultimedia;
-
-        return $this;
-    }
+    
 
     public function getDatePublication(): ?\DateTimeInterface
     {
@@ -226,4 +220,15 @@ class Post
 
         return $this;
     }
+
+
+    public function isLikedByUser(Utilisateur $user): bool
+            {
+                foreach ($this->likes_post as $like) {
+                    if ($like->getUserLike() === $user) {
+                        return true;
+                    }
+                }
+                return false;
+            }
 }

@@ -1,0 +1,301 @@
+
+{% extends 'basecnx.html.twig' %}
+
+{% block title %}Forum{% endblock %}
+
+{% block stylesheets %}
+   
+    <link href="{{asset('Posts/css/bootstrap.css')}}" rel="stylesheet" type="text/css">
+    <link href="{{asset('Posts/css/style.css')}}" rel="stylesheet" type="text/css">
+    <!-- <link href="{{asset('Posts/css/animate.css')}}" rel="stylesheet" type="text/css"> -->
+    <link href="{{asset('Posts/css/font-awesome.min.css')}}" rel="stylesheet" type="text/css"> 
+    <link href="{{asset('Posts/css/post.css')}}" rel="stylesheet" type="text/css">
+
+
+
+  
+
+ 
+{% endblock %}
+
+
+{% block body %}
+{% for message in app.flashes('success') %}
+    <div class="alert alert-success alert-dismissible fade show d-flex justify-content-between align-items-center" role="alert">
+        <span>{{ message }}</span>
+        <span class="close-icon" style="cursor: pointer;" data-bs-dismiss="alert" aria-label="Close">
+            X
+        </span>
+    </div>
+{% endfor %}
+    <!-- Page Header Start -->
+    <div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s">
+        <div class="container text-center py-5">
+            <h1 class="display-3 text-white mb-4 animated slideInDown">RecyConnect Forum</h1>
+           
+        </div>
+    </div>
+    <!-- Page Header End -->
+
+    <!-- ======content section/body=====-->
+    <section class="text-center mx-auto wow fadeInUp">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-9">
+                    <div id="main">
+                        <input id="tab1" type="radio" name="tabs" checked>
+                        <label for="tab1">Post Récents</label>
+                        <input id="tab2" type="radio" name="tabs">
+                        <label for="tab2">Les Posts Les Plus Lickés</label>
+                        <input id="tab3" type="radio" name="tabs">
+                        <label for="tab3">Mes Posts </label>
+                        <input id="tab4" type="radio" name="tabs">
+                        <label for="tab4"> Enregistrés </label>
+                       <!-- Create Post Button -->
+                        <button onclick="window.location.href='{{ path('post_create') }}'" class="btn btn-primary create-post-btn">Créer Une Publication</button>
+                        
+                    
+                        <!-- All Posts Content -->
+                        <section id="content1">
+                               <!--Recent Question Content Section -->
+                            {% for postData in postsWithMedia %}
+                            <div class="question-type2033">
+                                <div class="row">
+                                    <!-- User Info -->
+                                    <div class="col-md-1">
+                                        <div class="left-user12923 left-user12923-repeat">
+                                            
+                                            <a href="#"><img src="{{ asset(postData.post.userP.PhotoProfil ? 'uploads/profile_dir/' ~ postData.post.userP.PhotoProfil : 'backOffice/assets/img/profile.jpg') }}" alt="User Profile"></a>
+                                            <a href="#" class="user-name">{{ postData.post.userP.nomUser }}</a>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Post Content -->
+                                    <div class="col-md-9">
+                                        <div class="right-description893">
+                                            <div id="que-hedder2983">
+                                                <span class="fa fa-clock-o" aria-hidden="true"> {{ postData.post.datePublication|date('d/m/Y H:i') }}</span>
+                                            </div>
+                                            <div class="ques-details10018">
+                                                <p>{{ postData.post.contenu }}</p>
+                                            </div>
+                                            <!-- Gestion des médias associés au post -->
+                                            {% if postData.medias is not empty %}
+                                                <div class="post-media">
+                                                    {% for media in postData.medias|slice(0, 3) %}
+                                                        <img src="{{ asset('posts/uploads/' ~ media.chemin) }}" alt="Post Image"  class="clickable-image" data-post-id="{{ postData.post.id }}">
+                                                    {% endfor %}
+                                                    {% if postData.medias|length > 3 %}
+                                                        <div class="more-images-overlay clickable-image"
+                                                            data-post-id="{{ postData.post.id }}"
+                                                            data-remaining="{{ postData.medias|length - 3 }}">
+                                                            +{{ postData.medias|length - 3 }}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            {% endif %}
+
+
+                                            <hr>
+                                            <div class="ques-icon-info3293"> 
+                                                
+                                                <a href="#" class="fa fa-heart like-btn {% if postData.post.isLikedByUser(user) %}liked{% endif %}" 
+                                                data-post-id="{{ postData.post.id }}">
+                                                    {{ postData.post.getLikesPost()|length }}
+                                                </a>
+                                                <a href="{{ path('app_comments', { 'id': postData.post.id }) }}" class="fa fa-comment" aria-hidden="true"> {{ postData.post.getCommentairesPost()|length }}</a> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Comment Section -->
+                                    <div class="col-md-2">
+                                        <div class="ques-type302">
+                                            <a href="{{ path('app_comments', { 'id': postData.post.id }) }}" class="view-comments">Voir les commentaires</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <p>Aucun post disponible.</p>
+                            {% endfor %}
+
+                           
+                            
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination">
+                                  <li>
+                                    <a href="#" aria-label="Previous">
+                                      <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                  </li>
+                                  <li><a href="#">1</a></li>
+                                  <li><a href="#">2</a></li>
+                                  <li><a href="#">3</a></li>
+                                  <li><a href="#">4</a></li>
+                                  <li><a href="#">5</a></li>
+                                  <li>
+                                    <a href="#" aria-label="Next">
+                                      <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                  </li>
+                                </ul>
+                            </nav>
+                        </section>
+                        <!--  End of content-1 -->
+
+
+
+                         <!-- My Posts Content (Mes Posts) -->
+                        <section id="content3">
+                            {% for postData in myPostsWithMedia %}
+                            <div class="question-type2033">
+                                <div class="row">
+                                    <div class="col-md-1">
+                                        <div class="left-user12923 left-user12923-repeat">
+                                            <a href="#"><img src="{{ asset(postData.post.userP.PhotoProfil ? 'uploads/profile_dir/' ~ postData.post.userP.PhotoProfil : 'backOffice/assets/img/profile.jpg') }}" alt="User Profile"></a>
+                                            <a href="#" class="user-name">{{ postData.post.userP.nomUser }}</a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <div class="right-description893">
+                                            <div id="que-hedder2983">
+                                                <span class="fa fa-clock-o" aria-hidden="true"> {{ postData.post.datePublication|date('d/m/Y H:i') }}</span>
+                                            </div>
+                                            <div class="ques-details10018">
+                                                <p class="post-content" id="post-content-{{ postData.post.id }}">{{ postData.post.contenu }}</p>
+                                                <textarea class="edit-content d-none" id="edit-content-{{ postData.post.id }}">{{ postData.post.contenu }}</textarea>
+                                            </div>
+
+                                            <!-- Media associated with the post -->
+                                            {% if postData.medias is not empty %}
+                                            <div class="post-media">
+                                                {% for media in postData.medias|slice(0, 3) %}
+                                                <img src="{{ asset('posts/uploads/' ~ media.chemin) }}" alt="Post Image" class="clickable-image" data-post-id="{{ postData.post.id }}">
+                                                {% endfor %}
+                                                {% if postData.medias|length > 3 %}
+                                                <div class="more-images-overlay clickable-image" data-post-id="{{ postData.post.id }}" data-remaining="{{ postData.medias|length - 3 }}">
+                                                    +{{ postData.medias|length - 3 }}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            {% endif %}
+
+                                            <hr>
+                                           
+
+                                            <!-- Post Modification and Deletion -->
+                                            <div class="post-actions">
+                                                <button class="btn  edit-btn" data-post-id="{{ postData.post.id }}">Modifier</button>
+                                                <a href="{{ path('post_delete', { 'id': postData.post.id }) }}" class="fa fa-trash"> Supprimer</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <p>Aucun post disponible.</p>
+                            {% endfor %}
+                        </section>
+                
+                    </div>
+                </div>
+              
+            </div>
+        </div>
+
+
+        <div id="imageModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <div id="modal-images"></div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+    {% block javascripts %}
+        
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="{{asset('Posts/js/jquery-3.1.1.min.js')}}"></script>
+        <script src="{{asset('Posts/js/bootstrap.min.js')}}"></script>
+        
+        <!-- script lel modal-->
+        <script>
+           document.addEventListener('DOMContentLoaded', function () {
+                const modal = document.getElementById('imageModal');
+                const modalImages = document.getElementById('modal-images');
+                const closeModal = document.querySelector('.close');
+
+                // Fonction pour afficher toutes les images d'un post dans la modale
+                function openImageModal(postId) {
+                    modal.style.display = 'block';
+                    modalImages.innerHTML = ''; // Vider les images précédentes
+
+                    // Récupérer toutes les images du post
+                    const images = document.querySelectorAll(`[data-post-id="${postId}"]`);
+                    images.forEach(img => {
+                        const imgElement = document.createElement('img');
+                        imgElement.src = img.src;
+                        imgElement.alt = 'Post Image';
+                        imgElement.classList.add('modal-image');
+                        modalImages.appendChild(imgElement);
+                    });
+                }
+
+                // Gérer les clics sur les images et le "+X"
+                document.querySelectorAll('.clickable-image').forEach(image => {
+                    image.addEventListener('click', function () {
+                        openImageModal(this.dataset.postId);
+                    });
+                });
+
+                // Fermer la modale
+                closeModal.addEventListener('click', () => {
+                    modal.style.display = 'none';
+                });
+
+                // Fermer en cliquant à l'extérieur
+                window.addEventListener('click', (event) => {
+                    if (event.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            });
+
+        </script>
+
+
+        <!-- script lel like-->
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.like-btn').forEach(button => {
+                button.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    let postId = this.dataset.postId;
+
+                    fetch(`/post/like/${postId}`, { 
+                        method: 'POST', 
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' } 
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.liked) {
+                            this.classList.add('liked');
+                        } else {
+                            this.classList.remove('liked');
+                        }
+                        this.innerHTML = data.likesCount;
+                    })
+                    .catch(error => console.error('Erreur:', error));
+                });
+            });
+        });
+        </script>
+
+    {% endblock %}
+   
+
+
+
+

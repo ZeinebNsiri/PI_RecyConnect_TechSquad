@@ -7,6 +7,7 @@ parameters:
     photo_dir: "%kernel.project_dir%/public/uploads/images"
     profile_dir: "%kernel.project_dir%/public/uploads/profile"
     video_dir: "%kernel.project_dir%/public/uploads/videos"
+    posts_dir: '%kernel.project_dir%/public/posts/uploads'
 
 services:
     # default configuration for services in *this* file
