@@ -3,6 +3,7 @@
 {% block title %}Gestion des Réservations{% endblock %}
 
 {% block body %}
+<main id="main" class="main">
     <div class="container mt-4">
       <div class="card">
             <div class="card-body">
@@ -32,7 +33,7 @@
                         <tr>
                             <th>{{ loop.index }}</th>
                             <td>{{ reservation.getEventId().getNomEvent() }}</td>
-                            <td>{{ reservation.getUserId() ? reservation.getUserId().getNom() : 'N/A' }}</td>
+                            <td>{{ reservation.getUserId() ? reservation.getUserId().getnomUser() : 'N/A' }}</td>
                             <td>{{reservation.getEmail()}}</td>
                             <td>{{reservation.getNumTel()}}</td>
                             <td>{{reservation.getDemandesSpeciales( )}}</td>
@@ -57,4 +58,5 @@
 
       
     </div>
+    </main>
 {% endblock %}

@@ -3,6 +3,7 @@
 {% block title %}Gestion des Événements{% endblock %}
 
 {% block body %}
+<main id="main" class="main">
     {% for message in app.session.flashBag.get('success') %}
     <div class="alert alert-success bg-success text-light border-0 alert-dismissible fade show" role="alert">
         {{ message }}
@@ -53,6 +54,8 @@
                                         <a href="{{ path('edit_event', {'id': event.id}) }}" class="btn btn-warning">
                                             <i class="bi bi-pencil-square"></i> Modifier
                                         </a>
+
+                                        
                                         <a href="{{ path('delete_event_confirm', {'id': event.id}) }}" class="btn btn-danger">
                                             <i class="bi  bi-trash"></i> Supprimer
                                              
@@ -69,5 +72,5 @@
                 </div>
             </div>
         </div>
- 
+ </main>
 {% endblock %}

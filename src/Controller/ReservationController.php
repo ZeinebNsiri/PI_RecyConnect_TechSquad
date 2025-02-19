@@ -24,6 +24,7 @@ class ReservationController extends AbstractController
             $reservation->setEventId($evenement);
             $nbPlacesReservees = $reservation->getNbPlaces();
             $evenement->setNbRestant($evenement->getNbRestant() - $nbPlacesReservees);
+            $reservation->setUserId($this->getUser());
 
             $entityManager->persist($reservation);
             $entityManager->flush();
@@ -40,9 +41,9 @@ class ReservationController extends AbstractController
 
     #[Route('/reservations', name: 'reservations_list')]
     public function listReservations(EntityManagerInterface $entityManager): Response
-    {
+    {   $user = $this->getUser();
         $reservations = $entityManager->getRepository(Reservation::class)->findBy([
-            'status' => 'active',
+            'status' => 'active','user_id'=>$user
         ]);
 
         return $this->render('reservation/list.html.twig', [
