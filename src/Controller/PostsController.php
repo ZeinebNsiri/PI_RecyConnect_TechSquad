@@ -17,13 +17,17 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Repository\LikeRepository;
 use App\Entity\Like;
-
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 final class PostsController extends AbstractController
-{
+{   
+    
     #[Route('/posts', name: 'app_posts')]
     public function index(EntityManagerInterface $entityManager, MediaPostRepository $mediaPostRepository): Response
-    {
+    {   
+        if (!$this->isGranted('ROLE_USER') && !$this->isGranted('ROLE_PROFESSIONNEL')) {
+            throw $this->createAccessDeniedException('Accès refusé.');
+        }
         $user = $this->getUser();
 
         $posts = $entityManager->getRepository(Post::class)->findBy(['status_post' => true], ['datePublication' => 'DESC']);

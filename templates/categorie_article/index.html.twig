@@ -1,6 +1,6 @@
 {% extends 'base2.html.twig' %}
 
-{% block title %}Hello CategorieArticleController!{% endblock %}
+{% block title %}Catégories article{% endblock %}
 
 {% block body %}
 
@@ -96,7 +96,7 @@
                         <table class="table table-borderless">
                             <thead>
                                 <tr>
-                                    <th scope="col">Id</th>
+                                    <th scope="col">#</th>
                                     <th scope="col">Logo</th>
                                     <th scope="col">Catégorie</th>
                                     <th scope="col">Nombre d'articles</th>
@@ -107,15 +107,15 @@
                             <tbody>
                                 {% for categorie in categories %}
                                     <tr>
-                                        <td> {{categorie.id}} </td>
+                                        <th scope="row">{{ loop.index }}</th>
                                         <td><img src="{{ asset('uploads/photo_dir/' ~ categorie.imageCategorie) }}" alt="Image" height: 60px width: 70px  ></td>
                                         <td>{{ categorie.nomCategorie }} </td>
                                         <td>{{ articleCounts[categorie.id] }}</td>
                                         <td class="fw-bold">
-                                            <a href='{{ path ('pp_updateCategorieArticle' , { 'id':categorie.id } ) }}' class="btn btn-success">Modifier</a>
+                                          <a href='{{ path ('pp_updateCategorieArticle' , { 'id':categorie.id } ) }}' class="btn btn-success"><i class="bi bi-pencil-square"></i> Modifier</a>
                                         </td>
                                         <td>
-                                            <a href='{{ path ('app_deleteCategorieArticle' , { 'id':categorie.id } ) }}' class="btn btn-danger">Supprimer</a>
+                                            <a class="btn btn-danger delete-btn"data-url="{{ path('app_deleteCategorieArticle', {'id': categorie.id}) }}"data-entity="CategorieArticle"data-genre="f"><i class="bi bi-trash"></i> Supprimer</a>
                                         </td>
                                     </tr>
                                 {% else %}

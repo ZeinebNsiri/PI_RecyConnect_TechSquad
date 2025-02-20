@@ -2,10 +2,10 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
+        <title>{% block title %}RecyConnect{% endblock %}</title>
         <link rel="icon" href="{{asset('backOffice/data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>')}}">
         <!-- Favicons -->
-        <link href="{{asset('backOffice/assets/img/favicon.png')}}" rel="icon">
+        <link href="{{asset('frontOffice/img/mainlogo.png')}}" rel="icon">
         <link href="{{asset('backOffice/assets/img/apple-touch-icon.png')}}" rel="apple-touch-icon">
 
         <!-- Google Fonts -->
@@ -261,7 +261,7 @@
                 <ul class="sidebar-nav" id="sidebar-nav">
 
                 <li class="nav-item">
-                    <a class="nav-link " href="index.html">
+                    <a class="nav-link " href={{ path('app_base2back_office') }}>
                     <i class="bi bi-grid"></i>
                     <span>Dashboard</span>
                     </a>
@@ -276,7 +276,7 @@
                 
                             <li class="nav-item">
                 <a class="nav-link collapsed" data-bs-target="#ventes-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-journal-text"></i><span>Ventes</span><i class="bi bi-chevron-down ms-auto"></i>
+                    <i class="bi bi-shop"></i><span>Ventes</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
                 <ul id="ventes-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
                     <li>

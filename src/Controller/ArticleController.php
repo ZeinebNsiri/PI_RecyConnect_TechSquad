@@ -30,7 +30,9 @@ final class ArticleController extends AbstractController
     #[Route('/article/add', name: 'app_addArticle')]
     public function addArticle(ManagerRegistry $manager, Request $req, SluggerInterface $slugger,
     #[Autowire('%kernel.project_dir%/public/uploads/photo_dir')] string $brochuresDirectory, UtilisateurRepository $UtilisateurRepository)
-    {
+    {   if (!$this->isGranted('ROLE_USER') && !$this->isGranted('ROLE_PROFESSIONNEL')) {
+        throw $this->createAccessDeniedException('Accès refusé.');
+        }
         $em= $manager->getManager();
         $user = $this->getUser();
         $Article= new   Article();
@@ -88,18 +90,23 @@ final class ArticleController extends AbstractController
 
     #[Route('/Article/getall', name: 'app_article')]
     public function getallArticle(ArticleRepository $repository, CategorieArticleRepository $repo)
-    {
+    {   $template = $this->getUser() ? 'basecnx.html.twig' : 'base.html.twig';
         $articles= $repository-> findAll();
         $categories= $repo-> findAll();
         return $this->render('article/index.html.twig', [
             'articles' => $articles,
             'categories' => $categories,
+            'template'=>$template
         ]);  
     }
 
     #[Route('/Article/getMine', name: 'app_article_mine')]
     public function getMesArticle(ArticleRepository $repository, CategorieArticleRepository $repo)
-    {   $user=$this->getUser();
+    {   
+        if (!$this->isGranted('ROLE_USER') && !$this->isGranted('ROLE_PROFESSIONNEL')) {
+            throw $this->createAccessDeniedException('Accès refusé.');
+        }
+        $user=$this->getUser();
         $articles= $repository-> findmine($user);
         $categories= $repo-> findAll();
         return $this->render('article/mesArticle.html.twig', [
@@ -111,11 +118,15 @@ final class ArticleController extends AbstractController
     #[Route('/article/detail/{id}',name:'detail_article')]
 
     public function DetailsArticle(ArticleRepository $repo, int $id){
+        if (!$this->isGranted('ROLE_USER') && !$this->isGranted('ROLE_PROFESSIONNEL')) {
+            throw $this->createAccessDeniedException('Accès refusé.');
+        }
         
         $article = $repo->find($id);
         
         return $this->render('article/detailsArticle.html.twig',[
-        'article' => $article
+        'article' => $article,
+        
       ]);
     }
 
@@ -211,7 +222,7 @@ final class ArticleController extends AbstractController
 
     #[Route('/articles/{categoryId?}', name: 'app_articles_by_category')]
     public function articlesByCategory(ArticleRepository $articleRepository, $categoryId = null, CategorieArticleRepository $repository): Response
-    {
+    {   $template = $this->getUser() ? 'basecnx.html.twig' : 'base.html.twig';
         if ($categoryId) {
             $articles = $articleRepository->findByCategory($categoryId);
         } else {
@@ -224,6 +235,7 @@ final class ArticleController extends AbstractController
             'articles' => $articles,
             'categories' => $categories,
             'selectedCategory' => $categoryId,
+            'template' =>$template
         ]);
     }
 

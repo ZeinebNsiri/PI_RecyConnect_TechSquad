@@ -1,4 +1,4 @@
-{% extends 'basecnx.html.twig' %}
+{% extends template %}
 
 {% block title %}Nos Événements{% endblock %}
 
@@ -38,7 +38,7 @@
                 <h4 class="mb-3">{{ event.getNomEvent() }}</h4>
                 <p class="mb-4">{{ event.getDescriptionEvent() }}</p>
                 <p class="fst-italic text-center">{{ event.getDateEvent()|date('l d F \\à H\\hi') }}</p>
-                <a class="btn btn-sm" href="{{ path('event_show', {'id': event.getId()}) }}"><i class="fa fa-plus text-primary me-2"></i>En savoir plus</a>
+                <a class="btn btn-sm" href="{{ path('event_show', {'id': event.getId()}) }}"><i class="fa fa-plus text-primary me-2"></i>Savoir plus</a>
               </div>
             </div>
           </div>

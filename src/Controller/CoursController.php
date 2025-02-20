@@ -17,6 +17,7 @@ final class CoursController extends AbstractController
     #[Route('/cours', name: 'app_allcours')]
     public function getAllcours(CoursRepository $repo, Request $request): Response
     {
+        
     $selectedCategory = $request->query->get('category'); // Get the selected category from URL
     $categories = $repo->findUniqueCategories(); // Fetch all unique categories
 
@@ -30,6 +31,7 @@ final class CoursController extends AbstractController
         'cours' => $cours,
         'categories' => array_column($categories, 'nomCategorie'), // Extract category names
         'selectedCategory' => $selectedCategory,
+        
     ]);
     }
 
@@ -172,7 +174,7 @@ final class CoursController extends AbstractController
 
                     #[Route('/workshops', name: 'app_workshops')]
                     public function showWorkshops(CoursRepository $coursRepository, Request $request): Response
-                    {
+                    {   $template = $this->getUser() ? 'basecnx.html.twig' : 'base.html.twig';
                         
                         $categories = $coursRepository->findUniqueCategories();
                         
@@ -191,13 +193,16 @@ final class CoursController extends AbstractController
                             'workshops'        => $workshops,
                             'categories'       => array_column($categories, 'nomCategorie'), 
                             'selectedCategory' => $selectedCategory,
+                            'template'=>$template
                         ]);
                     }
 
                     #[Route('/workshops/{id}', name: 'appworkshop_details')]
                     public function showWorkshopDetails(int $id, CoursRepository $coursRepository): Response
                     {
-                       
+                        if (!$this->isGranted('ROLE_USER') && !$this->isGranted('ROLE_PROFESSIONNEL')) {
+                            throw $this->createAccessDeniedException('Accès refusé.');
+                        }
                         $workshop = $coursRepository->find($id);
 
                       

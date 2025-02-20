@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Form;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use App\Entity\CategorieArticle;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -9,8 +8,10 @@ use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ResetType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 
 class CategoriArticleType extends AbstractType
@@ -28,7 +29,8 @@ class CategoriArticleType extends AbstractType
                     ])
                 ]
             ])
-            ->add('description_categorie', TextType::class, [
+            ->add('description_categorie', TextareaType::class, [
+                'attr' => ['class' => 'form-control', 'rows' => 4],
                 'empty_data' => '',
                 'required' => true,
                 'constraints' => [

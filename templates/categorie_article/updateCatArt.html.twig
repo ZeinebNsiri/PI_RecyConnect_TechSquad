@@ -1,6 +1,6 @@
 {% extends 'base2.html.twig' %}
 
-{% block title %}Hello CategorieArticleController!{% endblock %}
+{% block title %}Modifier catégorie{% endblock %}
 
 {% block body %}
 <style>
@@ -59,7 +59,9 @@
                 {{ form_widget(form.Confirmer, {'attr': {'class': 'btn btn-success'}}) }}
                 {{ form_widget(form.Annuler, {'attr': {'class': 'btn btn-secondary', 'type': 'reset'}}) }}
             </div>
-
+              <div class="col-12">
+                <a href="{{ path('app_addCategorieArticle') }}" class="btn btn-success">Retouner vers la liste des catégorie</a>
+            </div>
             {{ form_end(form) }}
             <!-- End floating Labels Form -->
 

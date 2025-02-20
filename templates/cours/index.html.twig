@@ -6,7 +6,7 @@
 <main id="main" class="main">
 
 {% for message in app.session.flashBag.get('success') %}
-    <div class="alert alert-success bg-success text-light border-0 alert-dismissible fade show" role="alert">
+    <div class="alert alert-success alert-dismissible fade show d-flex justify-content-between align-items-center" role="alert">
         {{ message }}
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
@@ -73,12 +73,12 @@
                         
       
                         <td>
-                            <a href="{{ path('app_editcours', {'id': cour.id}) }}" class="btn btn-warning">
+                            <a href="{{ path('app_editcours', {'id': cour.id}) }}" class="btn btn-success">
                                 <i class="bi bi-pencil-square"></i> Modifier
                             </a>
 
                         
-                           <a href="#" class="btn btn-danger delete-btn"data-url="{{ path('app_deletecours', {'id': cour.id}) }}"data-entity="Cours"data-genre="m"><i class="bi bi-trash"></i> Supprimer</a>
+                           <a  class="btn btn-danger delete-btn"data-url="{{ path('app_deletecours', {'id': cour.id}) }}"data-entity="Cours"data-genre="m"><i class="bi bi-trash"></i> Supprimer</a>
                            
                             
                         </td>

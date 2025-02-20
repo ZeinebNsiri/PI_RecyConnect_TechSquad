@@ -1,6 +1,6 @@
 {% extends 'base2.html.twig' %}
 
-{% block title %}Hello CategorieArticleController!{% endblock %}
+{% block title %}Liste des articles{% endblock %}
 
 {% block body %}
 
@@ -32,7 +32,7 @@
                         <table class="table table-borderless">
                             <thead>
                                 <tr>
-                                    <th scope="col">Id</th>
+                                    <th scope="col">#</th>
                                     <th scope="col">Image</th>
                                     <th scope="col">Nom de l'article</th>
                                     <th scope="col">Catégorie</th>
@@ -45,7 +45,7 @@
                             <tbody>
                                 {% for article in articles %}
                                     <tr>
-                                        <td> {{article.id}} </td>
+                                        <th scope="row">{{ loop.index }}</th>
                                         <td><img src="{{ asset('uploads/photo_dir/' ~ article.imageArticle) }}" alt="Image" height: 60px width: 70px  ></td>
                                         <td>{{ article.nomArticle }} </td>
                                         <td>{{ article.categorie }} </td>
@@ -54,7 +54,7 @@
                                         <td>{{ article.utilisateur}}</td>
                                         
                                         <td>
-                                            <a href='{{ path ('app_deleteArticleAdmin' , { 'id':article.id } ) }}' class="btn btn-danger">Ban</a>
+                                            <a class="btn btn-danger delete-btn"data-url="{{ path('app_deleteArticleAdmin', {'id': article.id}) }}"data-entity="Article"><i class="bi bi-trash"></i> Ban</a>
                                         </td>
                                     </tr>
                                 {% else %}

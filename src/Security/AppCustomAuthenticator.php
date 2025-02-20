@@ -54,7 +54,7 @@ class AppCustomAuthenticator extends AbstractLoginFormAuthenticator
             return new RedirectResponse($this->urlGenerator->generate('app_base2back_office'));
         }
         
-        return new RedirectResponse($this->urlGenerator->generate('app_base_front_office_cnx'));
+        return new RedirectResponse($this->urlGenerator->generate('homecnx'));
 
         
     }

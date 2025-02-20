@@ -1,7 +1,7 @@
 
 {% extends 'basecnx.html.twig' %}
 
-{% block title %}Comments{% endblock %}
+{% block title %}Commentaires{% endblock %}
 
 {% block stylesheets %}
     <meta charset="utf-8">
@@ -19,11 +19,48 @@
     <link href="{{asset('css/font-awesome.min.css')}}" rel="stylesheet" type="text/css">
     <link href="{{asset('css/responsive.css')}}" rel="stylesheet" type="text/css">
     <link href="{{asset('Posts/css/comments.css')}}" rel="stylesheet" type="text/css">
+    <style>
+        .alert-success {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            color: #155724 !important;
+            background-color: #D4EDDA !important;
+            border-color: #C3E6CB !important;
+            padding-right: 20px; /* Ensures spacing on the right */
+            position: relative;
+        }
+
+        .close-icon {
+            margin-left: auto !important;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #155724 !important;
+            padding: 5px;
+        }
+
+        .close-icon:hover {
+            color: #0b3c1b !important;
+        }
+    </style>
     
 {% endblock %}
 
 
 {% block body %}
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show d-flex justify-content-between align-items-center" role="alert">
+            <span>{{ message }}</span>
+            <span class="close-icon" style="cursor: pointer;" data-bs-dismiss="alert" aria-label="Close">
+                X
+            </span>
+        </div>
+    {% endfor %}
   <div class="comment-list12993">
                         <div class="container">
                             <div class="row">

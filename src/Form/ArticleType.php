@@ -36,6 +36,7 @@ class ArticleType extends AbstractType
                 ]
             ])
             ->add('description_article', TextType::class, [
+                'attr' => ['class' => 'form-control', 'rows' => 4],
                 'empty_data' => '',
                 'required' => true,
                 'constraints' => [

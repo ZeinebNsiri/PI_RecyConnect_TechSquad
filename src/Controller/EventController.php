@@ -15,17 +15,20 @@ class EventController extends AbstractController
 {
     #[Route('/events', name: 'events_list')]
     public function index(EntityManagerInterface $entityManager): Response
-    {
+    {   $template = $this->getUser() ? 'basecnx.html.twig' : 'base.html.twig';
         $events = $entityManager->getRepository(Evenement::class)->findAll();
 
         return $this->render('event/index.html.twig', [
             'events' => $events,
+            'template'=>$template
         ]);
     }
 
     #[Route('/event/{id}', name: 'event_show')]
     public function detail(EvenementRepository $evenementRepository, int $id): Response
-    {
+    {   if (!$this->isGranted('ROLE_USER') && !$this->isGranted('ROLE_PROFESSIONNEL')) {
+        throw $this->createAccessDeniedException('Accès refusé.');
+        }
         $evenement = $evenementRepository->find($id);
 
         if (!$evenement) {

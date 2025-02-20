@@ -60,7 +60,7 @@ final class CommentsController extends AbstractController
 
             $entityManager->persist($commentaire);
             $entityManager->flush();
-
+            $this->addFlash('success', 'Commentaire ajouté avec succès!');
             return $this->json([
                 'success' => true,
                 'message' => 'Commentaire ajouté avec succès.',
@@ -91,6 +91,7 @@ final class CommentsController extends AbstractController
     
             $entityManager->persist($reply);
             $entityManager->flush();
+            $this->addFlash('success', 'Réponse ajouté avec succès!');
         }
     
         return $this->redirectToRoute('app_comments', ['id' => $comment->getPostCom()->getId()]);

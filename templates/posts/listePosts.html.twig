@@ -39,7 +39,8 @@
                         {% else %}
                             <a href="{{ path('admin_post_reject', {'id': post.id}) }}" class="btn btn-warning btn-sm">Rejeter</a>
                         {% endif %}
-                        <a href="{{ path('admin_post_delete', {'id': post.id}) }}" class="btn btn-danger btn-sm" onclick="return confirm('Voulez-vous vraiment supprimer ce post ?');">Supprimer</a>
+                        <a class="btn btn-danger delete-btn"data-url="{{ path('admin_post_delete', {'id': post.id}) }}"data-entity="Post"data-genre="f"><i class="bi bi-trash"></i>Supprimer</a>
+                        
                     </td>
                 </tr>
             {% endfor %}
