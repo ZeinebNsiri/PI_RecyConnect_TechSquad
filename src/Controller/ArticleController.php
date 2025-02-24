@@ -7,6 +7,7 @@ use App\Form\ArticleType;
 use App\Repository\ArticleRepository;
 use App\Repository\UtilisateurRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Repository\LigneCommandeRepository;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\CategorieArticleRepository;
 use Symfony\Component\HttpFoundation\Response;
@@ -209,10 +210,21 @@ final class ArticleController extends AbstractController
     }
 
     #[Route('article/delete/admin/{id}', name: 'app_deleteArticleAdmin')]
-    public function deleteArticleAdmin (ManagerRegistry $manager, ArticleRepository $repository, $id) {
+    public function deleteArticleAdmin (ManagerRegistry $manager, ArticleRepository $repository, $id, LigneCommandeRepository $ligneCommandeRepository) {
         $em= $manager->getManager();
+        
        
         $Article = $repository -> find($id);
+        $ligneCommandes = $ligneCommandeRepository->findBy(['article_c' => $Article]);
+
+            foreach ($ligneCommandes as $ligneCommande) {
+                if ($ligneCommande->getEtatC() === "confirmée") {
+                    $this->addFlash('warning', 'Cet article est déjà commandé, vous ne pouvez pas le supprimer.');
+                    return $this->redirectToRoute('app_article_admin');
+                }
+            }
+
+
         $em -> remove($Article);
 
         $em -> flush();
