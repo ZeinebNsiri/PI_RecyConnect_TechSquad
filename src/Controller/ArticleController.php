@@ -219,7 +219,7 @@ final class ArticleController extends AbstractController
 
             foreach ($ligneCommandes as $ligneCommande) {
                 if ($ligneCommande->getEtatC() === "confirmée") {
-                    $this->addFlash('warning', 'Cet article est déjà commandé, vous ne pouvez pas le supprimer.');
+                    $this->addFlash('success', 'Cet article a déjà été commandé, vous ne pouvez pas le supprimer!');
                     return $this->redirectToRoute('app_article_admin');
                 }
             }

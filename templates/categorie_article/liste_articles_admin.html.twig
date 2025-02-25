@@ -53,8 +53,10 @@
                                         <td>{{ article.prix }} TN/KG</td>
                                         <td>{{ article.utilisateur}}</td>
                                         
-                                        <td>
-                                            <a class="btn btn-danger delete-btn"data-url="{{ path('app_deleteArticleAdmin', {'id': article.id}) }}"data-entity="Article"><i class="bi bi-trash"></i> Ban</a>
+                                       <td>
+                                            <a class="btn btn-success detail-button" href="{{ path('app_deleteArticleAdmin', {'id': article.id}) }}">
+                                                <i class="bi bi-trash"></i> Ban
+                                            </a>
                                         </td>
                                     </tr>
                                 {% else %}
