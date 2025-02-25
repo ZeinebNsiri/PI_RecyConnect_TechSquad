@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Article;
 use App\Form\ArticleType;
+use App\Service\MailerService;
 use App\Repository\ArticleRepository;
 use App\Repository\UtilisateurRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -210,11 +211,13 @@ final class ArticleController extends AbstractController
     }
 
     #[Route('article/delete/admin/{id}', name: 'app_deleteArticleAdmin')]
-    public function deleteArticleAdmin (ManagerRegistry $manager, ArticleRepository $repository, $id, LigneCommandeRepository $ligneCommandeRepository) {
+    public function deleteArticleAdmin (ManagerRegistry $manager, ArticleRepository $repository, $id, LigneCommandeRepository $ligneCommandeRepository, MailerService $mailer) {
         $em= $manager->getManager();
         
-       
         $Article = $repository -> find($id);
+
+        $email_ban= $Article -> getUtilisateur() -> getEmail() ;
+
         $ligneCommandes = $ligneCommandeRepository->findBy(['article_c' => $Article]);
 
             foreach ($ligneCommandes as $ligneCommande) {
@@ -228,6 +231,12 @@ final class ArticleController extends AbstractController
         $em -> remove($Article);
 
         $em -> flush();
+        
+        $mailer->sendEmail(
+            $email_ban, 
+            'Notification de bannissement de votre article', 
+            "<p>Votre article a été banni car il ne respecte pas la réglementation de notre site!</p>"
+        );
         $this->addFlash('success', ' L\'article supprimé avec succès!');
         return $this-> redirectToRoute('app_article_admin'); 
     }
