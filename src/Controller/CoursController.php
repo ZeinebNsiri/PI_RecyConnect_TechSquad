@@ -174,26 +174,32 @@ final class CoursController extends AbstractController
 
                     #[Route('/workshops', name: 'app_workshops')]
                     public function showWorkshops(CoursRepository $coursRepository, Request $request): Response
-                    {   $template = $this->getUser() ? 'basecnx.html.twig' : 'base.html.twig';
-                        
+                    {
+                        // Base template depends on whether user is logged in or not
+                        $template = $this->getUser() ? 'basecnx.html.twig' : 'base.html.twig';
+                
+                        // 1) Récupérer toutes les catégories pour l’affichage des onglets/liste
                         $categories = $coursRepository->findUniqueCategories();
-                        
-                      
+                
+                        // 2) Récupérer les paramètres de filtre depuis l’URL:
+                        //    ?category=...     => pour la catégorie
+                        //    ?searchTitle=...  => pour le titre
+                        //    ?video=yes/no     => pour la présence de vidéo
                         $selectedCategory = $request->query->get('category');
-                    
-                       
-                        if ($selectedCategory) {
-                            $workshops = $coursRepository->findByCategory($selectedCategory);
-                        } else {
-                            $workshops = $coursRepository->findAll();
-                        }
-                    
-                       
+                        $searchTitle      = $request->query->get('searchTitle');
+                        $videoFilter      = $request->query->get('video');  // "yes" ou "no" ou null
+                
+                        // 3) Appeler la nouvelle méthode qui gère tous les filtres en même temps
+                        $workshops = $coursRepository->findByAllFilters($selectedCategory, $searchTitle, $videoFilter);
+                
+                        // 4) Renvoyer la vue
                         return $this->render('cours/courscnx_front.html.twig', [
                             'workshops'        => $workshops,
                             'categories'       => array_column($categories, 'nomCategorie'), 
                             'selectedCategory' => $selectedCategory,
-                            'template'=>$template
+                            'searchTitle'      => $searchTitle,
+                            'videoFilter'      => $videoFilter,
+                            'template'         => $template
                         ]);
                     }
 
@@ -241,6 +247,8 @@ final class CoursController extends AbstractController
                         ]);
                     }
 
+
+     
                     
 
 }

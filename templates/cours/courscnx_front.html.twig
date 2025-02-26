@@ -68,33 +68,30 @@
 .btn-voir-plus:hover {
     background: #218838;
 }
-/* .dropdown-toggle {
-    background-color: #e6f4ea;
-    color: #2c7a4b;
-    border: none;
-    padding: 8px 16px;
-    font-weight: bold;
-    border-radius: 8px;
+ .search-form {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap; 
+    gap: 10px;
+    margin-bottom: 20px;
 }
 
-.dropdown-toggle:hover {
-    background-color: #d4edda;
+.search-form label {
+    font-weight: 600;
+    margin-right: 5px;
+    white-space: nowrap; 
 }
 
-.dropdown-menu {
-    border-radius: 8px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+.search-form input {
+    max-width: 250px; 
 }
 
-.dropdown-item {
-    color: #2c7a4b;
-    font-weight: 500;
-}
+.search-form select {
+    max-width: 120px; 
+} 
 
-.dropdown-item:hover {
-    background-color: #e6f4ea;
-    color: #2c7a4b;
-} */
+
 
 
 </style>
@@ -122,6 +119,34 @@
             <h1 class="display-5 mb-5">vidéos et guides pour redonner vie à vos produits</h1>
         </div>
 
+        <form method="get" action="{{ path('app_workshops') }}"  class="search-form">
+            {# Keep the same 'category' so we don't lose the selected category when we do a text search #}
+            {% if selectedCategory %}
+                <input type="hidden" name="category" value="{{ selectedCategory }}">
+            {% endif %}
+
+            {# Titre search #}
+            <label for="searchTitle">Rechercher par Titre:</label>
+            <input
+                type="text"
+                id="searchTitle"
+                name="searchTitle"
+                class="form-control"
+                value="{{ searchTitle|default('') }}"
+                placeholder="Titre du cours..."
+                style="margin: 0 10px;"
+            />
+
+            {# Video dropdown #}
+            <label for="video">Vidéo:</label>
+            <select id="video" name="video" class="form-control">
+                <option value=""  {% if videoFilter is empty %}selected{% endif %}>-- Tous --</option>
+                <option value="yes" {% if videoFilter == 'oui' %}selected{% endif %}>Oui</option>
+                <option value="no" {% if videoFilter == 'non' %}selected{% endif %}>Non</option>
+            </select>
+
+            <button type="submit" class="btn btn-sm btn-primary">Filtrer</button>
+        </form>
 
         <center>
    <ul class="list-inline rounded mb-5" id="portfolio-flters">

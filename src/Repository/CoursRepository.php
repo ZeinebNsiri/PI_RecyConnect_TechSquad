@@ -34,11 +34,50 @@ class CoursRepository extends ServiceEntityRepository
      */
     public function findByCategory(string $category): array
     {
-        return $this->createQueryBuilder('c')
+        return $this->createQueryBuilder('c')   
             ->leftJoin('c.categorieC', 'cat')
             ->where('cat.nomCategorie = :category')
             ->setParameter('category', $category)
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * EXEMPLE DE NOUVEAU: Cherche par catégorie, titre et présence de vidéo
+     *
+     * @param string|null $category   Nom de la catégorie (ou null pour pas filtrer)
+     * @param string|null $searchTitle   Titre à chercher (ou null pour pas filtrer)
+     * @param string|null $videoFilter   "yes" => workshops avec vidéo
+     *                                   "no"  => workshops sans vidéo
+     *                                   null ou "" => ne pas filtrer sur vidéo
+     */
+    public function findByAllFilters(?string $category, ?string $searchTitle, ?string $videoFilter): array
+    {
+        $qb = $this->createQueryBuilder('c')
+                   ->leftJoin('c.categorieC', 'cat')
+                   ->addSelect('cat');
+
+        // Filtrer par catégorie si précisé
+        if ($category) {
+            $qb->andWhere('cat.nomCategorie = :category')
+               ->setParameter('category', $category);
+        }
+
+        // Filtrer par titre (LIKE)
+        if ($searchTitle) {
+            $qb->andWhere('c.titreCours LIKE :searchTitle')
+               ->setParameter('searchTitle', '%'.$searchTitle.'%');
+        }
+
+        // Filtrer par présence ou absence de vidéo
+        if ($videoFilter === 'yes') {
+            // cours.video n'est pas null ou n'est pas une chaîne vide
+            $qb->andWhere('c.video IS NOT NULL AND c.video != \'\'');
+        } elseif ($videoFilter === 'no') {
+            // cours.video est null ou chaîne vide
+            $qb->andWhere('c.video IS NULL OR c.video = \'\'');
+        }
+
+        return $qb->getQuery()->getResult();
     }
 }

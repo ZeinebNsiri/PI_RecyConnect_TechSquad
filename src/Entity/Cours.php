@@ -72,7 +72,7 @@ class Cours
     {
         $this->video = $video;
 
-        return $this;
+        return $this;   
     }
 
     public function getImageCours(): ?string
