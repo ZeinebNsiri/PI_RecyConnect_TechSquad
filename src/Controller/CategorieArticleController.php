@@ -166,4 +166,25 @@ final class CategorieArticleController extends AbstractController
 
       ]);
     }
+
+    #[Route('/statistiques/categories', name: 'app_statistiques_categories')]
+    public function statistiquesCategories(ArticleRepository $articleRepository, CategorieArticleRepository $categorieRepository): Response
+    {
+        
+        $categories = $categorieRepository->findAll();
+
+        // Préparer les données pour le graphique
+        $data = [];
+        foreach ($categories as $categorie) {
+            $data[] = [
+                'nom' => $categorie->getNomCategorie(),
+                'count' => $articleRepository->countArticlesInCategory($categorie->getId()),
+            ];
+        }
+
+        return $this->render('categorie_article/statistiques_categories.html.twig', [
+            'data' => json_encode($data), 
+        ]);
+    }
+
 }
