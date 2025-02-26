@@ -16,7 +16,10 @@ security:
         main:
             lazy: true
             provider: app_user_provider
-            custom_authenticator: App\Security\AppCustomAuthenticator
+            custom_authenticators:
+                - App\Security\AppCustomAuthenticator
+                - App\Security\GoogleAuthenticator
+
             logout:
                 path: app_logout
                 # where to redirect after logout

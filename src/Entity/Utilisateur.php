@@ -38,7 +38,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $prenom = null;
 
-    #[ORM\Column(length: 20)]
+    #[ORM\Column(length: 20,nullable: true)]
     private ?string $numTel = null;
 
     #[ORM\Column(length: 255,nullable: true)]
@@ -46,7 +46,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var string The hashed password
      */
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?string $password = null;
 
     #[ORM\Column(length: 255,nullable: true,unique: true)]
