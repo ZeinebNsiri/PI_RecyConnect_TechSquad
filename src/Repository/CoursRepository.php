@@ -43,13 +43,11 @@ class CoursRepository extends ServiceEntityRepository
     }
 
     /**
-     * EXEMPLE DE NOUVEAU: Cherche par catégorie, titre et présence de vidéo
+     * 
      *
-     * @param string|null $category   Nom de la catégorie (ou null pour pas filtrer)
-     * @param string|null $searchTitle   Titre à chercher (ou null pour pas filtrer)
-     * @param string|null $videoFilter   "yes" => workshops avec vidéo
-     *                                   "no"  => workshops sans vidéo
-     *                                   null ou "" => ne pas filtrer sur vidéo
+     * @param string|null 
+     * @param string|null 
+     * @param string|null 
      */
     public function findByAllFilters(?string $category, ?string $searchTitle, ?string $videoFilter): array
     {
@@ -63,7 +61,7 @@ class CoursRepository extends ServiceEntityRepository
                ->setParameter('category', $category);
         }
 
-        // Filtrer par titre (LIKE)
+        // Filtrer par titre
         if ($searchTitle) {
             $qb->andWhere('c.titreCours LIKE :searchTitle')
                ->setParameter('searchTitle', '%'.$searchTitle.'%');
@@ -71,13 +69,26 @@ class CoursRepository extends ServiceEntityRepository
 
         // Filtrer par présence ou absence de vidéo
         if ($videoFilter === 'yes') {
-            // cours.video n'est pas null ou n'est pas une chaîne vide
+          
             $qb->andWhere('c.video IS NOT NULL AND c.video != \'\'');
         } elseif ($videoFilter === 'no') {
-            // cours.video est null ou chaîne vide
+            
             $qb->andWhere('c.video IS NULL OR c.video = \'\'');
         }
 
         return $qb->getQuery()->getResult();
+    }
+
+
+    public function countByCategory(): array
+    {
+        // Récupérer la catégorie (nomCategorie) + le count
+        return $this->createQueryBuilder('c')
+            ->select('cat.nomCategorie AS category, COUNT(c.id) AS total') // Alias total
+            ->leftJoin('c.categorieC', 'cat')
+            ->groupBy('cat.nomCategorie')
+            ->orderBy('cat.nomCategorie', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 }

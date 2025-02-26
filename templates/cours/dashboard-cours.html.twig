@@ -1,0 +1,66 @@
+
+{% extends 'base2.html.twig' %} 
+
+{% block title %}Dashboard Cours{% endblock %}
+
+
+
+{% block body %}
+
+<main id="main" class="main">
+
+  <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Nombre du workshop par catégorie</h5>
+
+   <div id="chart"></div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+<script>
+   
+    const stats = {{ stats|json_encode()|raw }};
+
+     stats.sort((a, b) => b.total - a.total);
+
+
+    const categories = stats.map(item => item.category || 'SansCat');
+    const totals     = stats.map(item => item.total);
+
+    document.addEventListener("DOMContentLoaded", () => {
+      var options = {
+        series: [{
+          name: 'Cours',
+          data: totals
+        }],
+        chart: {
+          type: 'bar',
+          height: 400
+        },
+        xaxis: {
+          categories: categories
+        },
+          yaxis: {
+ 
+        labels: {
+          formatter: function(val) {
+            return parseInt(val);
+          }
+        },
+        forceNiceScale: true,
+        tickAmount: 5,
+        min: 0
+      }
+      };
+
+      var chart = new ApexCharts(document.querySelector("#chart"), options);
+      chart.render();
+    });
+</script>
+
+    </main>
+    </div>
+    </div>
+    
+{% endblock %}
