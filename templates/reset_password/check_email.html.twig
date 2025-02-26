@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Réinitialisation du mot de passe</title>
+
+    <!-- Fichiers CSS -->
+    <link rel="stylesheet" href="{{ asset('login_signup/css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('login_signup/vendors/css/vendor.bundle.base.css') }}">
+    <link rel="shortcut icon" href="{{ asset('frontOffice/img/mainlogo.png') }}" />
+    <link rel="stylesheet" href="{{ asset('login_signup/vendors/mdi/css/materialdesignicons.min.css') }}">
+</head>
+<body>
+
+    <div class="container-scroller">
+        <div class="container-fluid page-body-wrapper full-page-wrapper">
+            <div class="row w-100 m-0">
+                <div class="content-wrapper full-page-wrapper d-flex align-items-center auth login-bg">
+                    <div class="card col-lg-4 mx-auto">
+                        <div class="card-body px-7 py-7">
+                            <h3 class="card-title text-left mb-3">Vérifiez votre e-mail</h3>
+
+                            <p class="text-muted">
+                                Si un compte correspondant à votre adresse e-mail existe, un e-mail contenant un lien de réinitialisation vient de vous être envoyé.
+                                Ce lien expirera dans 
+                                <strong>{{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}</strong>.
+                            </p>
+
+                            <p class="text-muted">
+                                Si vous ne recevez pas d'e-mail, veuillez vérifier votre dossier de courriers indésirables (spam) ou 
+                                <a href="{{ path('app_forgot_password_request') }}" class="text-primary">essayez à nouveau</a>.
+                            </p>
+
+                            <p class="sign-up text-center mt-3" style="color: #205719;">
+                                Retourner à la <a href="{{ path('app_login') }}">page de connexion</a>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts JavaScript -->
+    <script src="{{ asset('login_signup/vendors/js/vendor.bundle.base.js') }}"></script>
+    <script src="{{ asset('login_signup/js/misc.js') }}"></script>
+
+</body>
+</html>

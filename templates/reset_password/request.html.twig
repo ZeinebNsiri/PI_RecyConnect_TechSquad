@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Réinitialisation du mot de passe</title>
+    <link href="{{asset('frontOffice/img/mainlogo.png')}}" rel="icon">
+
+    <!-- Fichiers CSS propres à cette page -->
+    <link rel="stylesheet" href="{{ asset('login_signup/css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('login_signup/vendors/css/vendor.bundle.base.css') }}">
+    <link rel="shortcut icon" href="{{ asset('frontOffice/img/mainlogo.png') }}" />
+    <link rel="stylesheet" href="{{ asset('login_signup/vendors/mdi/css/materialdesignicons.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('login_signup/vendors/css/vendor.bundle.base.css') }}">
+
+</head>
+<body>
+
+    <div class="container-scroller">
+        <div class="container-fluid page-body-wrapper full-page-wrapper">
+            <div class="row w-100 m-0">
+                <div class="content-wrapper full-page-wrapper d-flex align-items-center auth login-bg">
+                    <div class="card col-lg-4 mx-auto">
+                        <div class="card-body px-5 py-5">
+                            <h3 class="card-title text-left mb-3">Réinitialiser votre mot de passe</h3>
+
+                            {% for flash_error in app.flashes('reset_password_error') %}
+                                <div class="alert alert-danger alert-dismissible fade show d-flex justify-content-between align-items-center" role="alert">
+                                    <span>{{ flash_error }}</span>
+                                    <span class="close-icon" style="cursor: pointer; margin-left: 10px;" data-bs-dismiss="alert" aria-label="Close">
+                                        X
+                                    </span>
+                                </div>
+                            {% endfor %}
+
+                            {{ form_start(requestForm) }}
+                                <div class="form-group">
+                                    <label for="email">Adresse e-mail</label>
+                                    {{ form_widget(requestForm.email, { 'attr': {'class': 'form-control p_input', 'placeholder': 'Entrez votre email'} }) }}
+                                    <div class="text-danger">
+                                        {{ form_errors(requestForm.email) }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <small>
+                                        Entrez votre adresse e-mail et nous vous enverrons un lien pour réinitialiser votre mot de passe.
+                                    </small>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary btn-block enter-btn">Envoyer l'email de réinitialisation</button>
+                            {{ form_end(requestForm) }}
+
+                            <p class="sign-up text-center mt-3" style="color: #205719;">
+                                Retourner à la <a href="{{ path('app_login') }}">page de connexion</a>.
+                            </p>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts JavaScript spécifiques -->
+    <script src="{{ asset('login_signup/vendors/js/vendor.bundle.base.js') }}"></script>
+    <script src="{{ asset('login_signup/js/misc.js') }}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.display = 'none';
+                }, 5000); // Cache les alertes après 5 secondes
+            });
+        });
+    </script>
+
+</body>
+</html>
