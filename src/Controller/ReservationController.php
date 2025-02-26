@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Reservation;
 use App\Entity\Evenement;
+use App\Repository\ReservationRepository;
 use App\Form\RegistrationType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -122,15 +123,7 @@ class ReservationController extends AbstractController
         return $this->redirectToRoute('reservations_list');
     }
 
-    #[Route('/admin/reservations', name: 'admin_reservations_list')]
-    public function adminListReservations(EntityManagerInterface $entityManager): Response
-    {
-        $reservations = $entityManager->getRepository(Reservation::class)->findAll();
 
-        return $this->render('reservation/admin_listRes.html.twig', [
-            'reservations' => $reservations,
-        ]);
-    }
 
     #[Route('/admin/reservation/{id}', name: 'admin_reservation_show', methods: ['GET'])]
     public function adminShowReservation(int $id, EntityManagerInterface $entityManager): Response
@@ -155,6 +148,22 @@ class ReservationController extends AbstractController
             'reservation' => $reservation,
         ]);
     }
+    #[Route('/admin/reservations', name: 'admin_reservations_list')]
+    public function adminListReservations(Request $request, ReservationRepository $reservationRepository): Response
+    {
+        // Get search parameters
+        $eventName = $request->query->get('eventName');
+        $username = $request->query->get('username');
+        $status = $request->query->get('status');
+    
+        // Use the repository method to search for reservations
+        $reservations = $reservationRepository->searchReservations($eventName, $username, $status);
+    
+        return $this->render('reservation/admin_listRes.html.twig', [
+            'reservations' => $reservations,
+        ]);
+    }
+    
 
     #[Route('/admin/reservation/delete/{id}/confirm', name: 'admin_reservation_delete', methods: ['POST'])]
     public function adminDeleteReservation(int $id, EntityManagerInterface $entityManager): Response

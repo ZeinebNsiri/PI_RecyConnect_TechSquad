@@ -16,6 +16,37 @@ class ReservationRepository extends ServiceEntityRepository
         parent::__construct($registry, Reservation::class);
     }
 
+    /**
+     * Search for reservations based on event name, username, and status.
+     *
+     * @param string|null $eventName
+     * @param string|null $username
+     * @param string|null $status
+     * @return Reservation[]
+     */
+    public function searchReservations(?string $eventName, ?string $username, ?string $status): array
+{
+    $qb = $this->createQueryBuilder('r')
+        ->leftJoin('r.event', 'e') // Corrected association name
+        ->leftJoin('r.user_id', 'u'); // Corrected association name
+
+    if (!empty($eventName)) {
+        $qb->andWhere('LOWER(e.nomEvent) LIKE LOWER(:eventName)')
+           ->setParameter('eventName', '%' . strtolower($eventName) . '%');
+    }
+
+    if (!empty($username)) {
+        $qb->andWhere('LOWER(u.nom_user) LIKE LOWER(:username)')
+           ->setParameter('username', '%' . strtolower($username) . '%');
+    }
+
+    if (!empty($status)) {
+        $qb->andWhere('r.status = :status')
+           ->setParameter('status', $status);
+    }
+
+    return $qb->getQuery()->getResult();
+}
 //    /**
 //     * @return Reservation[] Returns an array of Reservation objects
 //     */

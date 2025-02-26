@@ -15,20 +15,17 @@ class EventController extends AbstractController
 {
     #[Route('/events', name: 'events_list')]
     public function index(EntityManagerInterface $entityManager): Response
-    {   $template = $this->getUser() ? 'basecnx.html.twig' : 'base.html.twig';
+    {
         $events = $entityManager->getRepository(Evenement::class)->findAll();
 
         return $this->render('event/index.html.twig', [
             'events' => $events,
-            'template'=>$template
         ]);
     }
 
     #[Route('/event/{id}', name: 'event_show')]
     public function detail(EvenementRepository $evenementRepository, int $id): Response
-    {   if (!$this->isGranted('ROLE_USER') && !$this->isGranted('ROLE_PROFESSIONNEL')) {
-        throw $this->createAccessDeniedException('Accès refusé.');
-        }
+    {
         $evenement = $evenementRepository->find($id);
 
         if (!$evenement) {
@@ -41,12 +38,22 @@ class EventController extends AbstractController
     }
 
     #[Route('/admin/events', name: 'admin_events')]
-    public function adminIndex(EntityManagerInterface $entityManager): Response
+    public function adminIndex(Request $request, EvenementRepository $evenementRepository): Response
     {
-        $events = $entityManager->getRepository(Evenement::class)->findAll();
+        // Récupération des paramètres de recherche en GET
+        $searchTerm = $request->query->get('search', '');
+        $location   = $request->query->get('location', '');
+        $dateInput  = $request->query->get('date', '');
 
+        // On passe $dateStart et $dateEnd au repository pour filtrer sur l'intervalle de la journée
+        $events = $evenementRepository->searchEvents($searchTerm, $location, $dateInput);
+
+        // Passage des variables à la vue (la date est renvoyée sous forme de chaîne pour pré-remplir le formulaire)
         return $this->render('event/admin_events.html.twig', [
-            'events' => $events,
+            'events'     => $events,
+            'searchTerm' => $searchTerm,
+            'location'   => $location,
+            'date'       => $dateInput,
         ]);
     }
 
@@ -54,14 +61,12 @@ class EventController extends AbstractController
     public function create(Request $request, EntityManagerInterface $entityManager): Response
     {
         $event = new Evenement();
-        $form = $this->createForm(EventType::class, $event,[
+        $form = $this->createForm(EventType::class, $event, [
             'validation_groups' => ['create']
         ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
-
             $imageFile = $form->get('imageEvent')->getData();
 
             if ($imageFile) {
@@ -73,13 +78,10 @@ class EventController extends AbstractController
                 }
 
                 $imageFile->move($uploadDir, $newFilename);
-                $event->setImageEvent( $newFilename);
+                $event->setImageEvent($newFilename);
             } else {
-                $event -> setImageEvent('uploads/images/defaultpng');  
-                }
-            
-
-
+                $event->setImageEvent('uploads/images/default.png');
+            }
 
             $event->setNbRestant($event->getCapacite());
 
@@ -91,16 +93,15 @@ class EventController extends AbstractController
         }
 
         if ($form->isSubmitted() && !$form->isValid()) {
-            // Récupérer les erreurs
             foreach ($form->getErrors() as $error) {
-                // Ajouter le message d'erreur
                 $this->addFlash('error', $error->getMessage());
             }
-            }
+        }
 
         return $this->render('event/create.html.twig', [
             'form' => $form->createView(),
-        ]);}
+        ]);
+    }
 
     #[Route('/admin/events/edit/{id}', name: 'edit_event', methods: ['GET', 'POST'])]
     public function edit(Request $request, Evenement $event, EntityManagerInterface $entityManager): Response

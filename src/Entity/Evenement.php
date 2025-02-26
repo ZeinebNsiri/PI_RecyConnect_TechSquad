@@ -7,7 +7,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EvenementRepository::class)]
 class Evenement
@@ -18,25 +17,19 @@ class Evenement
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-
     private ?string $nomEvent = null;
 
     #[ORM\Column(type: Types::TEXT)]
-
     private ?string $descriptionEvent = null;
 
     #[ORM\Column(length: 255)]
-   
     private ?string $lieuEvent = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-
     private ?\DateTimeInterface $dateEvent = null;
 
-
-    #[ORM\Column(type: 'time', nullable: false)] 
+    #[ORM\Column(type: Types::TIME_MUTABLE)]
     private ?\DateTimeInterface $heureEvent = null;
-    
 
     #[ORM\Column(length: 255)]
     private ?string $imageEvent = null;
@@ -47,11 +40,6 @@ class Evenement
     #[ORM\Column]
     private ?int $nbRestant = null;
 
-    
-
-    /**
-     * @var Collection<int, Reservation>
-     */
     #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'event', orphanRemoval: true)]
     private Collection $reservations;
 
@@ -60,6 +48,7 @@ class Evenement
         $this->reservations = new ArrayCollection();
     }
 
+    // Getters and Setters
     public function getId(): ?int
     {
         return $this->id;

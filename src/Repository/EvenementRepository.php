@@ -6,15 +6,35 @@ use App\Entity\Evenement;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @extends ServiceEntityRepository<Evenement>
- */
 class EvenementRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Evenement::class);
     }
+
+    public function searchEvents(?string $searchTerm, ?string $location, ?string $date): array
+{
+    $qb = $this->createQueryBuilder('e');
+
+    if (!empty($searchTerm)) {
+        $qb->andWhere('LOWER(e.nomEvent) LIKE LOWER(:search)')
+           ->setParameter('search', '%' . strtolower($searchTerm) . '%');
+    }
+
+    if (!empty($location)) {
+        $qb->andWhere('LOWER(e.lieuEvent) LIKE LOWER(:location)')
+           ->setParameter('location', '%' . strtolower($location) . '%');
+    }
+
+    if (!empty($date)) {
+        $qb->andWhere('e.dateEvent = :date')
+           ->setParameter('date', new \DateTime($date));
+    }
+
+    return $qb->getQuery()->getResult();
+}
+    
 
 //    /**
 //     * @return Evenement[] Returns an array of Evenement objects
