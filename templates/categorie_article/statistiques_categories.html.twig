@@ -1,28 +1,27 @@
 {% extends 'base2.html.twig' %}
 
-{% block title %}Statistiques des Catégories{% endblock %}
+{% block title %}Statistiques des Articles{% endblock %}
 
 {% block body %}
 <style>
-    
     .chart-container {
         width: 100%;
-        max-width: 500px; 
-        margin: 0 auto; 
+        max-width: 800px;
+        margin: 0 auto;
     }
 
-    
-    #categoryChart {
+    #categoryChart, #articleChart {
         width: 100% !important;
-        height: 400px !important;
+        height: 500px !important;
     }
 </style>
 
 <main id="main" class="main">
     <div class="pagetitle">
-        <h4>Statistiques des Catégories</h4>
+        <h4>Statistiques des Articles</h4>
     </div>
 
+    <!-- G1 Répartition des articles par catégorie -->
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">Répartition des Articles par Catégorie</h5>
@@ -31,24 +30,36 @@
             </div>
         </div>
     </div>
+
+    <!-- G2 Quantité des articles -->
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="card-title">Quantité des Articles</h5>
+            <div class="chart-container">
+                <canvas id="articleChart"></canvas>
+            </div>
+        </div>
+    </div>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        let ctx = document.getElementById('categoryChart').getContext('2d');
-        let data = {{ data|raw }};  // Injecter les données JSON 
+        let categoryCtx = document.getElementById('categoryChart').getContext('2d');
+        let articleCtx = document.getElementById('articleChart').getContext('2d');
 
-        let labels = data.map(categorie => categorie.nom);
-        let values = data.map(categorie => categorie.count);
+        // Données pour les catégories
+        let categoryData = {{ categoryData|raw }}; 
+        let categoryLabels = categoryData.map(categorie => categorie.nom);
+        let categoryValues = categoryData.map(categorie => categorie.count);
 
-        new Chart(ctx, {
+        new Chart(categoryCtx, {
             type: 'polarArea',
             data: {
-                labels: labels,
+                labels: categoryLabels,
                 datasets: [{
                     label: "Nombre d'articles",
-                    data: values,
+                    data: categoryValues,
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.5)',
                         'rgba(54, 162, 235, 0.5)',
@@ -57,40 +68,62 @@
                         'rgba(153, 102, 255, 0.5)',
                         'rgba(255, 159, 64, 0.5)'
                     ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
                     borderWidth: 1
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false, 
+                plugins: {
+                    legend: { position: 'right' }
+                }
+            }
+        });
+
+        // Données pour les articles
+        let articleData = {{ articleData|raw }};  
+        let articleLabels = articleData.map(article => article.nom);
+        let articleValues = articleData.map(article => article.quantite);
+
+        
+        function generateRandomColors(n) {
+            let colors = [];
+            for (let i = 0; i < n; i++) {
+                let color = `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.6)`;
+                colors.push(color);
+            }
+            return colors;
+        }
+
+        let articleColors = generateRandomColors(articleData.length);
+
+        new Chart(articleCtx, {
+            type: 'bar',
+            data: {
+                labels: articleLabels,
+                datasets: [{
+                    label: "Quantité (KG)",
+                    data: articleValues,
+                    backgroundColor: articleColors,
+                    borderColor: articleColors.map(color => color.replace('0.6', '1')), 
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
                 scales: {
-                    r: {
-                        max: Math.max(...values) * 1.2,
-                        ticks: {
-                            display: false
-                        }
+                    x: {
+                        beginAtZero: true
                     }
                 },
                 plugins: {
-                    legend: {
-                        position: 'right',
-                    },
-                    tooltip: {
-                        enabled: true
-                    }
+                    legend: { display: false }
                 }
             }
         });
     });
 </script>
-
 
 {% endblock %}

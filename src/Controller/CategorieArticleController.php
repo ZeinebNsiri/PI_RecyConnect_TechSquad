@@ -167,24 +167,35 @@ final class CategorieArticleController extends AbstractController
       ]);
     }
 
-    #[Route('/statistiques/categories', name: 'app_statistiques_categories')]
-    public function statistiquesCategories(ArticleRepository $articleRepository, CategorieArticleRepository $categorieRepository): Response
+    #[Route('/statistiques', name: 'app_statistiques')]
+    public function statistiques(ArticleRepository $articleRepository, CategorieArticleRepository $categorieRepository): Response
     {
         
         $categories = $categorieRepository->findAll();
-
-        // Préparer les données pour le graphique
-        $data = [];
+        $categoryData = [];
         foreach ($categories as $categorie) {
-            $data[] = [
+            $categoryData[] = [
                 'nom' => $categorie->getNomCategorie(),
                 'count' => $articleRepository->countArticlesInCategory($categorie->getId()),
             ];
         }
-
+    
+        
+        $articles = $articleRepository->findAll();
+        $articleData = [];
+        foreach ($articles as $article) {
+            $articleData[] = [
+                'nom' => $article->getNomArticle(),
+                'quantite' => $article->getQuantiteArticle(),
+            ];
+        }
+    
         return $this->render('categorie_article/statistiques_categories.html.twig', [
-            'data' => json_encode($data), 
+            'categoryData' => json_encode($categoryData),
+            'articleData' => json_encode($articleData),
         ]);
     }
+    
+
 
 }
