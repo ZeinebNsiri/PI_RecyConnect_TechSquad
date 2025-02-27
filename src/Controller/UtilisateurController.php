@@ -25,7 +25,11 @@ final class UtilisateurController extends AbstractController
             $users = $repository->findByRole('ROLE_USER');
         } elseif ($type == 'professionnels') {
             $users = $repository->findByRole('ROLE_PROFESSIONNEL');
-        } else {
+        }elseif ($type == 'true') {
+            $users = $repository->findBystatus(true);
+        }elseif ($type == 'false') {
+            $users = $repository->findBystatus(false);
+        }  else {
             $users = $repository->findusers();
         }
     
@@ -37,35 +41,37 @@ final class UtilisateurController extends AbstractController
     #[Route('/activer/user/{id}', name: 'app_Activer')]
     public function activer($id,UtilisateurRepository $repository,ManagerRegistry $manager): Response
     {   
-        $user = $repository -> find($id);
-        $em=$manager->getManager();
-        if ($user->isStatus() == true) {
-            $this->addFlash('danger', 'Ce compte est déja activé.');
-        } else {
-            $user-> setStatus(true);
-            $em->flush();
-            $this->addFlash('danger', 'Compte activé avec succès.');
-        } 
-    
+        $user = $repository->find($id);
+            $em = $manager->getManager();
 
-        return $this->redirectToRoute('app_Listeutilisateur');
+            if ($user) {
+                $user->setStatus(true); // ou false dans 'deactiver'
+                $em->persist($user); // Ajouté pour éviter l'oubli de l'entité
+                $em->flush();
+                
+                return $this->json(['success' => true, 'redirectUrl' => $this->generateUrl('app_Listeutilisateur')]);
+            }
+
+            return $this->json(['success' => false, 'message' => 'Utilisateur non trouvé']);
+
     }
 
     #[Route('/desactiver/user/{id}', name: 'app_Desactiver')]
     public function deactiver($id,UtilisateurRepository $repository,ManagerRegistry $manager): Response
     {   
-        $user = $repository -> find($id);
-        $em=$manager->getManager();
-        if ($user->isStatus() == false) {
-            $this->addFlash('danger', 'Ce compte est déja désactivé.');
-        } else {
-            $user-> setStatus(false);
-            $em->flush();
-            $this->addFlash('danger', 'Compte désactivé avec succès.');
-        } 
-    
+                $user = $repository->find($id);
+        $em = $manager->getManager();
 
-        return $this->redirectToRoute('app_Listeutilisateur');
+        if ($user) {
+            $user->setStatus(false); // ou false dans 'deactiver'
+            $em->persist($user); // Ajouté pour éviter l'oubli de l'entité
+            $em->flush();
+            
+            return $this->json(['success' => true, 'redirectUrl' => $this->generateUrl('app_Listeutilisateur')]);
+        }
+
+        return $this->json(['success' => false, 'message' => 'Utilisateur non trouvé']);
+
     }
 
     #[Route('/profileadmin/{id}', name: 'app_profileadmin')]

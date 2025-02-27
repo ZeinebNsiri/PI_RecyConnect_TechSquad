@@ -1,9 +1,30 @@
-<h1>Bonjour !</h1>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Réinitialisation du mot de passe</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px;">
+    <div style="max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); text-align: center;">
+    
+        <h1 style="color: #333;">Bonjour !</h1>
+        <p style="font-size: 16px; color: #555;">Vous avez demandé une réinitialisation de votre mot de passe.</p>
+        
+        <p style="font-size: 16px; color: #555;">Veuillez cliquer sur le bouton ci-dessous pour le réinitialiser:</p>
 
-<p>Pour réinitialiser votre mot de passe, veuillez visiter le lien suivant :</p>
+        <a href="{{ url('app_reset_password', {token: resetToken.token}) }}" 
+           style="display: inline-block; background-color: #205719; color: #ffffff; padding: 12px 24px; font-size: 16px; text-decoration: none; border-radius: 5px; margin: 20px 0;">
+            Réinitialiser mon mot de passe
+        </a>
 
-<a href="{{ url('app_reset_password', {token: resetToken.token}) }}">{{ url('app_reset_password', {token: resetToken.token}) }}</a>
+       
 
-<p>Ce lien expirera dans {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.</p>
+        <p style="font-size: 14px; color: #555;">Ce lien expirera dans <strong>{{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}</strong> </p>
 
-<p>À bientôt !</p>
+        
+        <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+        <p style="font-size: 14px; color: #555;">À bientôt !</p>
+    </div>
+</body>
+</html>
+

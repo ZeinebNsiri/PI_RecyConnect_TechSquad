@@ -68,4 +68,18 @@ class UtilisateurRepository extends ServiceEntityRepository implements PasswordU
         ->getQuery()
         ->getResult();
        }
+
+       public function findBystatus(bool $status): array
+        {
+            return $this->createQueryBuilder('u')
+                ->Where('u.roles LIKE :role1')
+                ->orWhere('u.roles LIKE :role2')
+                ->andWhere('u.status = :status')
+                ->setParameter('status', $status)
+                ->setParameter('role1', '%ROLE_USER%')
+                ->setParameter('role2', '%ROLE_PROFESSIONNEL%')
+                ->getQuery()
+                ->getResult();
+        }
+
 }
