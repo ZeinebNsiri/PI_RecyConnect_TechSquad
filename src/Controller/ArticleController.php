@@ -217,6 +217,8 @@ final class ArticleController extends AbstractController
         $Article = $repository -> find($id);
 
         $email_ban= $Article -> getUtilisateur() -> getEmail() ;
+        $article_name = $Article->getNomArticle();
+        $article_cat = $Article->getCategorie();
 
         $ligneCommandes = $ligneCommandeRepository->findBy(['article_c' => $Article]);
 
@@ -234,9 +236,10 @@ final class ArticleController extends AbstractController
         
         $mailer->sendEmail(
             $email_ban, 
-            'Notification de bannissement de votre article', 
-            "<p>Votre article a été banni car il ne respecte pas la réglementation de notre site!</p>"
-        );
+            'Notification de bannissement de votre article',
+            $article_name,
+            $article_cat
+            ) ;
         $this->addFlash('success', ' L\'article supprimé avec succès!');
         return $this-> redirectToRoute('app_article_admin'); 
     }

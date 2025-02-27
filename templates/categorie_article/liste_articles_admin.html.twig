@@ -51,7 +51,7 @@
                                         <td>{{ article.categorie }} </td>
                                         <td>{{ article.quantiteArticle }} KG</td>
                                         <td>{{ article.prix }} TN/KG</td>
-                                        <td>{{ article.utilisateur}}</td>
+                                        <td>{{ article.utilisateur.nomUser}}{{ article.utilisateur.prenom}}</td>
                                         
                                        <td>
                                             <a class="btn btn-success detail-button" href="{{ path('app_deleteArticleAdmin', {'id': article.id}) }}">

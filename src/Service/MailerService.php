@@ -2,9 +2,11 @@
 
 namespace App\Service;
 
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
+
 
 class MailerService
 {
@@ -15,13 +17,19 @@ class MailerService
         $this->mailer = $mailer;
     }
 
-    public function sendEmail($to, $subject, $content): void
+    public function sendEmail($to, $subject, $article_name,$article_cat ): void
     {
-        $email = (new Email())
+        
+        $email = (new TemplatedEmail())
             ->from('recyconnect.techsquad@gmail.com')
             ->to($to)
             ->subject($subject)
-            ->html($content);
+            ->htmlTemplate('categorie_article/email.html.twig')
+            ->context([
+                'article' => $article_name,
+                'categorie' => $article_cat,
+            ]);
+           
 
         $this->mailer->send($email);
     }
