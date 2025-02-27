@@ -14,15 +14,34 @@ use Symfony\Component\Routing\Annotation\Route;
 class EventController extends AbstractController
 {
     #[Route('/events', name: 'events_list')]
-    public function index(EntityManagerInterface $entityManager): Response
+    public function index(Request $request, EvenementRepository $evenementRepository): Response
     {
-        $events = $entityManager->getRepository(Evenement::class)->findAll();
-
+        // Get search parameters
+        $location = $request->query->get('location');
+        $date = $request->query->get('date');
+    
+        // Fetch events based on filters
+        $events = $evenementRepository->searchEvents($location, $date);
+    
+        // Separate online and onsite events
+        $onlineEvents = [];
+        $onsiteEvents = [];
+    
+        foreach ($events as $event) {
+            if (strtolower($event->getLieuEvent()) === 'en ligne') {
+                $onlineEvents[] = $event;
+            } else {
+                $onsiteEvents[] = $event;
+            }
+        }
+    
         return $this->render('event/index.html.twig', [
-            'events' => $events,
+            'onlineEvents' => $onlineEvents,
+            'onsiteEvents' => $onsiteEvents,
+            'location' => $location,
+            'date' => $date,
         ]);
     }
-
     #[Route('/event/{id}', name: 'event_show')]
     public function detail(EvenementRepository $evenementRepository, int $id): Response
     {

@@ -13,7 +13,7 @@ class EvenementRepository extends ServiceEntityRepository
         parent::__construct($registry, Evenement::class);
     }
 
-    public function searchEvents(?string $searchTerm, ?string $location, ?string $date): array
+    public function searchEventsAdmin(?string $searchTerm, ?string $location, ?string $date): array
 {
     $qb = $this->createQueryBuilder('e');
 
@@ -34,8 +34,25 @@ class EvenementRepository extends ServiceEntityRepository
 
     return $qb->getQuery()->getResult();
 }
-    
+public function searchEvents(?string $location, ?string $date): array
+{
+    $qb = $this->createQueryBuilder('e');
 
+    if (!empty($location)) {
+        $qb->andWhere('LOWER(e.lieuEvent) LIKE LOWER(:location)')
+           ->setParameter('location', '%' . strtolower($location) . '%');
+    }
+
+    if (!empty($date)) {
+        $qb->andWhere('e.dateEvent = :date')
+           ->setParameter('date', new \DateTime($date));
+    }
+
+    // Order by dateEvent in ascending order (closest dates first)
+    $qb->orderBy('e.dateEvent', 'ASC');
+
+    return $qb->getQuery()->getResult();
+}   
 //    /**
 //     * @return Evenement[] Returns an array of Evenement objects
 //     */
