@@ -193,4 +193,14 @@ public function listReservations(EntityManagerInterface $entityManager): Respons
         $this->addFlash('success', 'La réservation a été supprimée avec succès.');
         return $this->redirectToRoute('admin_reservations_list');
     }
+    #[Route('/dashboard/count', name: 'admin_stats')]
+public function stats(ReservationRepository $reservationRepository): Response
+{
+    $popularEvents = $reservationRepository->findMostPopularEvents();
+
+    return $this->render('reservation/adminStat.html.twig', [
+        'popularEvents' => $popularEvents,
+    ]);
+}
+
 }

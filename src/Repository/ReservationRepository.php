@@ -5,6 +5,8 @@ namespace App\Repository;
 use App\Entity\Reservation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManagerInterface;
+
 
 /**
  * @extends ServiceEntityRepository<Reservation>
@@ -46,6 +48,17 @@ class ReservationRepository extends ServiceEntityRepository
     }
 
     return $qb->getQuery()->getResult();
+}
+public function findMostPopularEvents($limit = 5)
+{
+    return $this->createQueryBuilder('r')
+        ->select('e.id, e.nomEvent, e.dateEvent, e.lieuEvent, COUNT(r.id) AS total_reservations')
+        ->join('r.event', 'e')
+        ->groupBy('e.id')
+        ->orderBy('total_reservations', 'DESC')
+        ->setMaxResults($limit)
+        ->getQuery()
+        ->getResult();
 }
 
 //    /**

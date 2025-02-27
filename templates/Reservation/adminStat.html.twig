@@ -1,0 +1,78 @@
+{% extends 'base2.html.twig' %}
+
+{% block title %}Statistiques des Réservations{% endblock %}
+
+{% block body %}
+<main id="main" class="main">
+
+    <section id="stats" class="stats section py-5">
+        <div class="container" data-aos="fade-up">
+            <h2 class="text-center mb-5 text-success">Statistiques des Réservations</h2>
+            
+            
+            <!-- Card for the Chart -->
+            <div class="card shadow-lg mb-5">
+                <div class="card-body">
+                            <p class=" text-muted">Les événements ayant enregistré le plus grand nombre de réservations.</p>
+
+                    <div class="chart-container" style="position: relative; height:400px; width:100%">
+                        <canvas id="popularEventsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var ctx = document.getElementById('popularEventsChart').getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'doughnut', // Doughnut chart for better visual appeal
+            data: {
+                labels: [{% for event in popularEvents %}"{{ event.nomEvent }}"{% if not loop.last %},{% endif %}{% endfor %}],
+                datasets: [{
+                    label: 'Nombre de Réservations',
+                    data: [{% for event in popularEvents %}{{ event.total_reservations|round(0, 'floor') }}{% if not loop.last %},{% endif %}{% endfor %}],
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.7)', // Greenish color
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(153, 102, 255, 0.7)',
+                        'rgba(255, 159, 64, 0.7)'
+                    ],
+                    borderColor: 'rgba(255, 255, 255, 1)',
+                    borderWidth: 2,
+                    hoverBackgroundColor: 'rgba(0, 0, 0, 0.9)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: {
+                            color: 'black',
+                            font: {
+                                size: 14
+                            }
+                        }
+                    },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: 'rgba(0,0,0,0.7)',
+                        titleFont: {
+                            size: 16
+                        },
+                        bodyFont: {
+                            size: 14
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</main>
+
+{% endblock %}

@@ -27,7 +27,7 @@ class EvenementRepository extends ServiceEntityRepository
            ->setParameter('location', '%' . strtolower($location) . '%');
     }
 
-    if (!empty($date)) {
+    if (!empty($date) && $date !== null) {
         $qb->andWhere('e.dateEvent = :date')
            ->setParameter('date', new \DateTime($date));
     }

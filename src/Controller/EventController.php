@@ -65,7 +65,7 @@ class EventController extends AbstractController
         $dateInput  = $request->query->get('date', '');
 
         // On passe $dateStart et $dateEnd au repository pour filtrer sur l'intervalle de la journée
-        $events = $evenementRepository->searchEvents($searchTerm, $location, $dateInput);
+        $events = $evenementRepository->searchEventsAdmin($searchTerm, $location, $dateInput);
 
         // Passage des variables à la vue (la date est renvoyée sous forme de chaîne pour pré-remplir le formulaire)
         return $this->render('event/admin_events.html.twig', [
