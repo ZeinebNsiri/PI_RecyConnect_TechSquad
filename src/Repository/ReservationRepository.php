@@ -47,6 +47,7 @@ class ReservationRepository extends ServiceEntityRepository
 
     return $qb->getQuery()->getResult();
 }
+
 //    /**
 //     * @return Reservation[] Returns an array of Reservation objects
 //     */

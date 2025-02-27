@@ -41,17 +41,26 @@ class ReservationController extends AbstractController
     }
 
     #[Route('/reservations', name: 'reservations_list')]
-    public function listReservations(EntityManagerInterface $entityManager): Response
-    {   $user = $this->getUser();
-        $reservations = $entityManager->getRepository(Reservation::class)->findBy([
-            'status' => 'active','user_id'=>$user
-        ]);
+public function listReservations(EntityManagerInterface $entityManager): Response
+{
+    $user = $this->getUser();
+    $now = new \DateTime();
 
-        return $this->render('reservation/list.html.twig', [
-            'reservations' => $reservations,
-        ]);
-    }
+    // Fetch all reservations for the current user
+    $reservations = $entityManager->getRepository(Reservation::class)->createQueryBuilder('r')
+        ->leftJoin('r.event', 'e')
+        ->where('r.user_id = :user')
+        ->setParameter('user', $user)
+        ->orderBy('e.dateEvent', 'ASC')
+        ->addOrderBy('e.heureEvent', 'ASC')
+        ->getQuery()
+        ->getResult();
 
+    return $this->render('reservation/list.html.twig', [
+        'reservations' => $reservations,
+        'now' => $now,
+    ]);
+}
     #[Route('/reservation/edit/{id}', name: 'reservation_edit', methods: ['GET', 'POST'])]
     public function editReservation(Request $request, int $id, EntityManagerInterface $entityManager): Response
     {
