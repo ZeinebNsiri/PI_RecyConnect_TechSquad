@@ -90,6 +90,23 @@
     max-width: 120px; 
 } 
 
+.form-control {
+  border: 2px solid #cce3de;
+  border-radius: 10px;
+  background-color: #f9fff6;
+  transition: 0.3s;
+}
+
+.form-control:hover {
+  background-color: #f2f2f2;
+}
+
+.form-control:focus {
+  border-color: #218838;
+  box-shadow: 0 0 5px rgba(108, 178, 235, 0.5);
+  outline: none;
+}
+
 
 
 
@@ -138,13 +155,13 @@
 
           
             <label for="video">Vidéo:</label>
-            <select id="video" name="video" class="form-control">
+            <select id="video" name="video" class="form-select">
                 <option value=""  {% if videoFilter is empty %}selected{% endif %}>-- Tous --</option>
-                <option value="yes" {% if videoFilter == 'oui' %}selected{% endif %}>Oui</option>
-                <option value="no" {% if videoFilter == 'non' %}selected{% endif %}>Non</option>
+                <option value="yes" {% if videoFilter == 'yes' %}selected{% endif %}>Oui</option>
+                <option value="no" {% if videoFilter == 'no' %}selected{% endif %}>Non</option>
             </select>
 
-            <button type="submit" class="btn btn-sm btn-primary">Filtrer</button>
+            <button type="submit" class="btn btn-sm btn-primary">Chercher<i class="bi bi-search ms-2"></i></button>
         </form>
 
         <center>
