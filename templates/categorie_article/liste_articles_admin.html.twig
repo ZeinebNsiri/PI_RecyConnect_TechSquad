@@ -29,43 +29,51 @@
                     <div class="card-body pb-0">
                         <h5 class="card-title">Tous les articles proposés chez RecyConnect</h5>
                         
-                        <table class="table table-borderless">
-                            <thead>
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Image</th>
-                                    <th scope="col">Nom de l'article</th>
-                                    <th scope="col">Catégorie</th>
-                                    <th scope="col">Quantité </th>
-                                    <th scope="col">Prix unitaire</th>
-                                    <th scope="col">Proprietaire</th>
-                                    <th scope="col"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for article in articles %}
+                        <select id="inputState" class="form-select" onchange="filterArticles(this.value)">
+                            <option value="all">Toutes les catégories</option>
+                            {% for categorie in categories %}
+                                <option value="{{ categorie.id }}">{{ categorie.nomCategorie }}</option>
+                            {% endfor %}
+                        </select>
+
+                        <div >
+                            <table class="table table-borderless" id="articlesTable">
+                                <thead>
                                     <tr>
-                                        <th scope="row">{{ loop.index }}</th>
-                                        <td><img src="{{ asset('uploads/photo_dir/' ~ article.imageArticle) }}" alt="Image" height: 60px width: 70px  ></td>
-                                        <td>{{ article.nomArticle }} </td>
-                                        <td>{{ article.categorie }} </td>
-                                        <td>{{ article.quantiteArticle }} KG</td>
-                                        <td>{{ article.prix }} TN/KG</td>
-                                        <td>{{ article.utilisateur.nomUser}}{{ article.utilisateur.prenom}}</td>
-                                        
-                                       <td>
-                                            <a class="btn btn-success detail-button" href="{{ path('app_deleteArticleAdmin', {'id': article.id}) }}">
-                                                <i class="bi bi-trash"></i> Ban
-                                            </a>
-                                        </td>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Image</th>
+                                        <th scope="col">Nom de l'article</th>
+                                        <th scope="col">Catégorie</th>
+                                        <th scope="col">Quantité</th>
+                                        <th scope="col">Prix unitaire</th>
+                                        <th scope="col">Propriétaire</th>
+                                        <th scope="col"></th>
                                     </tr>
-                                {% else %}
-                                    <tr>
-                                        <td colspan="3" class="text-center">Aucun article trouvé</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {% for article in articles %}
+                                        <tr>
+                                            <th scope="row">{{ loop.index }}</th>
+                                            <td><img src="{{ asset('uploads/photo_dir/' ~ article.imageArticle) }}" alt="Image" height="60" width="70"></td>
+                                            <td>{{ article.nomArticle }}</td>
+                                            <td>{{ article.categorie.nomCategorie }}</td>
+                                            <td>{{ article.quantiteArticle }} KG</td>
+                                            <td>{{ article.prix }} TN/KG</td>
+                                            <td>{{ article.utilisateur.nomUser }} {{ article.utilisateur.prenom }}</td>
+                                            <td>
+                                                <a class="btn btn-success detail-button" href="{{ path('app_deleteArticleAdmin', {'id': article.id}) }}">
+                                                    <i class="bi bi-trash"></i> Ban
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="8" class="text-center">Aucun article trouvé</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -73,4 +81,18 @@
     </section>
 
 </main>
+
+<script>
+    function filterArticles(category) {
+        fetch('/Article/getall/admin/' + encodeURIComponent(category))
+            .then(response => response.text())
+            .then(data => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(data, 'text/html');
+                const newContent = doc.querySelector('#articlesTable').innerHTML;
+                document.querySelector('#articlesTable').innerHTML = newContent;
+            })
+            .catch(error => console.error('Erreur:', error));
+    }
+</script>
 {% endblock %}

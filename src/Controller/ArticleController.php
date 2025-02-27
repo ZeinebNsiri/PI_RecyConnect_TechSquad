@@ -201,14 +201,22 @@ final class ArticleController extends AbstractController
         return $this-> redirectToRoute('app_article_mine'); 
     }
 
-    #[Route('/Article/getall/admin', name: 'app_article_admin')]
-    public function getallArticleAdmin(ArticleRepository $repository)
+    #[Route('/Article/getall/admin/{category?}', name: 'app_article_admin')]
+    public function getallArticleAdmin(?string $category, ArticleRepository $repository, CategorieArticleRepository $categorieRepo)
     {
-        $articles= $repository-> findAll();
+        $categories = $categorieRepo->findAll();
+    
+        if ($category && $category !== 'all') {
+            $articles = $repository->findByCategory2($category);
+        } else {
+            $articles = $repository->findAll();
+        }
+    
         return $this->render('categorie_article/liste_articles_admin.html.twig', [
             'articles' => $articles,
-        ]);  
-    }
+            'categories' => $categories,
+        ]);
+    }    
 
     #[Route('article/delete/admin/{id}', name: 'app_deleteArticleAdmin')]
     public function deleteArticleAdmin (ManagerRegistry $manager, ArticleRepository $repository, $id, LigneCommandeRepository $ligneCommandeRepository, MailerService $mailer) {
