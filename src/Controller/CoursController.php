@@ -306,13 +306,18 @@ final class CoursController extends AbstractController
                     }
 
                     #[Route('/dashboard/cours', name: 'app_cours_dashboard')]
-                    public function dashboardCours(CoursRepository $coursRepository): Response
-                    {
-                        
-                        $stats = $coursRepository->countByCategory();
-                    
+                    public function dashboardCours(
+                        CoursRepository $coursRepository,
+                        RatingRepository $ratingRepository
+                    ): Response {
+                        // 1) Nombre de workshops par catégorie
+                        $statsCategory = $coursRepository->countByCategory();
+
+                        $statsRatingSumByCategory = $ratingRepository->getRatingSumByCategory();
+
                         return $this->render('cours/dashboard-cours.html.twig', [
-                            'stats' => $stats
+                            'statsCategory'           => $statsCategory,
+                            'statsRatingSumByCategory'=> $statsRatingSumByCategory,
                         ]);
                     }
                     

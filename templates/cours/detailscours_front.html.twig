@@ -8,7 +8,7 @@
 <style>
     /* Centre horizontalement */
     .star-rating {
-        text-align: center;  /* si vous avez Bootstrap, vous pouvez .text-center */
+        text-align: center;  
         /* Astuce pour gérer le survol de droite à gauche */
         direction: rtl;
         unicode-bidi: bidi-override;
@@ -88,19 +88,19 @@
                                     <div class="star-rating">
 
 
-                                        {% for child in ratingForm.note %}
-        {# On masque le bouton radio #}
-        {{ form_widget(child, {'attr': {'class': 'visually-hidden'}}) }}
+                            {% for child in ratingForm.note %}
+                            {# On masque le bouton radio #}
+                            {{ form_widget(child, {'attr': {'class': 'visually-hidden'}}) }}
 
-        {# On teste si c'est la valeur "0" #}
-        {% if child.vars.value == '0' %}
-            <label for="{{ child.vars.id }}">
-                <i class="bi bi-arrow-repeat" style="font-size: 1.3rem; color: #777;"></i>
-            </label>
-        {% else %}
-            <label for="{{ child.vars.id }}">★</label>
-        {% endif %}
-    {% endfor %}
+                            {# On teste si c'est la valeur "0" #}
+                            {% if child.vars.value == '0' %}
+                                <label for="{{ child.vars.id }}">
+                                    <i class="bi bi-arrow-repeat" style="font-size: 1.3rem; color: #777;"></i>
+                                </label>
+                            {% else %}
+                                <label for="{{ child.vars.id }}">★</label>
+                            {% endif %}
+                        {% endfor %}
 
 
 

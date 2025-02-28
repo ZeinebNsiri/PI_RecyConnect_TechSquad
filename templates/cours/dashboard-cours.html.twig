@@ -1,66 +1,87 @@
-
-{% extends 'base2.html.twig' %} 
+{% extends 'base2.html.twig' %}
 
 {% block title %}Dashboard Cours{% endblock %}
 
-
-
 {% block body %}
-
 <main id="main" class="main">
 
+  <!-- Premier bloc : Nombre de workshops par catégorie -->
   <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">Nombre du workshop par catégorie</h5>
+    <div class="card-body">
+      <h5 class="card-title">Nombre du workshop par catégorie</h5>
+      <div id="chartCategory"></div>
+    </div>
+  </div>
 
-   <div id="chart"></div>
+  <!-- Deuxième bloc : Pie Chart des notes par catégorie -->
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Répartition du total des notes par catégorie</h5>
+      <div id="pieChartByCategory"></div>
+    </div>
+  </div>
 
+</main>
 
+<!-- ApexCharts -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
 <script>
-   
-    const stats = {{ stats|json_encode()|raw }};
+  // ------------------------------------------------
+  // 1) Nombre de workshops par catégorie (bar chart)
+  // ------------------------------------------------
+  const statsCategory = {{ statsCategory|json_encode()|raw }};
+  statsCategory.sort((a, b) => b.total - a.total);
 
-     stats.sort((a, b) => b.total - a.total);
+  const catNames  = statsCategory.map(item => item.category || 'SansCat');
+  const catTotals = statsCategory.map(item => item.total);
 
-
-    const categories = stats.map(item => item.category || 'SansCat');
-    const totals     = stats.map(item => item.total);
-
-    document.addEventListener("DOMContentLoaded", () => {
-      var options = {
-        series: [{
-          name: 'Cours',
-          data: totals
-        }],
-        chart: {
-          type: 'bar',
-          height: 400
-        },
-        xaxis: {
-          categories: categories
-        },
-          yaxis: {
- 
-        labels: {
-          formatter: function(val) {
-            return parseInt(val);
-          }
-        },
-        forceNiceScale: true,
-        tickAmount: 5,
+  document.addEventListener("DOMContentLoaded", () => {
+    var optionsCategory = {
+      series: [{
+        name: 'Workshops',
+        data: catTotals
+      }],
+      chart: {
+        type: 'bar',
+        height: 350
+      },
+      xaxis: {
+        categories: catNames
+      },
+      yaxis: {
         min: 0
       }
-      };
+    };
 
-      var chart = new ApexCharts(document.querySelector("#chart"), options);
-      chart.render();
-    });
+    var chartCategory = new ApexCharts(document.querySelector("#chartCategory"), optionsCategory);
+    chartCategory.render();
+  });
+
+  // ------------------------------------------------
+  // 2) Pie Chart : Somme des notes par catégorie
+  // ------------------------------------------------
+  const statsRatingSumByCategory = {{ statsRatingSumByCategory|json_encode()|raw }};
+  // statsRatingSumByCategory = [ {category: "...", ratingSum: 10}, ...]
+
+  const pieLabels = statsRatingSumByCategory.map(item => item.category);
+  const pieSeries = statsRatingSumByCategory.map(item => parseFloat(item.ratingSum));
+
+  document.addEventListener("DOMContentLoaded", () => {
+    var optionsPie = {
+      series: pieSeries,
+      chart: {
+        type: 'pie',
+        height: 350
+      },
+      labels: pieLabels,
+      legend: {
+        position: 'bottom'
+      }
+    };
+
+    var chartPie = new ApexCharts(document.querySelector("#pieChartByCategory"), optionsPie);
+    chartPie.render();
+  });
 </script>
-
-    </main>
-    </div>
-    </div>
-    
 {% endblock %}
