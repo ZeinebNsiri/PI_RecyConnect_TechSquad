@@ -33,7 +33,7 @@
 }
 
 .post-media img.more-images::after {
-    content: "+" attr(data-remaining); /* Affiche le nombre d'images restantes */
+    content: "+" attr(data-remaining); 
     position: absolute;
     top: 0;
     left: 0;
@@ -60,60 +60,3 @@
 }
 
 
-
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    padding-top: 10%;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.3);
-}
-
-.modal-content {
-    position: relative;
-    margin: auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 60%;
-    max-width: 800px;
-}
-
-.modal-image {
-    max-width: 100%;
-    max-height: 80vh;
-    border-radius: 10px;
-}
-
-.close {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 30px;
-    color: white;
-    cursor: pointer;
-}
-
-.close:hover {
-    color: #ccc;
-}
-
-.prev, .next {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: rgba(255, 255, 255, 0.6);
-    color: black;
-    font-size: 20px;
-    padding: 10px 15px;
-    border: none;
-    cursor: pointer;
-}
-
-.prev { left: 10px; }
-.next { right: 10px; }
-.prev:hover, .next:hover { background-color: white; }

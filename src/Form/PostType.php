@@ -4,12 +4,14 @@ namespace App\Form;
 
 use App\Entity\Post;
 use App\Entity\Utilisateur;
+use App\Enum\TagType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -32,6 +34,15 @@ class PostType extends AbstractType
                 ],
             
         ])
+
+        ->add('tags', ChoiceType::class, [
+                'choices' => TagType::getChoices(),
+                'multiple' => true,
+                'expanded' => true,
+                'label' => 'Tags',
+                'attr' => ['class' => 'badge-group', 'style' => 'display:none;']
+        ])
+
         ->add('media', FileType::class,  [
             'label' => 'Média (images)',
             'multiple' => true,
@@ -52,6 +63,8 @@ class PostType extends AbstractType
             ],
             
         ]);
+
+        
         
     }
 

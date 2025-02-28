@@ -42,6 +42,20 @@
                                 </div>
                             </div>
                             <div class="col-12">
+                                <h5 class="card-title">Tags</h5>
+                                <div class="d-flex flex-wrap gap-2" id="tags-container">
+                                    {% for tag in form.tags.vars.choices %}
+                                        <span class="badge rounded-pill bg-secondary tag-badge" 
+                                            data-value="{{ tag.value }}"
+                                            style="cursor: pointer;">
+                                            {{ tag.label }}
+                                        </span>
+                                    {% endfor %}
+                                </div>
+                                {{ form_widget(form.tags) }}
+                            </div>
+
+                            <div class="col-12">
                                 <div class="form-floating">
                                     {{ form_widget(form.media, {'attr': {'class': 'form-control border-0'}}) }}
                                     {{ form_label(form.media) }}
@@ -52,6 +66,7 @@
                                     {% endif %}
                                 </div>
                             </div>
+
                             <div class="col-12 text-center">
                                 <button type="submit" class="btn btn-primary py-3 px-4">Publier</button>
                             </div>
@@ -73,4 +88,37 @@
             </div>
         </div>
     </div>
+{% endblock %}
+{% block javascripts %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const badges = document.querySelectorAll('.tag-badge');
+            const tagsSelect = document.querySelector('#{{ form.tags.vars.id }}');
+
+            badges.forEach(badge => {
+                badge.addEventListener('click', function() {
+                    const value = badge.getAttribute('data-value');
+                    const isSelected = badge.classList.contains('bg-primary');
+
+                    if (isSelected) {
+                        // Retirer le tag
+                        badge.classList.remove('bg-primary');
+                        badge.classList.add('bg-secondary');
+                        const index = Array.from(tagsSelect.options).findIndex(option => option.value === value);
+                        tagsSelect.options[index].selected = false;
+                    } else {
+                        // Ajouter le tag
+                        badge.classList.remove('bg-secondary');
+                        badge.classList.add('bg-primary');
+                        const index = Array.from(tagsSelect.options).findIndex(option => option.value === value);
+                        tagsSelect.options[index].selected = true;
+                    }
+                });
+            });
+        });
+    </script>
+
+
+
+
 {% endblock %}

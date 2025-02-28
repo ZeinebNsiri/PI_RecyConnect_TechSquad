@@ -5,6 +5,14 @@
 {% block body %}
 <main id="main" class="main">
     <h1>Gestion des Posts</h1>
+
+    <!-- Card du Line Chart -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Nombre de Posts par Mois</h5>
+            <div id="lineChart"></div>
+        </div>
+    </div>
     
     <table class="table table-hover">
         <thead class="thead-dark">
@@ -48,3 +56,41 @@
     </table>
     </main>
 {% endblock %}
+
+ {% block javascripts %}
+
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const monthlyData = {{ monthlyData|raw }};
+            new ApexCharts(document.querySelector("#lineChart"), {
+                series: [{
+                    name: "Posts",
+                    data: monthlyData
+                }],
+                chart: {
+                    height: 350,
+                    type: 'line',
+                    zoom: {
+                        enabled: false
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    curve: 'smooth'
+                },
+                grid: {
+                    row: {
+                        colors: ['#f3f3f3', 'transparent'], // Alternance des couleurs de ligne
+                        opacity: 0.5
+                    },
+                },
+                xaxis: {
+                    categories: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
+                }
+            }).render();
+        });
+    </script>
+ {% endblock %}

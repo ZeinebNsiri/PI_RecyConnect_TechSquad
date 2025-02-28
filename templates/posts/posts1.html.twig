@@ -4,12 +4,13 @@
 {% block title %}Forum{% endblock %}
 
 {% block stylesheets %}
-   
+   <link href="{{asset('Posts/css/post.css')}}" rel="stylesheet" type="text/css">
     <link href="{{asset('Posts/css/bootstrap.css')}}" rel="stylesheet" type="text/css">
     <link href="{{asset('Posts/css/style.css')}}" rel="stylesheet" type="text/css">
     <!-- <link href="{{asset('Posts/css/animate.css')}}" rel="stylesheet" type="text/css"> -->
     <link href="{{asset('Posts/css/font-awesome.min.css')}}" rel="stylesheet" type="text/css"> 
-    <link href="{{asset('Posts/css/post.css')}}" rel="stylesheet" type="text/css">
+    <link href="{{asset('Posts/css/modal.css')}}" rel="stylesheet" type="text/css">
+    
 
     <style>
         .alert-success {
@@ -152,21 +153,7 @@
                             
                             <nav aria-label="Page navigation">
                                 <ul class="pagination">
-                                  <li>
-                                    <a href="#" aria-label="Previous">
-                                      <span aria-hidden="true">&laquo;</span>
-                                    </a>
-                                  </li>
-                                  <li><a href="#">1</a></li>
-                                  <li><a href="#">2</a></li>
-                                  <li><a href="#">3</a></li>
-                                  <li><a href="#">4</a></li>
-                                  <li><a href="#">5</a></li>
-                                  <li>
-                                    <a href="#" aria-label="Next">
-                                      <span aria-hidden="true">&raquo;</span>
-                                    </a>
-                                  </li>
+                                    {{ knp_pagination_render(postsWithMedia) }}
                                 </ul>
                             </nav>
                         </section>
@@ -254,21 +241,41 @@
                 const modal = document.getElementById('imageModal');
                 const modalImages = document.getElementById('modal-images');
                 const closeModal = document.querySelector('.close');
+                const prevButton = document.createElement('button');
+                const nextButton = document.createElement('button');
+                prevButton.classList.add('prev');
+                nextButton.classList.add('next');
+                prevButton.innerHTML = '&#10094;'; 
+                nextButton.innerHTML = '&#10095;';
+                modal.appendChild(prevButton);
+                modal.appendChild(nextButton); 
+
+
+                let currentImageIndex = 0;
+                let imagesList = [];
 
                 // Fonction pour afficher toutes les images d'un post dans la modale
                 function openImageModal(postId) {
-                    modal.style.display = 'block';
-                    modalImages.innerHTML = ''; // Vider les images précédentes
+                    modal.style.display = 'flex';
+                    modalImages.innerHTML = ''; 
 
-                    // Récupérer toutes les images du post
+                  
                     const images = document.querySelectorAll(`[data-post-id="${postId}"]`);
                     images.forEach(img => {
-                        const imgElement = document.createElement('img');
-                        imgElement.src = img.src;
-                        imgElement.alt = 'Post Image';
-                        imgElement.classList.add('modal-image');
-                        modalImages.appendChild(imgElement);
+                        imagesList.push(img.src);
                     });
+
+                    displayImage(0);
+                }
+
+                function displayImage(index) {
+                    modalImages.innerHTML = '';
+                    const imgElement = document.createElement('img');
+                    imgElement.src = imagesList[index];
+                    imgElement.alt = 'Post Image';
+                    imgElement.classList.add('modal-image');
+                    modalImages.appendChild(imgElement);
+                    currentImageIndex = index;
                 }
 
                 // Gérer les clics sur les images et le "+X"
@@ -289,6 +296,20 @@
                         modal.style.display = 'none';
                     }
                 });
+
+
+                // Navigation avec les flèches
+                nextButton.addEventListener('click', () => {
+                    const nextIndex = (currentImageIndex + 1) % imagesList.length;
+                    displayImage(nextIndex);
+                });
+
+                prevButton.addEventListener('click', () => {
+                    const prevIndex = (currentImageIndex - 1 + imagesList.length) % imagesList.length;
+                    displayImage(prevIndex);
+                });
+
+                
             });
 
         </script>

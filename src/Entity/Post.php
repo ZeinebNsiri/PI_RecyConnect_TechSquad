@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Enum\TagType;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
 class Post
@@ -51,6 +52,9 @@ class Post
      */
     #[ORM\OneToMany(targetEntity: Like::class, mappedBy: 'post_like', orphanRemoval: true)]
     private Collection $likes_post;
+
+    #[ORM\Column(type: Types::JSON)]
+    private array $tags = [];
 
     public function __construct()
     {
@@ -130,6 +134,36 @@ class Post
 
         return $this;
     }
+
+    public function getTags(): array
+    {
+        return $this->tags;
+    }
+
+    public function setTags(array $tags): static
+    {
+        foreach ($tags as $tag) {
+            if (!in_array($tag, array_column(TagType::cases(), 'value'))) {
+                throw new \InvalidArgumentException("Tag invalide : " . $tag);
+            }
+        }
+        $this->tags = $tags;
+        return $this;
+    }
+
+
+    public function addTag(string $tag): self {
+        if (!in_array($tag, $this->tags)) {
+            $this->tags[] = $tag;
+        }
+        return $this;
+    }
+    
+    public function removeTag(string $tag): self {
+        $this->tags = array_filter($this->tags, fn($t) => $t !== $tag);
+        return $this;
+    }
+
 
     /**
      * @return Collection<int, Commentaire>

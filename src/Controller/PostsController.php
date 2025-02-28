@@ -8,7 +8,7 @@ use App\Entity\Utilisateur;
 use App\Entity\MediaPost;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\MediaPostRepository;
-use Symfony\Component\HttpFoundation\Request;
+
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -18,12 +18,14 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Repository\LikeRepository;
 use App\Entity\Like;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 final class PostsController extends AbstractController
 {   
     
     #[Route('/posts', name: 'app_posts')]
-    public function index(EntityManagerInterface $entityManager, MediaPostRepository $mediaPostRepository): Response
+    public function index(EntityManagerInterface $entityManager, MediaPostRepository $mediaPostRepository, PaginatorInterface $paginator, Request $request): Response
     {   
         if (!$this->isGranted('ROLE_USER') && !$this->isGranted('ROLE_PROFESSIONNEL')) {
             throw $this->createAccessDeniedException('Accès refusé.');
@@ -41,6 +43,13 @@ final class PostsController extends AbstractController
             ];
         }
 
+
+        $pagination = $paginator->paginate(
+            $postsWithMedia, // Données à paginer
+            $request->query->getInt('page', 1), // Numéro de page
+            5 // Nombre de posts par page
+        );
+
         $myPostsWithMedia = [];
         foreach ($posts as $post) {
             if ($post->getUserP() === $user) {
@@ -54,7 +63,7 @@ final class PostsController extends AbstractController
         }
 
         return $this->render('posts/posts1.html.twig', [
-            'postsWithMedia' => $postsWithMedia,
+            'postsWithMedia' => $pagination,
             'user' => $user,
             'myPostsWithMedia' => $myPostsWithMedia,
         ]);
@@ -79,6 +88,12 @@ final class PostsController extends AbstractController
             }
 
             $post->setUserP($user);
+
+            // Gestion des tags
+            $tags = $form->get('tags')->getData();
+            foreach ($tags as $tagValue) {
+                $post->addTag($tagValue); // Méthode à ajouter dans votre entité Post
+            }
 
 
             // Gestion du fichier média
@@ -137,14 +152,14 @@ final class PostsController extends AbstractController
             return new JsonResponse(['message' => 'Unauthorized'], 403);
         }
 
-        // Vérifier si le like existe déjà
+        
         $existingLike = $likeRepository->findOneBy([
             'post_like' => $post,
             'user_like' => $user
         ]);
 
         if ($existingLike) {
-            // Supprimer le like
+            
             $entityManager->remove($existingLike);
             $liked = false;
         } else {
@@ -169,11 +184,31 @@ final class PostsController extends AbstractController
     public function listPosts(EntityManagerInterface $entityManager): Response
     {
         $posts = $entityManager->getRepository(Post::class)->findAll();
+        $queryBuilder = $entityManager->createQueryBuilder();
+        $queryBuilder
+            ->select("SUBSTRING(p.datePublication, 6, 2) as month, COUNT(p.id) as count")
+            ->from('App\Entity\Post', 'p')
+            ->where('p.status_post = true')
+            ->groupBy('month')
+            ->orderBy('month', 'ASC');
+
+        $stats = $queryBuilder->getQuery()->getResult();
+
+        // Initialisation des données pour tous les mois (1 à 12)
+        $monthlyData = array_fill(0, 12, 0);
+
+        // Remplissage des données selon les résultats de la requête
+        foreach ($stats as $stat) {
+            $monthlyData[intval($stat['month']) - 1] = intval($stat['count']);
+        }
 
         return $this->render('posts/listePosts.html.twig', [
             'posts' => $posts,
+            'monthlyData' => json_encode(array_values($monthlyData)), 
         ]);
     }
+
+
 
     #[Route('/admin/approvePost/{id}', name: 'admin_post_approve')]
     public function approve(Post $post, EntityManagerInterface $entityManager): Response
@@ -230,7 +265,10 @@ final class PostsController extends AbstractController
     }
 
 
+
+
     
+
 
 
 
