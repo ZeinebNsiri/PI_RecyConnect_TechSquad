@@ -4,6 +4,45 @@
 
 {% block body %}
 
+
+<style>
+    /* Centre horizontalement */
+    .star-rating {
+        text-align: center;  /* si vous avez Bootstrap, vous pouvez .text-center */
+        /* Astuce pour gérer le survol de droite à gauche */
+        direction: rtl;
+        unicode-bidi: bidi-override;
+        display: inline-block; /* pour que le text-align: center marche */
+    }
+    
+    /* On cache les radios */
+    .star-rating input[type="radio"] {
+        display: none;
+    }
+
+    /* Style des labels (les étoiles) */
+    .star-rating label {
+        font-size: 2rem; 
+        color: #ccc;         /* gris par défaut */
+        cursor: pointer;
+        margin: 0 2px;       /* un peu d'espace latéral */
+    }
+
+    /* Changer la couleur au survol */
+    .star-rating label:hover,
+    .star-rating label:hover ~ label {
+        color: gold !important;
+    }
+
+    /*
+     Quand on coche un radio, toutes les étoiles "après" (en RTL = à gauche) 
+     passent en or
+    */
+    .star-rating input[type="radio"]:checked ~ label {
+        color: gold;
+    }
+</style>
+
 <!-- Hero Section with Background Image -->
 <div class="container-fluid page-header py-5 mb-5 wow fadeIn position-relative" data-wow-delay="0.1s"
      style="background: url('{{ asset('uploads/images/' ~ workshop.imageCours) }}') no-repeat center center; background-size: cover; height: 350px;">
@@ -40,6 +79,42 @@
                             </video>
                         </div>
                         {% endif %}
+                    
+
+                    {% if is_granted('ROLE_USER') or is_granted('ROLE_PROFESSIONNEL') %}
+                            <div class="mt-4 p-3 bg-light border rounded">
+                                <h4>Donnez votre note :</h4>
+                                {{ form_start(ratingForm) }}
+                                    <div class="star-rating">
+
+
+                                        {% for child in ratingForm.note %}
+        {# On masque le bouton radio #}
+        {{ form_widget(child, {'attr': {'class': 'visually-hidden'}}) }}
+
+        {# On teste si c'est la valeur "0" #}
+        {% if child.vars.value == '0' %}
+            <label for="{{ child.vars.id }}">
+                <i class="bi bi-arrow-repeat" style="font-size: 1.3rem; color: #777;"></i>
+            </label>
+        {% else %}
+            <label for="{{ child.vars.id }}">★</label>
+        {% endif %}
+    {% endfor %}
+
+
+
+                                    </div>
+
+
+                                    <button type="submit" class="btn btn-primary">Noter</button>
+                                {{ form_end(ratingForm) }}
+                            </div>
+                        {% else %}
+                            <p>Connectez-vous pour donner une note.</p>
+                        {% endif %}
+                    <br>
+
 
                         <!-- Workshop Title -->
                         <h2 class="fw-bold">{{ workshop.titreCours }}</h2>

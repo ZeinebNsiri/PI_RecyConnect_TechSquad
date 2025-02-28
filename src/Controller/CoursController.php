@@ -10,6 +10,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Repository\RatingRepository;
+use App\Form\RatingType;
+use App\Entity\Rating;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class CoursController extends AbstractController
@@ -172,8 +175,11 @@ final class CoursController extends AbstractController
                         return $this->redirectToRoute('app_allcours');
                     }
 
+
+
+
                     #[Route('/workshops', name: 'app_workshops')]
-                    public function showWorkshops(CoursRepository $coursRepository, Request $request): Response
+                    public function showWorkshops(CoursRepository $coursRepository, RatingRepository $ratingRepository, Request $request): Response
                     {
                       
                         $template = $this->getUser() ? 'basecnx.html.twig' : 'base.html.twig';
@@ -188,6 +194,23 @@ final class CoursController extends AbstractController
                 
                       
                         $workshops = $coursRepository->findByAllFilters($selectedCategory, $searchTitle, $videoFilter);
+
+
+                        $user = $this->getUser();
+
+                        foreach ($workshops as $w) {
+                            if ($user) {
+                                $existingRating = $ratingRepository->findOneBy([
+                                    'cours' => $w,
+                                    'user'  => $user
+                                ]);
+                                // S’il existe, on stocke la note ; sinon, 0 ou null
+                                $w->userRating = $existingRating ? $existingRating->getNote() : 0;
+                            } else {
+                                // S'il n'y a pas d'utilisateur connecté, on peut mettre 0
+                                $w->userRating = 0;
+                            }
+                        } 
                 
                         return $this->render('cours/courscnx_front.html.twig', [
                             'workshops'        => $workshops,
@@ -200,20 +223,59 @@ final class CoursController extends AbstractController
                     }
 
                     #[Route('/workshops/{id}', name: 'appworkshop_details')]
-                    public function showWorkshopDetails(int $id, CoursRepository $coursRepository): Response
-                    {
+                    public function showWorkshopDetails(
+                        int $id,
+                        CoursRepository $coursRepository,
+                        RatingRepository $ratingRepository,
+                        ManagerRegistry $managerRegistry,
+                        Request $request
+                    ) {
+                        // Vérifier le rôle
                         if (!$this->isGranted('ROLE_USER') && !$this->isGranted('ROLE_PROFESSIONNEL')) {
                             throw $this->createAccessDeniedException('Accès refusé.');
                         }
+                
                         $workshop = $coursRepository->find($id);
-
-                      
                         if (!$workshop) {
-                            throw $this->createNotFoundException('Workshop n existe pas');
+                            throw $this->createNotFoundException('Workshop inexistant.');
                         }
-
+                
+                        // Récupérer l'utilisateur connecté
+                        $user = $this->getUser();
+                
+                        // Vérifier si l'utilisateur a déjà noté ce cours
+                        $existingRating = $ratingRepository->findOneBy([
+                            'cours' => $workshop,
+                            'user'  => $user,
+                        ]);
+                
+                        if ($existingRating) {
+                            $rating = $existingRating;
+                        } else {
+                            $rating = new Rating();
+                            // On affecte ici user, cours et date
+                            $rating->setUser($user);
+                            $rating->setCours($workshop);
+                            $rating->setDateRate(new \DateTime());
+                        }
+                
+                        // Créer le formulaire
+                        $form = $this->createForm(RatingType::class, $rating);
+                        $form->handleRequest($request);
+                
+                        if ($form->isSubmitted() && $form->isValid()) {
+                            $em = $managerRegistry->getManager();
+                            $em->persist($rating);
+                            $em->flush();
+                
+                            $this->addFlash('success', 'Merci pour votre note !');
+                            // Redirection pour éviter la resoumission du formulaire
+                            return $this->redirectToRoute('appworkshop_details', ['id' => $id]);
+                        }
+                
                         return $this->render('cours/detailscours_front.html.twig', [
-                            'workshop' => $workshop,
+                            'workshop'   => $workshop,
+                            'ratingForm' => $form->createView(),
                         ]);
                     }
 

@@ -108,6 +108,23 @@
 }
 
 
+.star-rating-readonly {
+    text-align: center;
+    direction: rtl;
+    unicode-bidi: bidi-override;
+    display: inline-block;
+    margin-top: 10px;
+}
+.star-rating-readonly span {
+    font-size: 1.4rem; 
+    color: #ccc; /* gris par défaut */
+    margin: 0 2px;
+    cursor: default; 
+}
+.star-rating-readonly .filled {
+    color: gold;
+}
+
 
 
 </style>
@@ -195,8 +212,25 @@
                     
                     <h3 class="fw-bold text-center">{{ workshop.titreCours }}</h3>
                     <p class="card-text text-center">{{ workshop.descriptionCours|slice(0, 120) }}...</p>
-                    
+
+
+                 <div style="display: flex; align-items: center; justify-content: space-between;">   
                    <a href="{{ path('appworkshop_details', { id: workshop.id }) }}" class="btn-voir-plus">Voir plus</a>
+
+                   {% set rating = workshop.userRating|default(0) %}
+                  <div class="star-rating-readonly" >
+                {% for i in range(5, 1, -1) %}
+                    {% if rating >= i %}
+                        <span class="filled">★</span>
+                    {% else %}
+                        <span>★</span>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            </div>
+
+
+
                 </div>
             </div>
             {% endfor %}
