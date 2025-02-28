@@ -28,7 +28,8 @@ class MailerService
             ->context([
                 'article' => $article_name,
                 'categorie' => $article_cat,
-            ]);
+            ])
+            ->embedFromPath(__DIR__.'/../../public/frontOffice/img/mainlogo.png', 'logo_cid');
            
 
         $this->mailer->send($email);
