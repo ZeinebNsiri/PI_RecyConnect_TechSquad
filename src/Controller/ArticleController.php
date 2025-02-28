@@ -9,6 +9,7 @@ use App\Repository\ArticleRepository;
 use App\Repository\UtilisateurRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Repository\LigneCommandeRepository;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\CategorieArticleRepository;
 use Symfony\Component\HttpFoundation\Response;
@@ -202,18 +203,25 @@ final class ArticleController extends AbstractController
     }
 
     #[Route('/Article/getall/admin/{category?}', name: 'app_article_admin')]
-    public function getallArticleAdmin(?string $category, ArticleRepository $repository, CategorieArticleRepository $categorieRepo)
+    public function getallArticleAdmin(?string $category, ArticleRepository $repository, CategorieArticleRepository $categorieRepo, PaginatorInterface $paginator, Request $request)
     {
         $categories = $categorieRepo->findAll();
+        
     
         if ($category && $category !== 'all') {
             $articles = $repository->findByCategory2($category);
+            
         } else {
             $articles = $repository->findAll();
+            
         }
-    
+        $pagination = $paginator->paginate(
+            $articles, // Données à paginer
+            $request->query->getInt('page', 1), // Numéro de page
+            5 // Nombre de posts par page
+            );
         return $this->render('categorie_article/liste_articles_admin.html.twig', [
-            'articles' => $articles,
+            'articles' => $pagination,
             'categories' => $categories,
         ]);
     }    
