@@ -107,6 +107,12 @@
                                             </div>
                                             <div class="ques-details10018">
                                                 <p>{{ postData.post.contenu }}</p>
+                                                
+                                            </div>
+                                            <div class="post-tags">
+                                                {% for tag in postData.post.tags %}
+                                                    <span class="badge bg-primary">{{ tag }}</span>
+                                                {% endfor %}
                                             </div>
                                             <!-- Gestion des médias associés au post -->
                                             {% if postData.medias is not empty %}
@@ -211,10 +217,24 @@
                             {% else %}
                             <p>Aucun post disponible.</p>
                             {% endfor %}
+
+
+
                         </section>
                 
                     </div>
                 </div>
+                <aside class="col-md-3 sidebar97239">
+                    <div class="categori-part329">
+                        <h4>Tags</h4>
+                        {% for tag in tags %} 
+                        <ul>
+                            <li><a>{{ tag }}</a></li>
+                            
+                        </ul>
+                        {% endfor %}
+                    </div>
+                </aside>
               
             </div>
         </div>
@@ -226,6 +246,8 @@
                 <div id="modal-images"></div>
             </div>
         </div>
+
+         
     </section>
 {% endblock %}
 

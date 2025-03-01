@@ -138,16 +138,17 @@ class Post
     public function getTags(): array
     {
         return $this->tags;
+        
     }
 
-    public function setTags(array $tags): static
+    public function setTags($tags): self
     {
-        foreach ($tags as $tag) {
-            if (!in_array($tag, array_column(TagType::cases(), 'value'))) {
-                throw new \InvalidArgumentException("Tag invalide : " . $tag);
-            }
+        if (is_string($tags)) {
+            $tags = json_decode($tags, true);
+           
         }
         $this->tags = $tags;
+
         return $this;
     }
 

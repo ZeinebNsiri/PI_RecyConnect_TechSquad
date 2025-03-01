@@ -532,7 +532,7 @@ hr {
 }
 
 .status-part3821 h4 {
-    color: #FF7361;
+    color: #114014;
     font-weight: bold;
     font-family: serif;
     border-bottom: 2px solid #eaeaeb;
@@ -548,10 +548,11 @@ hr {
     -webkit-box-shadow: 0px 0px 13px -3px;
             box-shadow: 0px 0px 13px -3px;
     margin-top: 30px;
+    border-radius: 10%;
 }
 
 .categori-part329 h4 {
-    color: #FF7361;
+    color: #0b4919;
     font-weight: bold;
     font-family: serif;
     border-bottom: 2px solid #eaeaeb;
@@ -568,7 +569,7 @@ hr {
 .categori-part329 ul li a {
     list-style: none;
     display: inline-block;
-    background-color: #222629;
+    background-color: #333537;
     padding: 5px 15px;
     border-radius: 15px;
     text-decoration: none;
@@ -578,7 +579,7 @@ hr {
 .categori-part329 ul li a:hover {
     list-style: none;
     display: inline-block;
-    background-color: #fd6372;
+    background-color: #bbd9c2;
     padding: 5px 15px;
     border-radius: 15px;
     text-decoration: none;

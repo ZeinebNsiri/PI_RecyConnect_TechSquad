@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Repository\LikeRepository;
 use App\Entity\Like;
+use App\Enum\TagType;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -66,6 +67,7 @@ final class PostsController extends AbstractController
             'postsWithMedia' => $pagination,
             'user' => $user,
             'myPostsWithMedia' => $myPostsWithMedia,
+            'tags' => TagType::getChoices()
         ]);
     }
 
@@ -90,9 +92,11 @@ final class PostsController extends AbstractController
             $post->setUserP($user);
 
             // Gestion des tags
-            $tags = $form->get('tags')->getData();
-            foreach ($tags as $tagValue) {
-                $post->addTag($tagValue); // Méthode à ajouter dans votre entité Post
+            $tags = json_decode($form->get('tags')->getData(), true); 
+            if (is_array($tags)) {
+                foreach ($tags as $tagValue) {
+                    $post->addTag($tagValue);
+                }
             }
 
 
@@ -139,6 +143,7 @@ final class PostsController extends AbstractController
 
         return $this->render('posts/ajoutPost.html.twig', [
             'form' => $form->createView(),
+            'tags' => TagType::getChoices()
         ]);
     }
 
