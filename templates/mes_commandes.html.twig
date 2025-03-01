@@ -1,0 +1,42 @@
+{% extends 'basecnx.html.twig' %}
+
+{% block title %}Mes Commandes{% endblock %}
+
+{% block body %}
+<h1>Mes Commandes</h1>
+
+{% if commande is not empty %}
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Montant</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for commande in commande %}
+    <tr>
+        <td>{{ commande.id }}</td>
+        <td>{{ commande.dateCommande | date('Y-m-d H:i') }}</td>
+        <td>{{ commande.prixTotal }} TND</td>
+        <td>
+            <span class="badge {% if commande.statut == 'Payé' %}bg-success{% else %}bg-warning{% endif %}">
+                {{ commande.statut }}
+            </span>
+        </td>
+        <td>
+            <a href="{{ path('app_facture_pdf', {'id': commande.id}) }}" class="btn btn-primary">Générer la facture</a>
+        </td>
+    </tr>
+{% endfor %}
+
+        </tbody>
+    </table>
+
+{% else %}
+    <p>Vous n'avez pas de commandes.</p>
+{% endif %}
+{% endblock %}
