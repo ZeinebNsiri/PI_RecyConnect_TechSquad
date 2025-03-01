@@ -31,4 +31,16 @@ class RatingRepository extends ServiceEntityRepository
         ;
     }
 
+    public function getAverageRatingByWorkshop(): array
+    {
+        return $this->createQueryBuilder('r')  // r = Rating
+            ->select('c.titreCours AS workshop, AVG(r.note) AS averageRating')
+            ->join('r.cours', 'c')
+            ->groupBy('c.id')
+            ->orderBy('averageRating', 'DESC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
 }

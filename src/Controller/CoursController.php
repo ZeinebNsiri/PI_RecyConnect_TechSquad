@@ -310,14 +310,18 @@ final class CoursController extends AbstractController
                         CoursRepository $coursRepository,
                         RatingRepository $ratingRepository
                     ): Response {
-                        // 1) Nombre de workshops par catégorie
+                       
                         $statsCategory = $coursRepository->countByCategory();
-
+                
+                       
                         $statsRatingSumByCategory = $ratingRepository->getRatingSumByCategory();
-
+                
+                        $averageByWorkshop = $ratingRepository->getAverageRatingByWorkshop();
+                
                         return $this->render('cours/dashboard-cours.html.twig', [
                             'statsCategory'           => $statsCategory,
                             'statsRatingSumByCategory'=> $statsRatingSumByCategory,
+                            'averageByWorkshop'       => $averageByWorkshop,
                         ]);
                     }
                     
