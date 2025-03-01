@@ -227,14 +227,14 @@
                 <aside class="col-md-3 sidebar97239">
                     <div class="categori-part329">
                         <h4>Tags</h4>
-                        {% for tag in tags %} 
-                        <ul>
-                            <li><a>{{ tag }}</a></li>
-                            
-                        </ul>
-                        {% endfor %}
+                        <div class="d-flex flex-wrap gap-2">  
+                            {% for tag in tags %} 
+                                <a href="#" class="badge custom-tag" data-tag="{{ tag }}">{{ tag }}</a>
+                            {% endfor %}
+                        </div>
                     </div>
                 </aside>
+
               
             </div>
         </div>

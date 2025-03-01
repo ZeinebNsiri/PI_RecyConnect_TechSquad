@@ -58,5 +58,18 @@
 .like-btn.liked {
     color: red;
 }
+.custom-tag {
+    background-color: #6c757d; /* Gris */
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    text-decoration: none; /* Enlever le soulignement */
+    transition: background-color 0.3s ease-in-out; /* Animation fluide */
+}
+
+.custom-tag:hover {
+    background-color: #d0ddec; /* Bleu au hover */
+    color: white;
+}
 
 
