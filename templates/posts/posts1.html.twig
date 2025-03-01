@@ -229,7 +229,7 @@
                         <h4>Tags</h4>
                         <div class="d-flex flex-wrap gap-2">  
                             {% for tag in tags %} 
-                                <a href="#" class="badge custom-tag" data-tag="{{ tag }}">{{ tag }}</a>
+                                <a href="#" class="badge custom-tag {% if tag in selectedTags %} active-tag {% endif %}" data-tag="{{ tag }}">{{ tag }}</a>
                             {% endfor %}
                         </div>
                     </div>
@@ -362,6 +362,46 @@
                 });
             });
         });
+        </script>
+
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                let selectedTags = new Set(); // Utilisation d'un Set pour éviter les doublons
+
+                // Récupérer les tags déjà sélectionnés dans l'URL
+                let params = new URLSearchParams(window.location.search);
+                let currentTags = params.get("tags") ? params.get("tags").split(",") : [];
+                
+                currentTags.forEach(tag => selectedTags.add(tag));
+
+                // Ajouter la classe active aux tags déjà sélectionnés
+                document.querySelectorAll(".custom-tag").forEach(tag => {
+                    if (selectedTags.has(tag.getAttribute("data-tag"))) {
+                        tag.classList.add("active-tag");
+                    }
+
+                    tag.addEventListener("click", function (event) {
+                        event.preventDefault(); // Empêcher le rechargement
+
+                        let tagValue = this.getAttribute("data-tag");
+
+                        if (selectedTags.has(tagValue)) {
+                            selectedTags.delete(tagValue); // Retirer le tag
+                            this.classList.remove("active-tag"); // Retirer le style actif
+                        } else {
+                            selectedTags.add(tagValue); // Ajouter le tag
+                            this.classList.add("active-tag"); // Ajouter un style actif
+                        }
+
+                        // Mise à jour de l'URL avec les tags sélectionnés
+                        let queryParams = new URLSearchParams(window.location.search);
+                        queryParams.set("tags", Array.from(selectedTags).join(",")); 
+                        window.location.search = queryParams.toString(); // Recharger avec les filtres
+                    });
+                });
+            });
+
         </script>
 
     {% endblock %}

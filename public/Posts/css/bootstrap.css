@@ -4186,6 +4186,16 @@ a.label:focus {
   background-color: #777;
   border-radius: 10px;
 }
+.active-tag {
+  background-color: #d0ddec !important; /* Bleu */
+  color: white !important;
+  font-weight: bold;
+}
+.badge:hover {
+  background-color: #d0ddec; /* Bleu au hover */
+  
+}
+
 .badge:empty {
   display: none;
 }

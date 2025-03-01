@@ -58,7 +58,7 @@
 .like-btn.liked {
     color: red;
 }
-.custom-tag {
+.badge .custom-tag {
     background-color: #6c757d; /* Gris */
     color: white;
     padding: 5px 10px;
@@ -67,9 +67,13 @@
     transition: background-color 0.3s ease-in-out; /* Animation fluide */
 }
 
-.custom-tag:hover {
+.badge .custom-tag:hover {
     background-color: #d0ddec; /* Bleu au hover */
     color: white;
 }
-
+.active-tag {
+    background-color: #007bff !important; /* Bleu */
+    color: white !important;
+    font-weight: bold;
+}
 

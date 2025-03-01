@@ -2,25 +2,25 @@
 
 namespace App\Controller;
 
+use dump;
+use App\Entity\Like;
 use App\Entity\Post;
+use App\Enum\TagType;
 use App\Form\PostType;
-use App\Entity\Utilisateur;
 use App\Entity\MediaPost;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\Utilisateur;
+use App\Repository\LikeRepository;
 use App\Repository\MediaPostRepository;
-
+use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use App\Repository\LikeRepository;
-use App\Entity\Like;
-use App\Enum\TagType;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Knp\Component\Pager\PaginatorInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 final class PostsController extends AbstractController
 {   
@@ -32,25 +32,44 @@ final class PostsController extends AbstractController
             throw $this->createAccessDeniedException('Accès refusé.');
         }
         $user = $this->getUser();
-
-        $posts = $entityManager->getRepository(Post::class)->findBy(['status_post' => true], ['datePublication' => 'DESC']);
+    
+        // Récupérer les tags sélectionnés depuis l'URL
+        $selectedTags = $request->query->get('tags', '');
+        $selectedTagsArray = $selectedTags ? explode(',', $selectedTags) : [];
+    
+        // Création de la requête avec QueryBuilder
+        $queryBuilder = $entityManager->getRepository(Post::class)->createQueryBuilder('p')
+            ->where('p.status_post = :status')
+            ->setParameter('status', true)
+            ->orderBy('p.datePublication', 'DESC');
+    
+        // Appliquer un filtre si des tags sont sélectionnés
+        if (!empty($selectedTagsArray)) {
+            $orX = $queryBuilder->expr()->orX();
+            foreach ($selectedTagsArray as $key => $tag) {
+                $orX->add($queryBuilder->expr()->like('p.tags', ":tag$key"));
+                $queryBuilder->setParameter("tag$key", '%"'.$tag.'"%'); // Recherche du tag dans le JSON
+            }
+            $queryBuilder->andWhere($orX);
+        }
+    
+        $posts = $queryBuilder->getQuery()->getResult();
+    
         $postsWithMedia = [];
         foreach ($posts as $post) {
             $medias = $mediaPostRepository->findBy(['post' => $post]);
             $postsWithMedia[] = [
                 'post' => $post,
                 'medias' => $medias,
-                
             ];
         }
-
-
+    
         $pagination = $paginator->paginate(
-            $postsWithMedia, // Données à paginer
-            $request->query->getInt('page', 1), // Numéro de page
-            5 // Nombre de posts par page
+            $postsWithMedia,
+            $request->query->getInt('page', 1),
+            5
         );
-
+    
         $myPostsWithMedia = [];
         foreach ($posts as $post) {
             if ($post->getUserP() === $user) {
@@ -58,18 +77,20 @@ final class PostsController extends AbstractController
                 $myPostsWithMedia[] = [
                     'post' => $post,
                     'medias' => $medias,
-                    
                 ];
             }
         }
-
+    
         return $this->render('posts/posts1.html.twig', [
             'postsWithMedia' => $pagination,
             'user' => $user,
             'myPostsWithMedia' => $myPostsWithMedia,
-            'tags' => TagType::getChoices()
+            'tags' => TagType::getChoices(),
+            'selectedTags' => $selectedTagsArray // Pour garder les tags sélectionnés actifs sur l'interface
         ]);
     }
+    
+    
 
 
     #[Route('/posts/new', name: 'post_create')]
