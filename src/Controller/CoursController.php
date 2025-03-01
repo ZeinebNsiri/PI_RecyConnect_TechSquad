@@ -20,26 +20,26 @@ final class CoursController extends AbstractController
     #[Route('/cours', name: 'app_allcours')]
     public function getAllcours(CoursRepository $repo, Request $request): Response
     {
-        
-    $selectedCategory = $request->query->get('category'); // Get the selected category from URL
-    $categories = $repo->findUniqueCategories(); // Fetch all unique categories
+        $selectedCategory = $request->query->get('category'); // Get the selected category from URL
+        $categories       = $repo->findUniqueCategories();    // Fetch all unique categories
 
-    if ($selectedCategory) {
-        $cours = $repo->findByCategory($selectedCategory); // Filter courses if category is selected
-    } else {
-        $cours = $repo->findAll(); // Otherwise, get all courses
+        if ($selectedCategory) {
+            $cours = $repo->findByCategory($selectedCategory); // Filter courses if category is selected
+        } else {
+            $cours = $repo->findAll(); // Otherwise, get all courses
+        }
+
+        return $this->render('cours/index.html.twig', [
+            'cours'           => $cours,
+            // On préfixe array_column par un backslash
+            'categories'      => \array_column($categories, 'nomCategorie'),
+            'selectedCategory'=> $selectedCategory,
+        ]);
     }
 
-    return $this->render('cours/index.html.twig', [
-        'cours' => $cours,
-        'categories' => array_column($categories, 'nomCategorie'), // Extract category names
-        'selectedCategory' => $selectedCategory,
-        
-    ]);
-    }
-
-
-    //add
+    // ---------------------------------------------
+    // add
+    // ---------------------------------------------
     #[Route('/add-cours', name: 'appcours_add')]
     public function add(
         Request $request,
@@ -48,50 +48,31 @@ final class CoursController extends AbstractController
         #[Autowire('%video_dir%')] string $videoDir
     ): Response {
         $cours = new Cours();
-
-       
-        $form = $this->createForm(CoursType::class, $cours);
+        $form  = $this->createForm(CoursType::class, $cours);
         $form->handleRequest($request);
 
-        
         if ($form->isSubmitted() && $form->isValid()) {
-          
+            // Gestion de l'image
             $photoFile = $form->get('imageCours')->getData();
             if ($photoFile) {
                 $fileName = $photoFile->getClientOriginalName();
-               
-                $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/images';
-
-                $photoFile->move(
-                    $photoDir, 
-                    $fileName
-                );
+                $photoFile->move($photoDir, $fileName);
                 $cours->setImageCours($fileName);
             }
 
-           
+            // Gestion de la vidéo
             $videoFile = $form->get('video')->getData();
             if ($videoFile) {
                 $fileName = $videoFile->getClientOriginalName();
-               
-                $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/videos';
-
-                $videoFile->move(
-                    $videoDir,  
-                    $fileName
-                );
+                $videoFile->move($videoDir, $fileName);
                 $cours->setVideo($fileName);
             }
 
-            
             $em = $manager->getManager();
             $em->persist($cours);
             $em->flush();
 
-           
             $this->addFlash('success', 'Le cours a été ajouté avec succès !');
-
-            
             return $this->redirectToRoute('app_allcours');
         }
 
@@ -100,7 +81,9 @@ final class CoursController extends AbstractController
         ]);
     }
 
-    //edit
+    // ---------------------------------------------
+    // edit
+    // ---------------------------------------------
     #[Route('/updatecours/{id}', name: 'app_editcours')]
     public function edit(
         Request $request,
@@ -114,218 +97,204 @@ final class CoursController extends AbstractController
         if (!$cours) {
             throw $this->createNotFoundException('Cours non trouvé');
         }
-    
-        
+
         $oldImage = $cours->getImageCours();
-    
-        $form = $this->createForm(CoursType::class, $cours);
+        $form     = $this->createForm(CoursType::class, $cours);
         $form->handleRequest($request);
-    
+
         if ($form->isSubmitted() && $form->isValid()) {
-           
+            // Image
             $photoFile = $form->get('imageCours')->getData();
             if ($photoFile) {
-                
                 $fileName = $photoFile->getClientOriginalName();
                 $photoFile->move($photoDir, $fileName);
                 $cours->setImageCours($fileName);
-    
-                
+
+                // Suppression de l'ancienne image
                 if ($oldImage && file_exists($photoDir.'/'.$oldImage)) {
                     unlink($photoDir.'/'.$oldImage);
                 }
             } else {
-               
                 $cours->setImageCours($oldImage);
             }
-    
-            
+
+            // Vidéo
             $videoFile = $form->get('video')->getData();
             if ($videoFile) {
                 $videoName = $videoFile->getClientOriginalName();
                 $videoFile->move($videoDir, $videoName);
                 $cours->setVideo($videoName);
             }
-    
+
             $em = $manager->getManager();
             $em->flush();
-    
+
             $this->addFlash('success', 'Le cours a été modifié avec succès.');
             return $this->redirectToRoute('app_allcours');
         }
-    
+
         return $this->render('cours/edit-cours.html.twig', [
             'form'  => $form->createView(),
             'cours' => $cours
         ]);
     }
 
+    // ---------------------------------------------
+    // delete
+    // ---------------------------------------------
+    #[Route('/deletecours/{id}', name: 'app_deletecours')]
+    public function deleteCours(ManagerRegistry $manager, CoursRepository $repo, $id )
+    {
+        $em   = $manager->getManager();
+        $cour = $repo->find($id);
 
+        $em->remove($cour);
+        $em->flush();
 
-                    //delete
-                    #[Route('/deletecours/{id}', name: 'app_deletecours')]
-                    public function deleteCours(ManagerRegistry $manager, CoursRepository $repo, $id )
-                    {
-                        $em= $manager->getManager();
-                        $cour = $repo->find($id);
-                    
-                        $em->remove($cour)  ;
-                        $em->flush();
-                
-                        return $this->redirectToRoute('app_allcours');
-                    }
+        return $this->redirectToRoute('app_allcours');
+    }
 
+    // ---------------------------------------------
+    // showWorkshops
+    // ---------------------------------------------
+    #[Route('/workshops', name: 'app_workshops')]
+    public function showWorkshops(
+        CoursRepository $coursRepository,
+        RatingRepository $ratingRepository,
+        Request $request
+    ): Response {
+        $template = $this->getUser() ? 'basecnx.html.twig' : 'base.html.twig';
 
+        $categories      = $coursRepository->findUniqueCategories();
+        $selectedCategory= $request->query->get('category');
+        $searchTitle     = $request->query->get('searchTitle');
+        $videoFilter     = $request->query->get('video');
 
+        $workshops = $coursRepository->findByAllFilters($selectedCategory, $searchTitle, $videoFilter);
 
-                    #[Route('/workshops', name: 'app_workshops')]
-                    public function showWorkshops(CoursRepository $coursRepository, RatingRepository $ratingRepository, Request $request): Response
-                    {
-                      
-                        $template = $this->getUser() ? 'basecnx.html.twig' : 'base.html.twig';
-                
-                        
-                        $categories = $coursRepository->findUniqueCategories();
-                
-                
-                        $selectedCategory = $request->query->get('category');
-                        $searchTitle      = $request->query->get('searchTitle');
-                        $videoFilter      = $request->query->get('video');  
-                
-                      
-                        $workshops = $coursRepository->findByAllFilters($selectedCategory, $searchTitle, $videoFilter);
+        // Injecter la note de l'utilisateur connecté, s'il existe
+        $user = $this->getUser();
+        foreach ($workshops as $w) {
+            if ($user) {
+                $existingRating = $ratingRepository->findOneBy([
+                    'cours' => $w,
+                    'user'  => $user
+                ]);
+                $w->userRating = $existingRating ? $existingRating->getNote() : 0;
+            } else {
+                $w->userRating = 0;
+            }
+        }
 
+        return $this->render('cours/courscnx_front.html.twig', [
+            'workshops'        => $workshops,
+            // Correction array_column
+            'categories'       => \array_column($categories, 'nomCategorie'),
+            'selectedCategory' => $selectedCategory,
+            'searchTitle'      => $searchTitle,
+            'videoFilter'      => $videoFilter,
+            'template'         => $template
+        ]);
+    }
 
-                        $user = $this->getUser();
+    // ---------------------------------------------
+    // showWorkshopDetails
+    // ---------------------------------------------
+    #[Route('/workshops/{id}', name: 'appworkshop_details')]
+    public function showWorkshopDetails(
+        int $id,
+        CoursRepository $coursRepository,
+        RatingRepository $ratingRepository,
+        ManagerRegistry $managerRegistry,
+        Request $request
+    ) {
+        // Vérifier le rôle
+        if (!$this->isGranted('ROLE_USER') && !$this->isGranted('ROLE_PROFESSIONNEL')) {
+            throw $this->createAccessDeniedException('Accès refusé.');
+        }
 
-                        foreach ($workshops as $w) {
-                            if ($user) {
-                                $existingRating = $ratingRepository->findOneBy([
-                                    'cours' => $w,
-                                    'user'  => $user
-                                ]);
-                                // S’il existe, on stocke la note ; sinon, 0 ou null
-                                $w->userRating = $existingRating ? $existingRating->getNote() : 0;
-                            } else {
-                                // S'il n'y a pas d'utilisateur connecté, on peut mettre 0
-                                $w->userRating = 0;
-                            }
-                        } 
-                
-                        return $this->render('cours/courscnx_front.html.twig', [
-                            'workshops'        => $workshops,
-                            'categories'       => array_column($categories, 'nomCategorie'), 
-                            'selectedCategory' => $selectedCategory,
-                            'searchTitle'      => $searchTitle,
-                            'videoFilter'      => $videoFilter,
-                            'template'         => $template
-                        ]);
-                    }
+        $workshop = $coursRepository->find($id);
+        if (!$workshop) {
+            throw $this->createNotFoundException('Workshop inexistant.');
+        }
 
-                    #[Route('/workshops/{id}', name: 'appworkshop_details')]
-                    public function showWorkshopDetails(
-                        int $id,
-                        CoursRepository $coursRepository,
-                        RatingRepository $ratingRepository,
-                        ManagerRegistry $managerRegistry,
-                        Request $request
-                    ) {
-                        // Vérifier le rôle
-                        if (!$this->isGranted('ROLE_USER') && !$this->isGranted('ROLE_PROFESSIONNEL')) {
-                            throw $this->createAccessDeniedException('Accès refusé.');
-                        }
-                
-                        $workshop = $coursRepository->find($id);
-                        if (!$workshop) {
-                            throw $this->createNotFoundException('Workshop inexistant.');
-                        }
-                
-                        // Récupérer l'utilisateur connecté
-                        $user = $this->getUser();
-                
-                        // Vérifier si l'utilisateur a déjà noté ce cours
-                        $existingRating = $ratingRepository->findOneBy([
-                            'cours' => $workshop,
-                            'user'  => $user,
-                        ]);
-                
-                        if ($existingRating) {
-                            $rating = $existingRating;
-                        } else {
-                            $rating = new Rating();
-                            // On affecte ici user, cours et date
-                            $rating->setUser($user);
-                            $rating->setCours($workshop);
-                            $rating->setDateRate(new \DateTime());
-                        }
-                
-                        // Créer le formulaire
-                        $form = $this->createForm(RatingType::class, $rating);
-                        $form->handleRequest($request);
-                
-                        if ($form->isSubmitted() && $form->isValid()) {
-                            $em = $managerRegistry->getManager();
-                            $em->persist($rating);
-                            $em->flush();
-                
-                            $this->addFlash('success', 'Merci pour votre note !');
-                            // Redirection pour éviter la resoumission du formulaire
-                            return $this->redirectToRoute('appworkshop_details', ['id' => $id]);
-                        }
-                
-                        return $this->render('cours/detailscours_front.html.twig', [
-                            'workshop'   => $workshop,
-                            'ratingForm' => $form->createView(),
-                        ]);
-                    }
+        // Récupérer l'utilisateur connecté
+        $user = $this->getUser();
 
+        // Vérifier si l'utilisateur a déjà noté ce cours
+        $existingRating = $ratingRepository->findOneBy([
+            'cours' => $workshop,
+            'user'  => $user,
+        ]);
 
-                
-                    #[Route('/workshopsg', name: 'app_workshopsg')]
-                    public function showWorkshopsguest(CoursRepository $coursRepository, Request $request): Response
-                    {
-                       
-                        $categories = $coursRepository->findUniqueCategories();
-                        
-                       
-                        $selectedCategory = $request->query->get('category');
-                    
-                       
-                        if ($selectedCategory) {
-                            $workshops = $coursRepository->findByCategory($selectedCategory);
-                        } else {
-                            $workshops = $coursRepository->findAll();
-                        }
-                    
-                       
-                        return $this->render('cours/coursguest_front.html.twig', [
-                            'workshops'        => $workshops,
-                            'categories'       => array_column($categories, 'nomCategorie'), 
-                            'selectedCategory' => $selectedCategory,
-                        ]);
-                    }
+        if ($existingRating) {
+            $rating = $existingRating;
+        } else {
+            $rating = new Rating();
+            $rating->setUser($user);
+            $rating->setCours($workshop);
+            $rating->setDateRate(new \DateTime());
+        }
 
-                    #[Route('/dashboard/cours', name: 'app_cours_dashboard')]
-                    public function dashboardCours(
-                        CoursRepository $coursRepository,
-                        RatingRepository $ratingRepository
-                    ): Response {
-                       
-                        $statsCategory = $coursRepository->countByCategory();
-                
-                       
-                        $statsRatingSumByCategory = $ratingRepository->getRatingSumByCategory();
-                
-                        $averageByWorkshop = $ratingRepository->getAverageRatingByWorkshop();
-                
-                        return $this->render('cours/dashboard-cours.html.twig', [
-                            'statsCategory'           => $statsCategory,
-                            'statsRatingSumByCategory'=> $statsRatingSumByCategory,
-                            'averageByWorkshop'       => $averageByWorkshop,
-                        ]);
-                    }
-                    
-     
-                    
+        // Créer le formulaire
+        $form = $this->createForm(RatingType::class, $rating);
+        $form->handleRequest($request);
 
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $managerRegistry->getManager();
+            $em->persist($rating);
+            $em->flush();
+
+            $this->addFlash('success', 'Merci pour votre note !');
+            // Redirection pour éviter la resoumission du formulaire
+            return $this->redirectToRoute('appworkshop_details', ['id' => $id]);
+        }
+
+        return $this->render('cours/detailscours_front.html.twig', [
+            'workshop'   => $workshop,
+            'ratingForm' => $form->createView(),
+        ]);
+    }
+
+    // ---------------------------------------------
+    // showWorkshopsguest
+    // ---------------------------------------------
+    #[Route('/workshopsg', name: 'app_workshopsg')]
+    public function showWorkshopsguest(CoursRepository $coursRepository, Request $request): Response
+    {
+        $categories      = $coursRepository->findUniqueCategories();
+        $selectedCategory= $request->query->get('category');
+
+        if ($selectedCategory) {
+            $workshops = $coursRepository->findByCategory($selectedCategory);
+        } else {
+            $workshops = $coursRepository->findAll();
+        }
+
+        return $this->render('cours/coursguest_front.html.twig', [
+            'workshops'        => $workshops,
+            // Correction array_column
+            'categories'       => \array_column($categories, 'nomCategorie'),
+            'selectedCategory' => $selectedCategory,
+        ]);
+    }
+
+    // ---------------------------------------------
+    // dashboardCours
+    // ---------------------------------------------
+    #[Route('/dashboard/cours', name: 'app_cours_dashboard')]
+    public function dashboardCours(
+        CoursRepository $coursRepository,
+        RatingRepository $ratingRepository
+    ): Response {
+        $statsCategory           = $coursRepository->countByCategory();
+        $statsRatingSumByCategory= $ratingRepository->getRatingSumByCategory();
+        $averageByWorkshop       = $ratingRepository->getAverageRatingByWorkshop();
+
+        return $this->render('cours/dashboard-cours.html.twig', [
+            'statsCategory'           => $statsCategory,
+            'statsRatingSumByCategory'=> $statsRatingSumByCategory,
+            'averageByWorkshop'       => $averageByWorkshop,
+        ]);
+    }
 }
