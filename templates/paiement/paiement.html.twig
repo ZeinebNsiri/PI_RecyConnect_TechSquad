@@ -1,3 +1,4 @@
+
 {% extends 'basecnx.html.twig' %}
 
 {% block title %}Paiement{% endblock %}
@@ -12,11 +13,11 @@
             </div>
         {% endfor %}
     {% endfor %}
-    <div class="payment-container">
 
+    <div class="payment-container">
         <h1 class="text-center">Choisir le mode de paiement</h1>
 
-        <form method="POST" action="{{ path('traiter_paiement', {'commandeId': commande.id}) }}" class="payment-form">
+        <form id="payment-form" method="POST" action="{{ path('traiter_paiement', {'commandeId': commande.id}) }}" class="payment-form">
             <div class="payment-option">
                 <label class="radio-container">
                     <input type="radio" name="mode_paiement" value="livraison" required>
@@ -33,14 +34,81 @@
                 </label>
             </div>
             
-           <button type="submit" class="submit-btn">
-                    Valider le paiement
-             </button>
-            
+            <button type="submit" class="submit-btn">Valider le paiement</button>
         </form>
+
+        <!-- Conteneur de l'iframe (initialement caché) -->
+        <div id="iframe-container" style="
+            clip: rect(0,381,381,0);
+            position: absolute;
+            background: #FFF;
+            height: 377px;
+            width: 377px;
+            left: 77px;
+            top: 77px;
+            display: none; /* Caché au départ */
+            border: 2px solid #333;
+        ">
+            <iframe 
+                id="payment-iframe"
+                src=""
+                width="377"
+                height="377"
+                marginwidth="0"
+                marginheight="0"
+                frameborder="no"
+                scrolling="yes"
+                style="background: #FFF;">
+            </iframe>
+        </div>
     </div>
 
+    <!-- JavaScript pour gérer l'affichage dynamique de l'iframe -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let form = document.getElementById("payment-form");
+            let iframeContainer = document.getElementById("iframe-container");
+            let paymentIframe = document.getElementById("payment-iframe");
+
+            form.addEventListener("submit", function (event) {
+                event.preventDefault(); // Empêcher le rechargement de la page
+
+                let formData = new FormData(form);
+                let paymentMethod = formData.get("mode_paiement");
+
+                if (paymentMethod === "visa") {
+                    // Récupération de l'URL de paiement via API Symfony
+                    fetch("{{ path('generate_payment_url', {'commandeId': commande.id}) }}", {
+                        method: "POST",
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.paymentUrl) {
+                            paymentIframe.src = data.paymentUrl;
+                            iframeContainer.style.display = "block"; // Afficher l'iframe
+                        }
+                    })
+                    .catch(error => console.error("Erreur lors de la récupération de l'URL de paiement", error));
+                } else {
+                    // Si c'est "À la livraison", envoyer normalement le formulaire
+                    form.submit();
+                }
+            });
+        });
+    </script>
+
     <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .payment-container {
+            flex: 1;
+        }
+
         /* Container for the payment form */
         .payment-container {
             width: 80%;
@@ -130,4 +198,5 @@
             }
         }
     </style>
+
 {% endblock %}
