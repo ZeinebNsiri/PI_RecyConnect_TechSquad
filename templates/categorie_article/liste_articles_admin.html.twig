@@ -7,6 +7,36 @@
 <style>
     .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
     .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+        .pagination .page-link {
+        color: #138A4B !important;  /* Texte vert */
+        background-color: white !important; /* Fond blanc */
+        border-color: #138A4B !important; /* Bordure verte */
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #0F6B3D !important; /* Fond vert foncé */
+        color: white !important; /* Texte blanc */
+        border-color: #0F6B3D !important;
+    }
+
+    .pagination .page-link:hover {
+        background-color: #A5D6A7 !important; /* Vert clair au survol */
+        color: #0F6B3D !important; /* Texte vert foncé */
+    }
+
+    .pagination .page-item:first-child .page-link,
+    .pagination .page-item:last-child .page-link {
+        background-color: #138A4B !important; /* Fond vert pour Précédent et Suivant */
+        color: white !important; /* Texte blanc */
+        border-color: #138A4B !important;
+    }
+
+    .pagination .page-item:first-child .page-link:hover,
+    .pagination .page-item:last-child .page-link:hover {
+        background-color: #A5D6A7 !important; /* Vert clair au survol */
+        color: #0F6B3D !important; /* Texte vert foncé */
+    }
+
     
 </style>
 
@@ -63,7 +93,7 @@
                                             <td>{{ article.prix }} TN/KG</td>
                                             <td>{{ article.utilisateur.nomUser }} {{ article.utilisateur.prenom }}</td>
                                             <td>
-                                                <a class="btn btn-success detail-button" href="{{ path('app_deleteArticleAdmin', {'id': article.id}) }}">
+                                                <a class="btn btn-danger detail-button" href="{{ path('app_deleteArticleAdmin', {'id': article.id}) }}">
                                                     <i class="bi bi-trash"></i> Ban
                                                 </a>
                                             </td>
