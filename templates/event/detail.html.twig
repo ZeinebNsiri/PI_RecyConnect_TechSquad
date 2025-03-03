@@ -4,7 +4,7 @@
 
 {% block body %}
   <!-- Page Header Start -->
-  <div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s" style="background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('{{ asset('uploads/images/carousel-1.jpg') }}') center/cover no-repeat;">
+  <div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s" style="background: linear-gradient(rgba(0, 0, 0, 0.6), url('{{ asset('uploads/images/' ~ evenement.imageEvent) }}') center/cover no-repeat;">
     <div class="container text-center py-5">
       <h1 class="display-3 text-white mb-3 fw-bold animated slideInDown">{{ evenement.nomEvent }}</h1>
       <nav aria-label="breadcrumb animated slideInDown">
@@ -56,14 +56,40 @@
                   <i class="fas fa-map-marker-alt me-2 text-primary"></i>
                   <strong>Lieu :</strong> {{ evenement.lieuEvent }}
                 </li>
-                <li class="mb-3">
-                  <i class="fas fa-users me-2 text-primary"></i>
-                  <strong>Capacité :</strong> {{ evenement.capacite }}
-                </li>
-                <li class="mb-3">
-                  <i class="fas fa-ticket-alt me-2 text-primary"></i>
-                  <strong>Places restantes :</strong> {{ evenement.nbRestant }}
-                </li>
+
+                <!-- Online Event: Meeting Link -->
+                {% if evenement.lieuEvent|lower == 'en ligne' %}
+                  {% if meetingLink and isEventActive %}
+                    <li class="mb-3">
+                      <i class="fas fa-video me-2 text-primary"></i>
+                      <strong>Lien de la réunion :</strong>
+                      <a href="{{ meetingLink }}" target="_blank" class="btn btn-primary btn-sm">
+                        <i class="fas fa-video me-2"></i> Rejoindre la réunion
+                      </a>
+                    </li>
+                  {% elseif meetingLink and not isEventActive %}
+                    <li class="mb-3">
+                      <i class="fas fa-video me-2 text-primary"></i>
+                      <strong>Lien de la réunion :</strong>
+                      <p class="text-muted">Le lien sera disponible le jour de l'événement à l'heure indiquée.</p>
+                    </li>
+                  {% else %}
+                    <li class="mb-3">
+                      <i class="fas fa-video me-2 text-primary"></i>
+                      <strong>Lien de la réunion :</strong>
+                      <p class="text-muted">Veuillez vous inscrire pour accéder au lien de la réunion.</p>
+                    </li>
+                  {% endif %}
+                {% endif %}
+
+                <!-- Onsite Event: Map -->
+                {% if evenement.lieuEvent|lower != 'en ligne' %}
+                  <li class="mb-3">
+                    <i class="fas fa-map-marked-alt me-2 text-primary"></i>
+                    <strong>Localisation :</strong>
+                    <div id="map" style="height: 200px;"></div>
+                  </li>
+                {% endif %}
               </ul>
             </div>
           </div>
@@ -73,42 +99,27 @@
   </div>
   <!-- Event Detail Section End -->
 
-  <style>
-    .card {
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-    }
-    .card-img-top {
-      border-radius: 8px 8px 0 0;
-    }
-    .card-body {
-      border-radius: 0 0 8px 8px;
-    }
-    .list-unstyled li {
-      padding: 10px 0;
-      border-bottom: 1px solid #eee;
-    }
-    .list-unstyled li:last-child {
-      border-bottom: none;
-    }
-    .btn-success {
-      background-color: #28a745; /* Bootstrap's default green */
-      border-color: #28a745;
-    }
-    .btn-success:hover {
-      background-color: #218838; /* Darker green on hover */
-      border-color: #1e7e34;
-    }
-    .btn-outline-secondary {
-      border-color: #6c757d;
-      color: #6c757d;
-    }
-    .btn-outline-secondary:hover {
-      background-color: #6c757d;
-      color: #fff;
-    }
-  </style>
+  <!-- Mapbox Integration -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script>
+    const map = L.map('map').setView([48.8566, 2.3522], 12); // Default to Paris coordinates
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Add a marker for the event location
+    {% if evenement.mapCoordinates %}
+      const coordinates = "{{ evenement.mapCoordinates }}".split(',');
+      const lat = parseFloat(coordinates[0]);
+      const lng = parseFloat(coordinates[1]);
+
+      L.marker([lat, lng]).addTo(map)
+        .bindPopup('{{ evenement.lieuEvent }}')
+        .openPopup();
+
+      map.setView([lat, lng], 15); // Zoom to the event location
+    {% endif %}
+  </script>
 {% endblock %}

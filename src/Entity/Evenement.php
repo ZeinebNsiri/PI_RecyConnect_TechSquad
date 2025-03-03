@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Entity;
 
 use App\Repository\EvenementRepository;
@@ -39,6 +38,11 @@ class Evenement
 
     #[ORM\Column]
     private ?int $nbRestant = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $googleMeetLink = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $mapCoordinates = null;
 
     #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'event', orphanRemoval: true)]
     private Collection $reservations;
@@ -142,9 +146,27 @@ class Evenement
         return $this;
     }
 
-    /**
-     * @return Collection<int, Reservation>
-     */
+    public function getGoogleMeetLink(): ?string
+    {
+        return $this->googleMeetLink;
+    }
+
+    public function setGoogleMeetLink(?string $googleMeetLink): static
+    {
+        $this->googleMeetLink = $googleMeetLink;
+        return $this;
+    }
+    public function getMapCoordinates(): ?string
+    {
+        return $this->mapCoordinates;
+    }
+
+    public function setMapCoordinates(?string $mapCoordinates): static
+    {
+        $this->mapCoordinates = $mapCoordinates;
+        return $this;
+    }
+
     public function getReservations(): Collection
     {
         return $this->reservations;
@@ -156,7 +178,6 @@ class Evenement
             $this->reservations->add($reservation);
             $reservation->setEventId($this);
         }
-
         return $this;
     }
 
@@ -167,7 +188,6 @@ class Evenement
                 $reservation->setEventId(null);
             }
         }
-
         return $this;
     }
 }

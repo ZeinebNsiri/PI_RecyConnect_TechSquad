@@ -15,52 +15,103 @@ use Symfony\Component\Routing\Annotation\Route;
 class ReservationController extends AbstractController
 {
     #[Route('/event/{id}/register', name: 'event_registration', methods: ['GET', 'POST'])]
-    public function register(Request $request, EntityManagerInterface $entityManager, Evenement $evenement): Response
-    {
-        $reservation = new Reservation();
-        $form = $this->createForm(RegistrationType::class, $reservation);
-        $form->handleRequest($request);
+public function register(Request $request, EntityManagerInterface $entityManager, Evenement $evenement, ReservationRepository $reservationRepository): Response
+{
+    $reservation = new Reservation();
+    $form = $this->createForm(RegistrationType::class, $reservation);
+    $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $reservation->setEventId($evenement);
-            $nbPlacesReservees = $reservation->getNbPlaces();
-            $evenement->setNbRestant($evenement->getNbRestant() - $nbPlacesReservees);
-            $reservation->setUserId($this->getUser());
+    if ($form->isSubmitted() && $form->isValid()) {
+        // Set the event and user for the reservation
+        $reservation->setEventId($evenement);
+        $reservation->setUserId($this->getUser());
 
-            $entityManager->persist($reservation);
-            $entityManager->flush();
+        // Update the remaining places for the event
+        $nbPlacesReservees = $reservation->getNbPlaces();
+        $evenement->setNbRestant($evenement->getNbRestant() - $nbPlacesReservees);
 
-            $this->addFlash('success', 'Votre inscription a été enregistrée avec succès.');
-            return $this->redirectToRoute('reservations_list');
+        // Generate a unique meeting link for online events
+        if (strtolower($evenement->getLieuEvent()) === 'en ligne') {
+            $reservation->setMeetingLink('https://meet.jit.si/' . uniqid());
         }
 
-        return $this->render('reservation/register.html.twig', [
-            'form' => $form->createView(),
+        // Save the reservation
+        $entityManager->persist($reservation);
+        $entityManager->flush();
+
+        // Check if the event is currently active
+        $now = new \DateTime();
+        $eventDate = $evenement->getDateEvent();
+        $eventTime = $evenement->getHeureEvent();
+
+        // Combine date and time into a single DateTime object
+        $eventStart = new \DateTime($eventDate->format('Y-m-d') . ' ' . $eventTime->format('H:i:s'));
+
+        // Assume the event lasts for 2 hours (you can adjust this as needed)
+        $eventEnd = (clone $eventStart)->modify('+2 hours');
+
+        $isEventActive = ($now >= $eventStart && $now <= $eventEnd);
+
+        // Pass the meeting link and event active status to the template
+        return $this->render('event/detail.html.twig', [
             'evenement' => $evenement,
+            'meetingLink' => $reservation->getMeetingLink(),
+            'isEventActive' => $isEventActive,
         ]);
     }
 
-    #[Route('/reservations', name: 'reservations_list')]
-public function listReservations(EntityManagerInterface $entityManager): Response
+    return $this->render('reservation/register.html.twig', [
+        'form' => $form->createView(),
+        'evenement' => $evenement,
+    ]);
+}
+    
+#[Route('/reservations', name: 'reservations_list')]
+public function listReservations(Request $request, EntityManagerInterface $entityManager): Response
 {
     $user = $this->getUser();
     $now = new \DateTime();
 
-    // Fetch all reservations for the current user
-    $reservations = $entityManager->getRepository(Reservation::class)->createQueryBuilder('r')
+    // Get search parameters from the request
+    $eventName = $request->query->get('eventName');
+    $status = $request->query->get('status');
+
+    // Build the query
+    $qb = $entityManager->getRepository(Reservation::class)->createQueryBuilder('r')
         ->leftJoin('r.event', 'e')
         ->where('r.user_id = :user')
-        ->setParameter('user', $user)
-        ->orderBy('e.dateEvent', 'ASC')
-        ->addOrderBy('e.heureEvent', 'ASC')
-        ->getQuery()
-        ->getResult();
+        ->setParameter('user', $user);
+
+    // Apply filters
+    if ($eventName) {
+        $qb->andWhere('e.nomEvent LIKE :eventName')
+           ->setParameter('eventName', '%' . $eventName . '%');
+    }
+
+    if ($status) {
+        if ($status === 'upcoming') {
+            $qb->andWhere('e.dateEvent >= :now')
+               ->setParameter('now', $now->format('Y-m-d'));
+        } else {
+            $qb->andWhere('r.status = :status')
+               ->setParameter('status', $status);
+        }
+    }
+
+    // Order by event date and time
+    $qb->orderBy('e.dateEvent', 'ASC')
+       ->addOrderBy('e.heureEvent', 'ASC');
+
+    $reservations = $qb->getQuery()->getResult();
 
     return $this->render('reservation/list.html.twig', [
         'reservations' => $reservations,
         'now' => $now,
+        'eventName' => $eventName,
+        'status' => $status,
     ]);
 }
+
     #[Route('/reservation/edit/{id}', name: 'reservation_edit', methods: ['GET', 'POST'])]
     public function editReservation(Request $request, int $id, EntityManagerInterface $entityManager): Response
     {
@@ -132,8 +183,6 @@ public function listReservations(EntityManagerInterface $entityManager): Respons
         return $this->redirectToRoute('reservations_list');
     }
 
-
-
     #[Route('/admin/reservation/{id}', name: 'admin_reservation_show', methods: ['GET'])]
     public function adminShowReservation(int $id, EntityManagerInterface $entityManager): Response
     {
@@ -149,7 +198,6 @@ public function listReservations(EntityManagerInterface $entityManager): Respons
         ]);
     }
 
-
     #[Route('/admin/reservation/delete/{id}', name: 'delete_reservation_confirm', methods: ['GET'])]
     public function deleteConfirmRes(Reservation $reservation): Response
     {
@@ -157,6 +205,7 @@ public function listReservations(EntityManagerInterface $entityManager): Respons
             'reservation' => $reservation,
         ]);
     }
+
     #[Route('/admin/reservations', name: 'admin_reservations_list')]
     public function adminListReservations(Request $request, ReservationRepository $reservationRepository): Response
     {
@@ -164,15 +213,14 @@ public function listReservations(EntityManagerInterface $entityManager): Respons
         $eventName = $request->query->get('eventName');
         $username = $request->query->get('username');
         $status = $request->query->get('status');
-    
+
         // Use the repository method to search for reservations
         $reservations = $reservationRepository->searchReservations($eventName, $username, $status);
-    
+
         return $this->render('reservation/admin_listRes.html.twig', [
             'reservations' => $reservations,
         ]);
     }
-    
 
     #[Route('/admin/reservation/delete/{id}/confirm', name: 'admin_reservation_delete', methods: ['POST'])]
     public function adminDeleteReservation(int $id, EntityManagerInterface $entityManager): Response
@@ -193,14 +241,14 @@ public function listReservations(EntityManagerInterface $entityManager): Respons
         $this->addFlash('success', 'La réservation a été supprimée avec succès.');
         return $this->redirectToRoute('admin_reservations_list');
     }
+
     #[Route('/dashboard/count', name: 'admin_stats')]
-public function stats(ReservationRepository $reservationRepository): Response
-{
-    $popularEvents = $reservationRepository->findMostPopularEvents();
+    public function stats(ReservationRepository $reservationRepository): Response
+    {
+        $popularEvents = $reservationRepository->findMostPopularEvents();
 
-    return $this->render('reservation/adminStat.html.twig', [
-        'popularEvents' => $popularEvents,
-    ]);
-}
-
+        return $this->render('reservation/adminStat.html.twig', [
+            'popularEvents' => $popularEvents,
+        ]);
+    }
 }

@@ -57,6 +57,9 @@ class Reservation
 
     #[ORM\Column(type: 'string', length: 20)]
     private string $status = 'active';
+    
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $meetingLink = null; 
 
     public function getNom(): ?string
     {
@@ -160,6 +163,16 @@ class Reservation
         return $this;
     }
 
+    public function getMeetingLink(): ?string
+    {
+        return $this->meetingLink;
+    }
+
+    public function setMeetingLink(?string $meetingLink): static
+    {
+        $this->meetingLink = $meetingLink;
+        return $this;
+    }
     
   
 
