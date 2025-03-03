@@ -29,6 +29,9 @@ class Evenement
 
     #[ORM\Column(type: Types::TIME_MUTABLE)]
     private ?\DateTimeInterface $heureEvent = null;
+   
+    #[ORM\Column(type: Types::TIME_MUTABLE)]
+    private $endTime;
 
     #[ORM\Column(length: 255)]
     private ?string $imageEvent = null;
@@ -171,6 +174,17 @@ class Evenement
     {
         return $this->reservations;
     }
+    public function getEndTime(): ?\DateTimeInterface
+{
+    return $this->endTime;
+}
+
+public function setEndTime(\DateTimeInterface $endTime): self
+{
+    $this->endTime = $endTime;
+    return $this;
+}
+
 
     public function addReservation(Reservation $reservation): static
     {

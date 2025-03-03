@@ -98,7 +98,11 @@ class EventType extends AbstractType
                     ]),
                 ],
             ])
-            ->add('submit', SubmitType::class, [
+            ->add('endTime', TimeType::class, [
+                'label' => 'End Time',
+                'widget' => 'single_text', 
+            ])
+                        ->add('submit', SubmitType::class, [
                 'label' => $isEdit ? 'Modifier l\'événement' : 'Créer l\'événement',
                 'attr' => ['class' => 'btn btn-primary'],
             ]);

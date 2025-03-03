@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller;
 
 use App\Entity\Evenement;
@@ -15,6 +16,7 @@ use function uniqid;
 use function file_exists;
 use function mkdir;
 use function unlink;
+
 class EventController extends AbstractController
 {
     #[Route('/events', name: 'events_list')]
@@ -43,52 +45,55 @@ class EventController extends AbstractController
             'date' => $date,
         ]);
     }
+
     #[Route('/event/{id}', name: 'event_show')]
     public function detail(EvenementRepository $evenementRepository, ReservationRepository $reservationRepository, int $id): Response
     {
         $evenement = $evenementRepository->find($id);
-    
+
         if (!$evenement) {
             throw $this->createNotFoundException('Événement non trouvé');
         }
-    
-        // Check if the current user has registered for this event
+
         $user = $this->getUser();
         $meetingLink = null;
         $isEventActive = false;
-    
+        $isUserRegistered = false; // Initialize the variable
+
+        // Check if the user is registered for this event
         if ($user) {
             $reservation = $reservationRepository->findOneBy([
                 'event' => $evenement,
                 'user_id' => $user,
             ]);
-    
+
             if ($reservation) {
+                $isUserRegistered = true; // Set to true if the user is registered
                 $meetingLink = $reservation->getMeetingLink();
-    
+
                 // Check if the event is currently active
                 $now = new \DateTime();
                 $eventDate = $evenement->getDateEvent();
-                $eventTime = $evenement->getHeureEvent();
-    
-                // Combine date and time into a single DateTime object
-                $eventStart = new \DateTime($eventDate->format('Y-m-d') . ' ' . $eventTime->format('H:i:s'));
-    
-                // Assume the event lasts for 2 hours (you can adjust this as needed)
-                $eventEnd = (clone $eventStart)->modify('+2 hours');
-    
+                $eventStart = new \DateTime($eventDate->format('Y-m-d') . ' ' . $evenement->getHeureEvent()->format('H:i:s'));
+                $eventEnd = new \DateTime($eventDate->format('Y-m-d') . ' ' . $evenement->getEndTime()->format('H:i:s'));
+
                 $isEventActive = ($now >= $eventStart && $now <= $eventEnd);
             }
         }
-    
+
+        // Debugging: Dump the variables to check their values
+        dump($isUserRegistered); // Check if this shows up in the Symfony profiler
+
+        // Render the template with all the variables
         return $this->render('event/detail.html.twig', [
             'evenement' => $evenement,
             'meetingLink' => $meetingLink,
             'isEventActive' => $isEventActive,
-            'mapCoordinates' => $evenement->getMapCoordinates(), // Pass map coordinates
+            'isUserRegistered' => $isUserRegistered, // Pass the variable to the template
+            'mapCoordinates' => $evenement->getMapCoordinates(),
         ]);
     }
-    
+
     #[Route('/admin/events', name: 'admin_events')]
     public function adminIndex(Request $request, EvenementRepository $evenementRepository): Response
     {
@@ -134,6 +139,13 @@ class EventController extends AbstractController
                 $event->setGoogleMeetLink('https://meet.jit.si/' . uniqid());
             }
 
+            // Set the end time
+            $eventDate = $event->getDateEvent(); // DateTime object
+            $eventTime = $event->getHeureEvent(); // DateTime or string
+            $startTime = new \DateTime($eventDate->format('Y-m-d') . ' ' . $eventTime);
+            $endTime = (clone $startTime)->modify('+2 hours'); // Adjust as needed
+            $event->setEndTime($endTime);
+
             $event->setNbRestant($event->getCapacite());
 
             $entityManager->persist($event);
@@ -149,48 +161,48 @@ class EventController extends AbstractController
     }
 
     #[Route('/admin/events/edit/{id}', name: 'edit_event', methods: ['GET', 'POST'])]
-public function edit(Request $request, Evenement $event, EntityManagerInterface $entityManager): Response
-{
-    $oldImage = $event->getImageEvent();
+    public function edit(Request $request, Evenement $event, EntityManagerInterface $entityManager): Response
+    {
+        $oldImage = $event->getImageEvent();
 
-    $form = $this->createForm(EventType::class, $event, [
-        'is_edit' => true, // Pass a flag to indicate edit mode
-    ]);
-    $form->handleRequest($request);
+        $form = $this->createForm(EventType::class, $event, [
+            'is_edit' => true, // Pass a flag to indicate edit mode
+        ]);
+        $form->handleRequest($request);
 
-    if ($form->isSubmitted() && $form->isValid()) {
-        $imageFile = $form->get('imageEvent')->getData();
-        if ($imageFile) {
-            $newFilename = uniqid() . '.' . $imageFile->guessExtension();
-            $uploadDir = $this->getParameter('photo_dir');
+        if ($form->isSubmitted() && $form->isValid()) {
+            $imageFile = $form->get('imageEvent')->getData();
+            if ($imageFile) {
+                $newFilename = uniqid() . '.' . $imageFile->guessExtension();
+                $uploadDir = $this->getParameter('photo_dir');
 
-            $imageFile->move($uploadDir, $newFilename);
-            $event->setImageEvent($newFilename);
+                $imageFile->move($uploadDir, $newFilename);
+                $event->setImageEvent($newFilename);
 
-            if ($oldImage && file_exists($uploadDir . '/' . $oldImage)) {
-                unlink($uploadDir . '/' . $oldImage);
+                if ($oldImage && file_exists($uploadDir . '/' . $oldImage)) {
+                    unlink($uploadDir . '/' . $oldImage);
+                }
+            } else {
+                // Keep the old image if no new image is uploaded
+                $event->setImageEvent($oldImage);
             }
-        } else {
-            // Keep the old image if no new image is uploaded
-            $event->setImageEvent($oldImage);
+
+            // Regenerate Jitsi Meet link if the event is online
+            if (strtolower($event->getLieuEvent()) === 'en ligne' && !$event->getGoogleMeetLink()) {
+                $event->setGoogleMeetLink('https://meet.jit.si/' . uniqid());
+            }
+
+            $entityManager->flush();
+
+            $this->addFlash('success', 'L\'événement a été mis à jour avec succès.');
+            return $this->redirectToRoute('admin_events');
         }
 
-        // Regenerate Jitsi Meet link if the event is online
-        if (strtolower($event->getLieuEvent()) === 'en ligne' && !$event->getGoogleMeetLink()) {
-            $event->setGoogleMeetLink('https://meet.jit.si/' . uniqid());
-        }
-
-        $entityManager->flush();
-
-        $this->addFlash('success', 'L\'événement a été mis à jour avec succès.');
-        return $this->redirectToRoute('admin_events');
+        return $this->render('event/edit.html.twig', [
+            'form' => $form->createView(),
+            'event' => $event,
+        ]);
     }
-
-    return $this->render('event/edit.html.twig', [
-        'form' => $form->createView(),
-        'event' => $event,
-    ]);
-}
 
     #[Route('/admin/events/delete/{id}', name: 'delete_event_confirm', methods: ['GET'])]
     public function deleteConfirmEvent(Evenement $event): Response
