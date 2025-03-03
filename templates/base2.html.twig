@@ -64,80 +64,21 @@
                     </a>
                     </li><!-- End Search Icon-->
 
-                    <li class="nav-item dropdown">
+                   <li class="nav-item dropdown">
+                        <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
+                            <i class="bi bi-bell"></i>
+                            <span class="badge bg-danger badge-number" id="notification-count">0</span>
+                        </a>
 
-                    <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
-                        <i class="bi bi-bell"></i>
-                        <span class="badge bg-primary badge-number">4</span>
-                    </a><!-- End Notification Icon -->
+                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications" id="notification-list">
+                            <li class="dropdown-header">
+                                <span id="notification-title">Chargement des notifications...</span>
+                                <a href="{{ path('app_notifications_all') }}"><span class="badge rounded-pill bg-success p-2 ms-2">Tout voir</span></a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                        </ul>
+                    </li>
 
-                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
-                        <li class="dropdown-header">
-                        You have 4 new notifications
-                        <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
-                        </li>
-                        <li>
-                        <hr class="dropdown-divider">
-                        </li>
-
-                        <li class="notification-item">
-                        <i class="bi bi-exclamation-circle text-warning"></i>
-                        <div>
-                            <h4>Lorem Ipsum</h4>
-                            <p>Quae dolorem earum veritatis oditseno</p>
-                            <p>30 min. ago</p>
-                        </div>
-                        </li>
-
-                        <li>
-                        <hr class="dropdown-divider">
-                        </li>
-
-                        <li class="notification-item">
-                        <i class="bi bi-x-circle text-danger"></i>
-                        <div>
-                            <h4>Atque rerum nesciunt</h4>
-                            <p>Quae dolorem earum veritatis oditseno</p>
-                            <p>1 hr. ago</p>
-                        </div>
-                        </li>
-
-                        <li>
-                        <hr class="dropdown-divider">
-                        </li>
-
-                        <li class="notification-item">
-                        <i class="bi bi-check-circle text-success"></i>
-                        <div>
-                            <h4>Sit rerum fuga</h4>
-                            <p>Quae dolorem earum veritatis oditseno</p>
-                            <p>2 hrs. ago</p>
-                        </div>
-                        </li>
-
-                        <li>
-                        <hr class="dropdown-divider">
-                        </li>
-
-                        <li class="notification-item">
-                        <i class="bi bi-info-circle text-primary"></i>
-                        <div>
-                            <h4>Dicta reprehenderit</h4>
-                            <p>Quae dolorem earum veritatis oditseno</p>
-                            <p>4 hrs. ago</p>
-                        </div>
-                        </li>
-
-                        <li>
-                        <hr class="dropdown-divider">
-                        </li>
-                        <li class="dropdown-footer">
-                        <a href="#">Show all notifications</a>
-                        </li>
-
-                    </ul><!-- End Notification Dropdown Items -->
-
-                    </li><!-- End Notification Nav -->
 
                     <li class="nav-item dropdown">
 
@@ -387,67 +328,135 @@
         <!-- Template Main JS File -->
         <script src="{{asset('backOffice/assets/js/main.js')}}"></script>
 
-        
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+     <script>
+            function loadNotifications() {
+                $.ajax({
+                    url: "{{ path('app_notifications') }}",
+                    type: "GET",
+                    dataType: "json",
+                    success: function (data) {
+                        let notificationList = $("#notification-list");
+                        let notificationCount = $("#notification-count");
+                        notificationList.find(".notification-item").remove();
+                        
+                        if (data.length > 0) {
+                            $("#notification-title").text(`Vous avez ${data.length} nouvelles notifications`);
+                            notificationCount.text(data.length);
+
+                            data.forEach(notification => {
+                                let notifItem = `
+                                    <li class="notification-item">
+                                        <i class="bi bi-info-circle text-success"></i>
+                                        <div>
+                                            <h4>${notification.message}</h4>
+                                            <p>${notification.createdAt}</p>
+                                        </div>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                `;
+                                notificationList.append(notifItem);
+                            });
+                        } else {
+                            $("#notification-title").text("Aucune nouvelle notification");
+                            notificationCount.text(0);
+                        }
+                    },
+                    error: function () {
+                        $("#notification-title").text("Erreur de chargement");
+                    }
+                });
+            }
+
+            function markNotificationsAsRead() {
+                $.ajax({
+                    url: "{{ path('app_notifications_mark_as_read') }}",
+                    type: "POST",
+                    dataType: "json",
+                    success: function (response) {
+                        if (response.success) {
+                            $("#notification-count").text(0); // Réinitialise le compteur après fermeture
+                        }
+                    },
+                    error: function () {
+                        console.error("Erreur lors de la mise à jour des notifications.");
+                    }
+                });
+            }
+
+            $(document).ready(function () {
+                loadNotifications();
+
+                // Détecter la fermeture du dropdown et marquer les notifications comme lues
+                $(".nav-item.dropdown").on("hidden.bs.dropdown", function () {
+                    markNotificationsAsRead();
+                    loadNotifications(); // Recharger la liste après fermeture
+                });
+            });
+     </script>
+
+
+
         <!-- Confirmation de suppression avec SweetAlert -->
 
 
         <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll(".delete-btn").forEach(button => {
-            button.addEventListener("click", function (event) {
-                event.preventDefault();
+            document.addEventListener("DOMContentLoaded", function () {
+                document.querySelectorAll(".delete-btn").forEach(button => {
+                    button.addEventListener("click", function (event) {
+                        event.preventDefault();
 
-                const deleteUrl = this.getAttribute("data-url");
-                const entity = this.getAttribute("data-entity") || "élément";
-                const genre = this.getAttribute("data-genre") || "m"; // Par défaut masculin
+                        const deleteUrl = this.getAttribute("data-url");
+                        const entity = this.getAttribute("data-entity") || "élément";
+                        const genre = this.getAttribute("data-genre") || "m"; // Par défaut masculin
 
-                // Accord du texte selon le genre
-                const article = (genre === "f") ? "cette" : "ce";
-                const supprimé = (genre === "f") ? "supprimée" : "supprimé";
-                const erreur = (genre === "f") ? "une erreur s'est produite lors de la suppression de la" : "une erreur s'est produite lors de la suppression du";
+                        // Accord du texte selon le genre
+                        const article = (genre === "f") ? "cette" : "ce";
+                        const supprimé = (genre === "f") ? "supprimée" : "supprimé";
+                        const erreur = (genre === "f") ? "une erreur s'est produite lors de la suppression de la" : "une erreur s'est produite lors de la suppression du";
 
-                Swal.fire({
-                    title: "Êtes-vous sûr ?",
-                    text: `Vous ne pourrez pas revenir en arrière !`,
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#198754",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: "Oui, supprimer !",
-                    cancelButtonText: "Annuler"
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        fetch(deleteUrl, { method: 'GET' })
-                        .then(response => {
-                            if (response.ok) {
-                                Swal.fire({
-                                    title: "Supprimé !",
-                                    text: `${article.charAt(0).toUpperCase() + article.slice(1)} ${entity} a été ${supprimé} avec succès.`,
-                                    icon: "success"
-                                }).then(() => {
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire({
-                                    title: "Erreur",
-                                    text: `${erreur} ${entity}.`,
-                                    icon: "error"
+                        Swal.fire({
+                            title: "Êtes-vous sûr ?",
+                            text: `Vous ne pourrez pas revenir en arrière !`,
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#198754",
+                            cancelButtonColor: "#d33",
+                            confirmButtonText: "Oui, supprimer !",
+                            cancelButtonText: "Annuler"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                fetch(deleteUrl, { method: 'GET' })
+                                .then(response => {
+                                    if (response.ok) {
+                                        Swal.fire({
+                                            title: "Supprimé !",
+                                            text: `${article.charAt(0).toUpperCase() + article.slice(1)} ${entity} a été ${supprimé} avec succès.`,
+                                            icon: "success"
+                                        }).then(() => {
+                                            location.reload();
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            title: "Erreur",
+                                            text: `${erreur} ${entity}.`,
+                                            icon: "error"
+                                        });
+                                    }
+                                })
+                                .catch(error => {
+                                    Swal.fire({
+                                        title: "Erreur",
+                                        text: `Une erreur inattendue s'est produite lors de la suppression de ${article} ${entity}.`,
+                                        icon: "error"
+                                    });
                                 });
                             }
-                        })
-                        .catch(error => {
-                            Swal.fire({
-                                title: "Erreur",
-                                text: `Une erreur inattendue s'est produite lors de la suppression de ${article} ${entity}.`,
-                                icon: "error"
-                            });
                         });
-                    }
+                    });
                 });
             });
-        });
-    });
-</script>
+        </script>
 
 
 

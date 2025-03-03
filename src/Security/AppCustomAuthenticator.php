@@ -50,6 +50,11 @@ class AppCustomAuthenticator extends AbstractLoginFormAuthenticator
 
         $user=$token->getUser();
 
+        // Vérifier si le compte est désactivé
+        if (!$user->isStatus()) { // Assurez-vous que `isStatus()` existe dans votre entité `User`
+            return new RedirectResponse($this->urlGenerator->generate('account_disabled'));
+        }
+
         if(in_array('ROLE_ADMIN',$user->getRoles(),true)){
             return new RedirectResponse($this->urlGenerator->generate('app_base2back_office'));
         }

@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-
+use App\Entity\Notification;
 class RegistrationController extends AbstractController
 {
     
@@ -46,6 +46,11 @@ class RegistrationController extends AbstractController
                 return $this->redirectToRoute('app_register');
             }
 
+            $notification = new Notification();
+            $notification->setMessage("Un nouvel utilisateur a été créé: " . $user->getEmail());
+            $em->persist($notification);
+            $em->flush();
+
             return $this->redirectToRoute('app_login');
         }
         } else {
@@ -63,6 +68,11 @@ class RegistrationController extends AbstractController
             $this->addFlash('danger', 'Cet email est déjà utilisé.');
             return $this->redirectToRoute('app_register');
         }
+
+            $notification = new Notification();
+            $notification->setMessage("Un nouvel utilisateur a été créé: " . $user->getEmail());
+            $em->persist($notification);
+            $em->flush();
             return $this->redirectToRoute('app_login');
         }
         }

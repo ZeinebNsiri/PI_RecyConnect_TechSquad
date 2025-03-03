@@ -7,6 +7,7 @@ use App\Form\UpdateUserType;
 use App\Form\UpdateUserproType;
 use App\Repository\UtilisateurRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -18,7 +19,8 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 final class UtilisateurController extends AbstractController
 {
     #[Route('/Liste/utilisateurs/{type?}', name: 'app_Listeutilisateur')]
-    public function Listeutilisateur(?string $type,UtilisateurRepository $repository): Response
+    public function Listeutilisateur(?string $type,UtilisateurRepository $repository,PaginatorInterface $paginator,Request $request
+    ): Response
     {   
         
         if ($type == 'particuliers') {
@@ -32,10 +34,15 @@ final class UtilisateurController extends AbstractController
         }  else {
             $users = $repository->findusers();
         }
-    
+        
+        $pagination = $paginator->paginate(
+            $users, // Données à paginer
+            $request->query->getInt('page', 1), // Numéro de page
+            5 // Nombre de posts par page
+        );
 
         return $this->render('utilisateur/index.html.twig', [
-            'users' => $users,
+            'users' => $pagination,
         ]);
     }
     #[Route('/activer/user/{id}', name: 'app_Activer')]

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compte Désactivé</title>
+
+    <!-- Fichiers CSS -->
+    <link rel="stylesheet" href="{{ asset('login_signup/css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('login_signup/vendors/css/vendor.bundle.base.css') }}">
+    <link rel="shortcut icon" href="{{ asset('frontOffice/img/mainlogo.png') }}" />
+    <link rel="stylesheet" href="{{ asset('login_signup/vendors/mdi/css/materialdesignicons.min.css') }}">
+</head>
+<body>
+
+    <div class="container-scroller">
+        <div class="container-fluid page-body-wrapper full-page-wrapper">
+            <div class="row w-100 m-0">
+                <div class="content-wrapper full-page-wrapper d-flex align-items-center auth login-bg">
+                    <div class="card col-lg-4 mx-auto">
+                        <div class="card-body px-7 py-7 text-center">
+                            <h3 class="card-title text-danger mb-3">
+                                <i class="mdi mdi-alert-circle-outline"></i> Compte Désactivé
+                            </h3>
+
+                            <p class="text-muted">
+                                Votre compte a été désactivé par l'administrateur. Vous ne pouvez pas accéder à votre espace utilisateur pour le moment.
+                            </p>
+
+                            <p class="text-muted">
+                                Si vous pensez qu'il s'agit d'une erreur ou si vous souhaitez réactiver votre compte, veuillez contacter notre support :
+                                <br>
+                                📧 <strong>support@votre-site.com</strong>
+                            </p>
+
+                            <p class="sign-up text-center mt-3" style="color: #205719;">
+                                Retourner à la <a href="{{ path('app_logout') }}" class="text-primary">page d'Acceuil'</a>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts JavaScript -->
+    <script src="{{ asset('login_signup/vendors/js/vendor.bundle.base.js') }}"></script>
+    <script src="{{ asset('login_signup/js/misc.js') }}"></script>
+
+</body>
+</html>

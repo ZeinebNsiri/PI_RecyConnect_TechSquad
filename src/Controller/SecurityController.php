@@ -25,6 +25,7 @@ class SecurityController extends AbstractController
         $error = $authenticationUtils->getLastAuthenticationError();
         $errorMessageKey = null;
         
+        
     
         if ($error) {
             
@@ -43,5 +44,11 @@ class SecurityController extends AbstractController
     public function logout(): RedirectResponse
     {
          return $this->redirectToRoute('home');
+    }
+
+    #[Route('/account-disabled', name: 'account_disabled')]
+    public function accountDisabled(): Response
+    {
+        return $this->render('utilisateur/desactive.html.twig');
     }
 }
