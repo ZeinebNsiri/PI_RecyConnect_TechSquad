@@ -8,12 +8,18 @@ parameters:
     profile_dir: "%kernel.project_dir%/public/uploads/profile"
     video_dir: "%kernel.project_dir%/public/uploads/videos"
     posts_dir: '%kernel.project_dir%/public/posts/uploads'
+    chat_gpt_api_url: '%env(CHAT_GPT_API_URL)%'
+    chat_gpt_api_key: '%env(CHAT_GPT_API_KEY)%'
+
 
 services:
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    App\ServiceChat\ChatClient: 
+        autowire: true
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name

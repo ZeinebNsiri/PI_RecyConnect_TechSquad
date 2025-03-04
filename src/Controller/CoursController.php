@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Cours;
@@ -13,6 +15,9 @@ use Doctrine\Persistence\ManagerRegistry;
 use App\Repository\RatingRepository;
 use App\Form\RatingType;
 use App\Entity\Rating;
+use App\ServiceChat\ChatClient;
+use App\Form\ChatType;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class CoursController extends AbstractController
@@ -26,7 +31,7 @@ final class CoursController extends AbstractController
         if ($selectedCategory) {
             $cours = $repo->findByCategory($selectedCategory); // Filter courses if category is selected
         } else {
-            $cours = $repo->findAll(); // Otherwise, get all courses
+            $cours = $repo->findAll(); 
         }
 
         return $this->render('cours/index.html.twig', [
@@ -156,46 +161,87 @@ final class CoursController extends AbstractController
 
     // ---------------------------------------------
     // showWorkshops
-    // ---------------------------------------------
-    #[Route('/workshops', name: 'app_workshops')]
-    public function showWorkshops(
-        CoursRepository $coursRepository,
-        RatingRepository $ratingRepository,
-        Request $request
-    ): Response {
-        $template = $this->getUser() ? 'basecnx.html.twig' : 'base.html.twig';
+  
 
-        $categories      = $coursRepository->findUniqueCategories();
-        $selectedCategory= $request->query->get('category');
-        $searchTitle     = $request->query->get('searchTitle');
-        $videoFilter     = $request->query->get('video');
+#[Route('/workshops', name: 'app_workshops', methods: ['GET', 'POST'])]
+public function showWorkshops(
+    CoursRepository $coursRepository,
+    RatingRepository $ratingRepository,
+    Request $request,
+    ChatClient $chatClient
+): Response {
+    // Choose base template
+    $template = $this->getUser() ? 'basecnx.html.twig' : 'base.html.twig';
 
-        $workshops = $coursRepository->findByAllFilters($selectedCategory, $searchTitle, $videoFilter);
+    // 1) Fetch categories, filters, workshops, etc. (same as your code)
+    $categories       = $coursRepository->findUniqueCategories();
+    $selectedCategory = $request->query->get('category');
+    $searchTitle      = $request->query->get('searchTitle');
+    $videoFilter      = $request->query->get('video');
+    $workshops        = $coursRepository->findByAllFilters($selectedCategory, $searchTitle, $videoFilter);
 
-        // Injecter la note de l'utilisateur connecté, s'il existe
-        $user = $this->getUser();
-        foreach ($workshops as $w) {
-            if ($user) {
-                $existingRating = $ratingRepository->findOneBy([
-                    'cours' => $w,
-                    'user'  => $user
-                ]);
-                $w->userRating = $existingRating ? $existingRating->getNote() : 0;
-            } else {
-                $w->userRating = 0;
-            }
+    // 2) Add user rating to each workshop (same as your code)
+    $user = $this->getUser();
+    foreach ($workshops as $w) {
+        if ($user) {
+            $existingRating = $ratingRepository->findOneBy([
+                'cours' => $w,
+                'user'  => $user
+            ]);
+            $w->userRating = $existingRating ? $existingRating->getNote() : 0;
+        } else {
+            $w->userRating = 0;
+        }
+    }
+
+    // 3) Handle chat form
+    $chatForm = $this->createForm(ChatType::class);
+    $chatForm->handleRequest($request);
+
+    // Retrieve conversation from session (default to empty array)
+    $session = $request->getSession();
+    $conversation = $session->get('conversation', []);
+
+    if ($chatForm->isSubmitted() && $chatForm->isValid()) {
+        // a) Get user’s prompt from the form
+        $prompt = $chatForm->get('prompt')->getData();
+
+        // b) Add user’s message to conversation
+        $conversation[] = [
+            'sender' => 'user',
+            'text'   => $prompt,
+        ];
+
+        // c) Call your ChatClient to get an AI response
+        try {
+            $answer = $chatClient->getAnswer($prompt);
+        } catch (\Exception $e) {
+            $answer = "Error processing your request: " . $e->getMessage();
         }
 
-        return $this->render('cours/courscnx_front.html.twig', [
-            'workshops'        => $workshops,
-            // Correction array_column
-            'categories'       => \array_column($categories, 'nomCategorie'),
-            'selectedCategory' => $selectedCategory,
-            'searchTitle'      => $searchTitle,
-            'videoFilter'      => $videoFilter,
-            'template'         => $template
-        ]);
+        // d) Add bot’s response to conversation
+        $conversation[] = [
+            'sender' => 'bot',
+            'text'   => $answer,
+        ];
+
+        // e) Store the updated conversation back in session
+        $session->set('conversation', $conversation);
     }
+
+    // 4) Render template, passing the entire conversation
+    return $this->render('cours/courscnx_front.html.twig', [
+        'workshops'        => $workshops,
+        'categories'       => array_column($categories, 'nomCategorie'),
+        'selectedCategory' => $selectedCategory,
+        'searchTitle'      => $searchTitle,
+        'videoFilter'      => $videoFilter,
+        'template'         => $template,
+
+        'chat_form'        => $chatForm->createView(),
+        'conversation'     => $conversation, // <--- important
+    ]);
+}
 
     // ---------------------------------------------
     // showWorkshopDetails

@@ -4,161 +4,255 @@
 
 {% block body %}
 <style>
+    /* ==================== Styles des cartes ==================== */
+    .workshop-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        transition: 0.3s;
+    }
+    .card {
+        width: calc(33.333% - 20px);
+        max-width: 400px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+    .card-img-top {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+    }
+    .category-badge {
+        background-color: #e0e0e0;
+        color: #4a4a4a;
+        font-size: 14px;
+        font-weight: 500;
+        padding: 4px 10px;
+        border-radius: 8px;
+        position: absolute;
+        top: 10px;
+        left: 10px;
+    }
+    .btn-voir-plus {
+        display: inline-block;
+        padding: 8px 16px;
+        background-color: #2c7a4b;
+        color: white;
+        border-radius: 5px;
+        text-align: center;
+        text-decoration: none;
+        font-weight: bold;
+        margin-top: auto;
+        align-self: center;
+        width: fit-content;
+        min-width: 120px;
+    }
+    .btn-voir-plus:hover {
+        background: #218838;
+    }
 
-.workshop-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-    transition: 0.3s
-}
+    /* ==================== Styles du formulaire de recherche ==================== */
+    .search-form {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    .search-form label {
+        font-weight: 600;
+        margin-right: 5px;
+        white-space: nowrap;
+    }
+    .search-form input {
+        max-width: 250px;
+    }
+    .search-form select {
+        max-width: 120px;
+    }
+    .form-control {
+        border: 2px solid #cce3de;
+        border-radius: 10px;
+        background-color: #f9fff6;
+        transition: 0.3s;
+    }
+    .form-control:hover {
+        background-color: #f2f2f2;
+    }
+    .form-control:focus {
+        border-color: #218838;
+        box-shadow: 0 0 5px rgba(108, 178, 235, 0.5);
+        outline: none;
+    }
 
-.card {
-     width: calc(33.333% - 20px); 
-    max-width: 400px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
+    /* ==================== Styles des étoiles de notation ==================== */
+    .star-rating-readonly {
+        text-align: center;
+        direction: rtl;
+        unicode-bidi: bidi-override;
+        display: inline-block;
+        margin-top: 10px;
+    }
+    .star-rating-readonly span {
+        font-size: 1.4rem;
+        color: #ccc;
+        margin: 0 2px;
+        cursor: default;
+    }
+    .star-rating-readonly .filled {
+        color: gold;
+    }
 
-.card:hover {
-    transform: scale(1.05); 
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); 
-}
+    /* ==================== Styles de la bulle de chat et fenêtre ==================== */
+    .chat-container {
+        position: fixed;
+        bottom: 80px; 
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+    .chat-toggle {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 15px;
+        border-radius: 50px;
+        background-color: #2c7a4b;
+        color: #fff;
+        font-weight: bold;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .chat-toggle i {
+        font-size: 1.2rem;
+    }
+    .chat-window {
+        display: none;
+        margin-top: 10px;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 350px;
+    }
+    .chat-window h2 {
+        margin-top: 0;
+        text-align: center;
+    }
 
-.card-img-top {
-    width: 100%;
-    height: 250px;
-    object-fit: cover;
-}
+    /* ==================== Styles du formulaire dans la fenêtre de chat ==================== */
+    .chat-form {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    .chat-form input[type="text"] {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+    .chat-form button {
+        padding: 10px 20px;
+        background-color: #2c7a4b;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+    .chat-form button:hover {
+        background-color: #218838;
+    }
 
-.category-badge {
-    background-color: #e0e0e0;
-    color: #4a4a4a;
-    font-size: 14px;
-    font-weight: 500;
-    padding: 4px 10px;
-    border-radius: 8px;
-    position: absolute;
-    top: 10px;
-    left: 10px;
-}
-
-.btn-voir-plus {
-    display: inline-block;
-    padding: 8px 16px;
-    background-color: #2c7a4b;
-    color: white;
-    border-radius: 5px;
-    text-align: center;
-    text-decoration: none;
-    font-weight: bold;
-    margin-top: auto; 
-    align-self: center; 
-    width: fit-content; 
-    min-width: 120px;
-}
-
-.btn-voir-plus:hover {
-    background: #218838;
-}
- .search-form {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap; 
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.search-form label {
-    font-weight: 600;
-    margin-right: 5px;
-    white-space: nowrap; 
-}
-
-.search-form input {
-    max-width: 250px; 
-}
-
-.search-form select {
-    max-width: 120px; 
-} 
-
-.form-control {
-  border: 2px solid #cce3de;
-  border-radius: 10px;
-  background-color: #f9fff6;
-  transition: 0.3s;
-}
-
-.form-control:hover {
-  background-color: #f2f2f2;
-}
-
-.form-control:focus {
-  border-color: #218838;
-  box-shadow: 0 0 5px rgba(108, 178, 235, 0.5);
-  outline: none;
-}
-
-
-.star-rating-readonly {
-    text-align: center;
-    direction: rtl;
-    unicode-bidi: bidi-override;
-    display: inline-block;
-    margin-top: 10px;
-}
-.star-rating-readonly span {
-    font-size: 1.4rem; 
-    color: #ccc; /* gris par défaut */
-    margin: 0 2px;
-    cursor: default; 
-}
-.star-rating-readonly .filled {
-    color: gold;
-}
-
-
-
+    /* ==================== Styles de la conversation (bulles façon Messenger) ==================== */
+    .chat-response {
+        padding: 15px;
+        background-color: #e9f5eb;
+        border-radius: 5px;
+        border: 1px solid #d4edda;
+        max-height: 200px; /* Ajustez selon vos besoins */
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+    .chat-message {
+        margin: 10px 0;
+        padding: 10px 15px;
+        border-radius: 18px;
+        max-width: 80%;
+        line-height: 1.4;
+        font-size: 0.9rem;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        word-wrap: break-word;
+    }
+    /* Bulle utilisateur (VERT) */
+    .chat-message.user-message {
+        background-color: #2c7a4b; /* Couleur verte */
+        color: #fff;
+        align-self: flex-end;
+        text-align: right;
+        border-bottom-right-radius: 2px;
+        border-top-left-radius: 18px;
+        margin-left: 20%;
+    }
+    /* Bulle bot (gris clair) */
+    .chat-message.bot-message {
+        background-color: #e4e6eb; /* gris clair */
+        color: #000;
+        align-self: flex-start;
+        text-align: left;
+        border-bottom-left-radius: 2px;
+        border-top-right-radius: 18px;
+        margin-right: 20%;
+    }
 </style>
 
+<!-- ==================== En-tête de page ==================== -->
 <div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s">
     <div class="container text-center py-5">
         <h1 class="display-3 text-white mb-4 animated slideInDown">Workshops</h1>
-        <nav aria-label="breadcrumb animated slideInDown">
+        <nav aria-label="breadcrumb" class="animated slideInDown">
             <ol class="breadcrumb justify-content-center mb-0">
-                <li class="breadcrumb-item"><a href="#">Accueil</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Workshops</li>
+                <li class="breadcrumb-item">
+                    <a href="#">Accueil</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">
+                    Workshops
+                </li>
             </ol>
         </nav>
     </div>
 </div>
 
-
-
-
-
-        <div class="container-xxl py-5">
-        <div class="container">
+<!-- ==================== Section des workshops ==================== -->
+<div class="container-xxl py-5">
+    <div class="container">
         <div class="text-center mx-auto wow fadeInUp" data-wow-delay="0.1s" style="max-width: 500px;">
             <p class="fs-5 fw-bold text-primary">Nos workshops proposent</p>
-            <h1 class="display-5 mb-5">vidéos et guides pour redonner vie à vos produits</h1>
+            <h1 class="display-5 mb-5">Vidéos et guides pour redonner vie à vos produits</h1>
         </div>
 
-        <form method="get" action="{{ path('app_workshops') }}"  class="search-form">
-           
+        <!-- ==================== Formulaire de recherche ==================== -->
+        <form method="get" action="{{ path('app_workshops') }}" class="search-form">
             {% if selectedCategory %}
                 <input type="hidden" name="category" value="{{ selectedCategory }}">
             {% endif %}
 
-         
             <label for="searchTitle">Rechercher par Titre:</label>
             <input
                 type="text"
@@ -170,72 +264,175 @@
                 style="margin: 0 10px;"
             />
 
-          
             <label for="video">Vidéo:</label>
             <select id="video" name="video" class="form-select">
-                <option value=""  {% if videoFilter is empty %}selected{% endif %}>-- Tous --</option>
+                <option value="" {% if videoFilter is empty %}selected{% endif %}>-- Tous --</option>
                 <option value="yes" {% if videoFilter == 'yes' %}selected{% endif %}>Oui</option>
                 <option value="no" {% if videoFilter == 'no' %}selected{% endif %}>Non</option>
             </select>
 
-            <button type="submit" class="btn btn-sm btn-primary">Chercher<i class="bi bi-search ms-2"></i></button>
+            <button type="submit" class="btn btn-sm btn-primary">
+                Chercher
+                <i class="bi bi-search ms-2"></i>
+            </button>
         </form>
 
+        <!-- ==================== Liste des catégories ==================== -->
         <center>
-   <ul class="list-inline rounded mb-5" id="portfolio-flters">
+            <ul class="list-inline rounded mb-5" id="portfolio-flters">
+                <li class="mx-2 {% if not selectedCategory %}active{% endif %}">
+                    <a href="{{ path('app_workshops') }}" class="text-decoration-none text-success">Tous</a>
+                </li>
+                {% for category in categories %}
+                    <li class="mx-2 {% if selectedCategory == category %}active{% endif %}">
+                        <a href="{{ path('app_workshops', { category: category }) }}" class="text-decoration-none text-success">
+                            {{ category }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </center>
 
-    <li class="mx-2 {% if not selectedCategory %}active{% endif %}">
-        <a href="{{ path('app_workshops') }}" class="text-decoration-none text-success">Tous</a>
-    </li>
-
-  
-    {% for category in categories %}
-        <li class="mx-2 {% if selectedCategory == category %}active{% endif %}">
-            <a href="{{ path('app_workshops', { category: category }) }}" class="text-decoration-none text-success">
-                {{ category }}
-            </a>
-        </li>
-    {% endfor %}
-</ul>
-
-</center>
-
-
-
+        <!-- ==================== Affichage des workshops sous forme de cartes ==================== -->
         <div class="workshop-container" data-aos="zoom-in" data-aos-delay="100">
             {% for workshop in workshops %}
-            <div class="card">
-                <img src="{{ asset('uploads/images/' ~ workshop.imageCours) }}" class="card-img-top" alt="{{ workshop.titreCours }}">
-
-                <div class="card-body">
-                    <span class="category-badge">{{ workshop.categorieC.nomCategorie }}</span>
-                    
-                    <h3 class="fw-bold text-center">{{ workshop.titreCours }}</h3>
-                    <p class="card-text text-center">{{ workshop.descriptionCours|slice(0, 120) }}...</p>
-
-
-                 <div style="display: flex; align-items: center; justify-content: space-between;">   
-                   <a href="{{ path('appworkshop_details', { id: workshop.id }) }}" class="btn-voir-plus">Voir plus</a>
-
-                   {% set rating = workshop.userRating|default(0) %}
-                  <div class="star-rating-readonly" >
-                {% for i in range(5, 1, -1) %}
-                    {% if rating >= i %}
-                        <span class="filled">★</span>
-                    {% else %}
-                        <span>★</span>
-                    {% endif %}
-                {% endfor %}
-            </div>
-            </div>
-
-
-
+                <div class="card">
+                    <img 
+                        src="{{ asset('uploads/images/' ~ workshop.imageCours) }}" 
+                        class="card-img-top" 
+                        alt="{{ workshop.titreCours }}"
+                    >
+                    <div class="card-body">
+                        <span class="category-badge">
+                            {{ workshop.categorieC.nomCategorie }}
+                        </span>
+                        <h3 class="fw-bold text-center">{{ workshop.titreCours }}</h3>
+                        <p class="card-text text-center">
+                            {{ workshop.descriptionCours|slice(0, 120) }}...
+                        </p>
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <a 
+                                href="{{ path('appworkshop_details', { id: workshop.id }) }}" 
+                                class="btn-voir-plus"
+                            >
+                                Voir plus
+                            </a>
+                            {% set rating = workshop.userRating|default(0) %}
+                            <div class="star-rating-readonly">
+                                {% for i in range(5, 1, -1) %}
+                                    {% if rating >= i %}
+                                        <span class="filled">★</span>
+                                    {% else %}
+                                        <span>★</span>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
             {% endfor %}
         </div>
     </div>
 </div>
 
+<!-- ==================== Chat Container avec la bulle ==================== -->
+<div class="chat-container">
+    <!-- Bouton d'activation du chat (bulle) -->
+    <div id="chatToggle" class="chat-toggle">
+        <i class="bi bi-chat-dots"></i> Chat
+    </div>
+
+    <!-- Fenêtre de chat (cachée par défaut) -->
+    <div id="chatWindow" class="chat-window">
+        <h2>Discuter avec Chatbot</h2>
+
+        <!-- Zone d'affichage de la conversation -->
+        <div id="chatResponse" class="chat-response">
+            <div id="responseText">
+                {% if conversation is defined and conversation|length %}
+                    {% for msg in conversation %}
+                        <div class="chat-message {{ msg.sender == 'user' ? 'user-message' : 'bot-message' }}">
+                            <strong>
+                                {{ msg.sender == 'user' ? 'Vous' : 'IA' }} :
+                            </strong>
+                            {{ msg.text }}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="chat-message bot-message">
+                        <strong>IA :</strong> Bonjour, comment puis-je vous aider ?
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Formulaire EN-DESSOUS de la discussion -->
+        {{ form_start(chat_form, {
+            'attr': {
+                'class': 'chat-form',
+                'novalidate': 'novalidate',
+                'id': 'chatForm'
+            }
+        }) }}
+            {{ form_widget(chat_form.prompt, {
+                'attr': {
+                    'placeholder': 'Posez votre question ici...',
+                    'autocomplete': 'off'
+                }
+            }) }}
+            <button type="submit" id="submitBtn">Envoyer</button>
+        {{ form_end(chat_form) }}
+    </div>
+</div>
+
+<script>
+    // Toggle pour afficher/cacher la fenêtre de chat
+    document.getElementById('chatToggle').addEventListener('click', function() {
+        const chatWindow = document.getElementById('chatWindow');
+        if (chatWindow.style.display === 'none' || chatWindow.style.display === '') {
+            chatWindow.style.display = 'block';
+        } else {
+            chatWindow.style.display = 'none';
+        }
+    });
+
+    // Gestion de l'envoi du formulaire
+    document.getElementById('chatForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const button = document.getElementById('submitBtn');
+        const responseDiv = document.getElementById('chatResponse');
+        
+        button.disabled = true;
+        button.innerHTML = 'Envoi...';
+
+        // Petit message d'attente
+        responseDiv.innerHTML = '<div class="loading">Traitement...</div>';
+
+        fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+        })
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            // On récupère la zone #responseText du HTML renvoyé
+            const newResponse = doc.getElementById('responseText');
+            if (newResponse) {
+                responseDiv.innerHTML = newResponse.innerHTML;
+            } else {
+                responseDiv.innerHTML = 'Erreur lors de la récupération de la réponse.';
+            }
+        })
+        .catch(error => {
+            responseDiv.innerHTML = 'Erreur : ' + error.message;
+        })
+        .finally(() => {
+            button.disabled = false;
+            button.innerHTML = 'Envoyer';
+            form.reset();
+        });
+    });
+</script>
 {% endblock %}
