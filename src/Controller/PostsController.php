@@ -10,6 +10,7 @@ use App\Form\PostType;
 use App\Entity\MediaPost;
 use App\Entity\Utilisateur;
 use App\Repository\LikeRepository;
+use App\Repository\PostRepository;
 use App\Repository\MediaPostRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
@@ -187,7 +188,7 @@ final class PostsController extends AbstractController
         ]);
 
         if ($existingLike) {
-            
+            $post->removeLikesPost($existingLike);
             $entityManager->remove($existingLike);
             $liked = false;
         } else {
@@ -195,10 +196,12 @@ final class PostsController extends AbstractController
             $like = new Like();
             $like->setPostLike($post);
             $like->setUserLike($user);
+            $post->addLikesPost($like);
             $entityManager->persist($like);
             $liked = true;
         }
-
+        $post->setNbrJaime($post->getLikesPost()->count());
+        $entityManager->persist($post); 
         $entityManager->flush();
 
         return new JsonResponse([
@@ -235,6 +238,23 @@ final class PostsController extends AbstractController
             'monthlyData' => json_encode(array_values($monthlyData)), 
         ]);
     }
+
+    #[Route('/admin/stats/posts-likes', name: 'admin_stats_posts_likes')]
+    public function statsPostsLikes(PostRepository $postRepository): JsonResponse
+    {
+        $topPosts = $postRepository->findTopLikedPosts();
+
+        $data = [];
+        foreach ($topPosts as $post) {
+            $data[] = [
+                'label' => substr($post['contenu'], 0, 20) . '..', // Pour limiter la longueur du texte
+                'value' => $post['nbrJaime']
+            ];
+        }
+
+        return new JsonResponse($data);
+    }
+
 
 
 
