@@ -238,4 +238,50 @@ public function adminIndex(Request $request, EvenementRepository $evenementRepos
         $this->addFlash('success', 'L\'événement a été supprimé avec succès.');
         return $this->redirectToRoute('admin_events');
     }
+    #[Route('/events/recommendations', name: 'event_recommendations')]
+public function recommendations(ReservationRepository $reservationRepository, EvenementRepository $evenementRepository): Response
+{
+    $user = $this->getUser();
+    if (!$user) {
+        return $this->redirectToRoute('app_login');
+    }
+
+    // Get all events the user has registered for
+    $reservations = $reservationRepository->findBy(['user_id' => $user]);
+    $registeredEvents = array_map(function ($reservation) {
+        return $reservation->getEventId();
+    }, $reservations);
+
+    // Extract keywords from registered events
+    $keywords = [];
+    foreach ($registeredEvents as $event) {
+        $keywords = array_merge($keywords, $this->extractKeywords($event));
+    }
+
+    // Remove duplicates
+    $keywords = array_unique($keywords);
+
+    // Find similar events based on keywords
+    $recommendedEvents = $evenementRepository->findByKeywords($keywords);
+
+    return $this->render('event/recommendations.html.twig', [
+        'recommendedEvents' => $recommendedEvents,
+    ]);
+}
+private function extractKeywords(Evenement $event): array
+{
+    // Extract keywords from event name and description
+    $text = $event->getNomEvent() . ' ' . $event->getDescriptionEvent();
+    $words = str_word_count(strtolower($text), 1);
+
+    // French stopwords
+    $stopWords = [
+        'le', 'la', 'les', 'de', 'des', 'du', 'et', 'en', 'à', 'au', 'aux', 'pour', 'dans', 'sur', 'avec', 'par', 'est', 'un', 'une', 'son', 'ses', 'ces', 'cet', 'cette', 'qui', 'que', 'quoi', 'où', 'quand', 'comment', 'pourquoi', 'mais', 'ou', 'donc', 'or', 'ni', 'car', 'sont', 'a', 'as', 'ai', 'ont', 'été', 'être', 'avoir', 'il', 'elle', 'ils', 'elles', 'nous', 'vous', 'ils', 'elles', 'je', 'tu', 'il', 'elle', 'on', 'nous', 'vous', 'ils', 'elles', 'ce', 'cet', 'cette', 'ces', 'mon', 'ton', 'son', 'notre', 'votre', 'leur', 'mes', 'tes', 'ses', 'nos', 'vos', 'leurs', 'duquel', 'auquel', 'dont', 'lequel', 'laquelle', 'lesquels', 'lesquelles', 'quel', 'quels', 'quelle', 'quelles', 'quand', 'que', 'qui', 'quoi', 'où', 'comment', 'pourquoi', 'combien', 'quelque', 'plusieurs', 'certains', 'certaines', 'tout', 'tous', 'toute', 'toutes', 'aucun', 'aucune', 'plus', 'moins', 'très', 'peu', 'beaucoup', 'bien', 'mal', 'meilleur', 'pire', 'bon', 'mauvais', 'grand', 'petit', 'haut', 'bas', 'premier', 'dernier', 'autre', 'même', 'tel', 'telle', 'tels', 'telles', 'chaque', 'plusieurs', 'quelques', 'certain', 'certaine', 'certains', 'certaines', 'tout', 'tous', 'toute', 'toutes', 'aucun', 'aucune', 'plus', 'moins', 'très', 'peu', 'beaucoup', 'bien', 'mal', 'meilleur', 'pire', 'bon', 'mauvais', 'grand', 'petit', 'haut', 'bas', 'premier', 'dernier', 'autre', 'même', 'tel', 'telle', 'tels', 'telles', 'chaque'
+    ];
+
+    // Remove stopwords
+    $keywords = array_diff($words, $stopWords);
+
+    return array_values($keywords);
+}
 }

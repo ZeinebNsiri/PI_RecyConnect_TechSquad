@@ -1,0 +1,64 @@
+{% extends 'basecnx.html.twig' %}
+
+{% block title %}Événements Recommandés{% endblock %}
+
+{% block body %}
+  <!-- Page Header Start -->
+  <div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s">
+    <div class="container text-center py-5">
+      <h1 class="display-3 text-white mb-4 animated slideInDown">Événements Recommandés</h1>
+      <nav aria-label="breadcrumb animated slideInDown">
+        <ol class="breadcrumb justify-content-center mb-0">
+          <li class="breadcrumb-item"><a href="{{ path('home') }}" class="text-white">Accueil</a></li>
+          <li class="breadcrumb-item text-white active" aria-current="page">Événements Recommandés</li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+  <!-- Page Header End -->
+
+  <!-- Recommended Events Section Start -->
+  <div class="container-xxl py-5">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Événements Recommandés</h2>
+        <div>
+          <a href="{{ path('reservations_list') }}" class="btn btn-primary me-2">Mes Réservations</a>
+          <a href="{{ path('events_list') }}" class="btn btn-primary me-2">Tous les Événements</a>
+        </div>
+      </div>
+      <div class="row g-4">
+        {% if recommendedEvents %}
+          {% for event in recommendedEvents %}
+            <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+              <div class="card border-0 shadow-lg h-100">
+                {% if event.imageEvent %}
+                  <img src="{{ asset('uploads/images/' ~ event.imageEvent) }}" class="card-img-top rounded-top" alt="{{ event.nomEvent }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                  <img src="{{ asset('uploads/images/default.png') }}" class="card-img-top rounded-top" alt="Default Event Image" style="height: 200px; object-fit: cover;">
+                {% endif %}
+                <div class="card-body p-4">
+                  <h5 class="card-title fw-bold">{{ event.nomEvent }}</h5>
+                  <p class="card-text">{{ event.descriptionEvent|slice(0, 100) ~ '...' }}</p>
+                  <ul class="list-unstyled">
+                    <li><strong>Date:</strong> {{ event.dateEvent|date('d M Y') }}</li>
+                    <li><strong>Heure:</strong> {{ event.heureEvent|date('H:i') }}</li>
+                    <li><strong>Lieu:</strong> {{ event.lieuEvent }}</li>
+                  </ul>
+                  <a href="{{ path('event_show', {'id': event.id}) }}" class="btn btn-primary">Voir plus</a>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="col-12">
+            <div class="alert alert-info" role="alert">
+              Aucune recommandation disponible. Inscrivez-vous à plus d'événements pour obtenir des recommandations personnalisées !
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <!-- Recommended Events Section End -->
+{% endblock %}
