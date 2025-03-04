@@ -5,25 +5,26 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Cours;
+use App\Entity\Rating;
+use App\Form\ChatType;
 use App\Form\CoursType;
+use App\Form\RatingType;
+use App\ServiceChat\ChatClient;
 use App\Repository\CoursRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\RatingRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\HttpFoundation\Request;
-use Doctrine\Persistence\ManagerRegistry;
-use App\Repository\RatingRepository;
-use App\Form\RatingType;
-use App\Entity\Rating;
-use App\ServiceChat\ChatClient;
-use App\Form\ChatType;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class CoursController extends AbstractController
 {
     #[Route('/cours', name: 'app_allcours')]
-    public function getAllcours(CoursRepository $repo, Request $request): Response
+    public function getAllcours(CoursRepository $repo, Request $request,PaginatorInterface $paginator): Response
     {
         $selectedCategory = $request->query->get('category'); // Get the selected category from URL
         $categories       = $repo->findUniqueCategories();    // Fetch all unique categories
@@ -33,9 +34,13 @@ final class CoursController extends AbstractController
         } else {
             $cours = $repo->findAll(); 
         }
-
+        $pagination = $paginator->paginate(
+            $cours,
+            $request->query->getInt('page', 1), 
+            5
+        );
         return $this->render('cours/index.html.twig', [
-            'cours'           => $cours,
+            'cours'           => $pagination,
             // On préfixe array_column par un backslash
             'categories'      => \array_column($categories, 'nomCategorie'),
             'selectedCategory'=> $selectedCategory,
