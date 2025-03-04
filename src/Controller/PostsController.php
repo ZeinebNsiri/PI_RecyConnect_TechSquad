@@ -13,10 +13,12 @@ use App\Repository\LikeRepository;
 use App\Repository\MediaPostRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -108,8 +110,10 @@ final class PostsController extends AbstractController
                 return $this->redirectToRoute('app_posts');
             }
 
-            $post->setUserP($user);
 
+            
+            $post->setUserP($user);
+            
             // Gestion des tags
             $tags = json_decode($form->get('tags')->getData(), true); 
             if (is_array($tags)) {
@@ -286,6 +290,19 @@ final class PostsController extends AbstractController
 
         $this->addFlash('success', 'Post supprimé avec succès !');
         return $this->redirectToRoute('app_posts');
+    }
+
+
+    public function filterBadWords($text)
+    {
+        $client = HttpClient::create();
+        $response = $client->request('POST', 'http://127.0.0.1:5001/detect', [
+            'json' => ['text' => $text]
+        ]);
+
+        dump($response->getContent(false));
+        $data = $response->toArray();
+        return $data['clean_text'];
     }
 
 
