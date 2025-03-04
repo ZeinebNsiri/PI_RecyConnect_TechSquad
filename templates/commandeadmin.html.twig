@@ -5,6 +5,7 @@
     <section class="section dashboard">
         <div class="row">
             <div class="col-12">
+             <a href="{{ path('app_salescontroller') }}" class="btn btn-primary">stat</a>
                 {% for type, messages in app.flashes %}
                     {% for message in messages %}
                         <div class="alert alert-{{ type }} alert-dismissible fade show d-flex justify-content-between align-items-center" role="alert">
@@ -19,7 +20,8 @@
                 <div class="card top-selling overflow-auto">
                     <div class="card-body pb-0">
                         <h5 class="card-title">Liste des Commandes</h5>
-                        <!-- Filter Dropdown -->
+                        
+                        <!-- Filtre -->
                         <div class="col-md-3 mb-4">
                             <select id="inputState" class="form-select" onchange="filterOrders(this.value)">
                                 <option value="all">Toutes les commandes</option>
@@ -28,14 +30,15 @@
                             </select>
                         </div>
 
-                        <!-- Commandes Table -->
+                        <!-- Tableau des commandes -->
                         <table class="table table-striped table-bordered" id="commandeTable">
-                            <thead>
+                           <thead>
                                 <tr>
                                     <th scope="col">ID</th>
                                     <th scope="col">Prix Total</th>
                                     <th scope="col">Date</th>
                                     <th scope="col">Statut</th>
+                                    <th scope="col">Nom du client</th> 
                                     <th scope="col">Articles</th>
                                 </tr>
                             </thead>
@@ -43,7 +46,7 @@
                                 {% for commande in commandes %}
                                     <tr class="commande-row" data-status="{{ commande.statut }}">
                                         <td>{{ commande.id }}</td>
-                                        <td>{{ commande.prixTotal }} DT </td>
+                                        <td>{{ commande.prixTotal }} DT</td>
                                         <td>{{ commande.dateCommande|date('Y-m-d H:i') }}</td>
                                         <td>
                                             {% if commande.statut == 'Payé à la livraison' %}
@@ -56,7 +59,22 @@
                                                 <span class="badge bg-danger" style="width: 100px; text-align: center;">Non Payée</span>
                                             {% endif %}
                                         </td>
+                                        <td>
+                                            {% set utilisateur = null %}
+                                        {% for ligne in commande.ligneCommandes %}
+                                            {% if utilisateur is null and ligne.userC is defined %}
+                                                {% set utilisateur = ligne.userC %}
+                                            {% endif %}
+                                        {% endfor %}
 
+                                            
+                                            {% if utilisateur %}
+                                                {{ utilisateur.prenom }}  {{ utilisateur.nomUser }}
+
+                                            {% else %}
+                                                Utilisateur inconnu
+                                            {% endif %}
+                                        </td>
                                         <td>
                                             <ul class="list-unstyled">
                                                 {% for ligne in commande.ligneCommandes %}
@@ -68,10 +86,8 @@
                                 {% endfor %}
                             </tbody>
                         </table>
-
                     </div>
                 </div>
-
             </div>
         </div>
     </section>
@@ -84,20 +100,14 @@
         rows.forEach(row => {
             const rowStatus = row.getAttribute('data-status').toLowerCase();
 
-            // Si le filtre est sur "all", on montre toutes les commandes
             if (status === 'all') {
-                row.style.display = ''; // Afficher toutes les commandes
-            }
-            // Si le filtre est sur "payées", on montre uniquement les commandes "Payé à la livraison" et "Payé par VISA"
-            else if (status === 'paid' && (rowStatus === 'payé à la livraison' || rowStatus === 'payé par visa')) {
-                row.style.display = ''; // Afficher les commandes payées
-            }
-            // Si le filtre est sur "non payées", on montre les commandes "En attente"
-            else if (status === 'unpaid' && rowStatus === 'en attente') {
-                row.style.display = ''; // Afficher les commandes en attente
-            }
-            else {
-                row.style.display = 'none'; // Masquer les autres
+                row.style.display = ''; 
+            } else if (status === 'paid' && (rowStatus === 'payé à la livraison' || rowStatus === 'payé par visa')) {
+                row.style.display = ''; 
+            } else if (status === 'unpaid' && rowStatus === 'en attente') {
+                row.style.display = ''; 
+            } else {
+                row.style.display = 'none'; 
             }
         });
     }

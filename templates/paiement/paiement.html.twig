@@ -12,11 +12,11 @@
             </div>
         {% endfor %}
     {% endfor %}
-    <div class="payment-container">
 
+    <div class="payment-container">
         <h1 class="text-center">Choisir le mode de paiement</h1>
 
-        <form method="POST" action="{{ path('traiter_paiement', {'commandeId': commande.id}) }}" class="payment-form">
+        <form id="payment-form" method="POST" action="{{ path('traiter_paiement', {'commandeId': commande.id}) }}" class="payment-form">
             <div class="payment-option">
                 <label class="radio-container">
                     <input type="radio" name="mode_paiement" value="livraison" required>
@@ -33,16 +33,69 @@
                 </label>
             </div>
             
-            <a href="{{ path('app_article') }}" class="submit-btn">
-                Valider le paiement
-            </a>
-            
+            <button type="submit" class="submit-btn">Valider le paiement</button>
         </form>
+
+        <!-- Conteneur de l'iframe (affiché sous le formulaire) -->
+        <div id="iframe-container">
+            <iframe 
+                id="payment-iframe"
+                src=""
+                width="377"
+                height="377"
+                marginwidth="0"
+                marginheight="0"
+                frameborder="no"
+                scrolling="yes"
+                style="background: #FFF;">
+            </iframe>
+        </div>
     </div>
 
+    <!-- JavaScript pour gérer l'affichage dynamique de l'iframe -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let form = document.getElementById("payment-form");
+            let iframeContainer = document.getElementById("iframe-container");
+            let paymentIframe = document.getElementById("payment-iframe");
+
+            form.addEventListener("submit", function (event) {
+                event.preventDefault(); // Empêcher le rechargement de la page
+
+                let formData = new FormData(form);
+                let paymentMethod = formData.get("mode_paiement");
+
+                if (paymentMethod === "visa") {
+                    // Récupération de l'URL de paiement via API Symfony
+                    fetch("{{ path('generate_payment_url', {'commandeId': commande.id}) }}", {
+                        method: "POST",
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.paymentUrl) {
+                            paymentIframe.src = data.paymentUrl;
+                            iframeContainer.style.display = "block"; // Afficher l'iframe
+                        }
+                    })
+                    .catch(error => console.error("Erreur lors de la récupération de l'URL de paiement", error));
+                } else {
+                    // Si c'est "À la livraison", envoyer normalement le formulaire
+                    form.submit();
+                }
+            });
+        });
+    </script>
+
     <style>
-        /* Container for the payment form */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
         .payment-container {
+            flex: 1;
             width: 80%;
             max-width: 600px;
             margin: 0 auto;
@@ -52,24 +105,26 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             margin-top: 30px;
+            text-align: center;
         }
 
-        /* Header of the payment form */
+        /* Header */
         .payment-container h1 {
             font-size: 24px;
             color: #333;
             margin-bottom: 20px;
         }
 
-        /* Style for payment options */
+        /* Payment options */
         .payment-option {
             margin-bottom: 15px;
             display: flex;
             align-items: center;
+            justify-content: center;
             font-size: 16px;
         }
 
-        /* Style for radio buttons */
+        /* Radio buttons */
         .radio-container {
             display: flex;
             align-items: center;
@@ -81,7 +136,7 @@
             margin-right: 10px;
         }
 
-        /* Custom style for radio buttons */
+        /* Custom radio buttons */
         .radio-checkmark {
             width: 16px;
             height: 16px;
@@ -119,7 +174,19 @@
             background-color: #45a049;
         }
 
-        /* Responsive design */
+        /* Iframe container */
+        #iframe-container {
+            display: none; /* Caché au départ */
+            margin-top: 20px; /* Ajout d'un espace sous le formulaire */
+            text-align: center;
+        }
+
+        iframe {
+            border: 2px solid #333;
+            border-radius: 8px;
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
             .payment-container {
                 width: 95%;
@@ -130,4 +197,5 @@
             }
         }
     </style>
+
 {% endblock %}

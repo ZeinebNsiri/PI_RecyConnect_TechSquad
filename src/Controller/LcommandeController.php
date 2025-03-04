@@ -24,40 +24,53 @@ final class LcommandeController extends AbstractController
         UtilisateurRepository $UtilisateurRepository, 
         LigneCommandeRepository $ligneCommandeRepository
     ): Response {
-        $utilisateur =$this->getUser();
+        $utilisateur = $this->getUser();
         $panier = $session->get('panier', []);
-    
+        
         if (empty($panier)) {
             $this->addFlash('message', 'Votre panier est vide.');
             return $this->redirectToRoute('paiement');
         }
-    
+        
         // Création de la commande
         $commande = new Commande();
         $commande->setDateCommande(new \DateTime());
         $commande->setStatut('En attente');
-    
+        
         $prixTotal = 0;
-    
+        
         // Récupérer toutes les lignes de commande non confirmées pour cet utilisateur
         $lignesCommande = $ligneCommandeRepository->findLignesCommandeSansCommande($utilisateur);
-    
+        
         foreach ($lignesCommande as $ligneCommande) {
+            $article = $ligneCommande->getArticleC();
+            $quantiteCommandee = $ligneCommande->getQuantiteC();
+            
+            // Vérifier si la quantité commandée est disponible
+            if ($article->getQuantiteArticle() < $quantiteCommandee) {
+                $this->addFlash('error', "Stock insuffisant pour l'article: " . $article->getNom());
+                return $this->redirectToRoute('app_cart');
+            }
+            
+            // Réduire la quantité de l'article
+            $article->setQuantiteArticle($article->getQuantiteArticle() - $quantiteCommandee);
+            $entityManager->persist($article);
+            
+            // Associer la ligne de commande à la commande
             $ligneCommande->setCommandeId($commande); // Associer la ligne à la commande
             $ligneCommande->setEtatC('confirmée'); // Changer l'état
             $prixTotal += $ligneCommande->getPrixC(); // Ajouter au prix total
         }
-    
-        $commande->setPrixTotal($prixTotal);
         
+        $commande->setPrixTotal($prixTotal);
         $entityManager->persist($commande);
         $entityManager->flush();
-    
+        
         $this->addFlash('message', 'Commande créée avec succès');
-    
+        
         // Vider le panier après validation
         $session->remove('panier');
-    
+        
         return $this->redirectToRoute('paiement', ['commandeId' => $commande->getId()]);
     }
     

@@ -97,6 +97,7 @@
             </a>
 
             <!-- Icône Panier -->
+          <!-- Icône Panier (Redirection vers les commandes) -->
             <a href="{{ path('app_cart') }}" class="nav-link me-3 position-relative">
                 <i class="fa fa-shopping-cart fs-4 text-dark"></i>
             </a>
@@ -166,12 +167,12 @@
 
 
                   <li>
-                    <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
-                      <i class="bi bi-bookmark"></i>
-                      <span>Mes Posts Enregistrés</span>
+                    <a class="dropdown-item d-flex align-items-center" href="{{ path('mes_commandes') }}">
+                        <i class="bi bi-bookmark"></i>
+                        <span>Mes commandes</span>
                     </a>
-                  </li>
-                  
+                </li>
+
             
                   <li>
                     <hr class="dropdown-divider">
