@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\CoursRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -33,6 +35,17 @@ class Cours
     #[Assert\NotBlank(message: 'La categorie est obligatoire')]
     #[ORM\JoinColumn(nullable: false)]
     private ?CategorieCours $categorieC = null;
+
+    /**
+     * @var Collection<int, Rating>
+     */
+    #[ORM\OneToMany(targetEntity: Rating::class, mappedBy: 'cours')]
+    private Collection $ratings;
+
+    public function __construct()
+    {
+        $this->ratings = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -72,7 +85,7 @@ class Cours
     {
         $this->video = $video;
 
-        return $this;
+        return $this;   
     }
 
     public function getImageCours(): ?string
@@ -95,6 +108,36 @@ class Cours
     public function setCategorieC(?CategorieCours $categorieC): static
     {
         $this->categorieC = $categorieC;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Rating>
+     */
+    public function getRatings(): Collection
+    {
+        return $this->ratings;
+    }
+
+    public function addRating(Rating $rating): static
+    {
+        if (!$this->ratings->contains($rating)) {
+            $this->ratings->add($rating);
+            $rating->setCours($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRating(Rating $rating): static
+    {
+        if ($this->ratings->removeElement($rating)) {
+            // set the owning side to null (unless already changed)
+            if ($rating->getCours() === $this) {
+                $rating->setCours(null);
+            }
+        }
 
         return $this;
     }

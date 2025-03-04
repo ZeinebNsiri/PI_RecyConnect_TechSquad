@@ -170,10 +170,24 @@ document.getElementById('search-form').addEventListener('submit', function(event
         return response.text();
     })
     .then(data => {
-        // Remplace TOUT le contenu de la page avec la nouvelle version
-        document.open();
-        document.write(data);
-        document.close();
+        let parser = new DOMParser();
+        let doc = parser.parseFromString(data, "text/html");
+
+        // Extract the new table body and replace it in the current page
+        let newTableBody = doc.querySelector('tbody');
+        let currentTableBody = document.querySelector('tbody');
+
+        if (newTableBody && currentTableBody) {
+            currentTableBody.innerHTML = newTableBody.innerHTML;
+        }
+
+        // Update the pagination controls
+        let newPagination = doc.querySelector('.pagination-container'); // Update this selector as per your pagination div class
+        let currentPagination = document.querySelector('.pagination-container');
+
+        if (newPagination && currentPagination) {
+            currentPagination.innerHTML = newPagination.innerHTML;
+        }
     })
     .catch(error => console.error('Erreur AJAX :', error));
 });

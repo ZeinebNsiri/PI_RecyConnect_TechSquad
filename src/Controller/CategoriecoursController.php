@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Persistence\ManagerRegistry;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 class CategoriecoursController extends AbstractController
@@ -16,12 +17,31 @@ class CategoriecoursController extends AbstractController
     
 
 
-    #[Route('/allcategoriecours',name:'app_allcategoriecours')]
-    public function getAllcategoriecours(CategorieCoursRepository $repo) {
-        $categories= $repo->findAll();
-        return $this->render('categoriecours/index.html.twig',
-        ['categories'=>$categories]);
-    }
+    #[Route('/allcategoriecours', name: 'app_allcategoriecours')]
+public function getAllcategoriecours(
+    CategorieCoursRepository $repo,
+    PaginatorInterface $paginator,
+    Request $request
+): Response {
+    // 1) Construire la requête Doctrine (QueryBuilder ou Query)
+    $query = $repo->createQueryBuilder('c')
+        ->orderBy('c.id', 'DESC')
+        ->getQuery();
+
+    // 2) Paginer le résultat
+    //    - $request->query->getInt('page', 1) : numéro de page
+    //    - 5 : nombre de catégories par page
+    $categories = $paginator->paginate(
+        $query,
+        $request->query->getInt('page', 1),
+        5
+    );
+
+    // 3) Renvoyer le template en passant les catégories paginées
+    return $this->render('categoriecours/index.html.twig', [
+        'categories' => $categories,
+    ]);
+}
     
             //add
         #[Route('/add-categorie-cours', name: 'categorie_cours_add')]

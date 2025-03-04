@@ -250,7 +250,7 @@ final class UtilisateurController extends AbstractController
             'user'=>$user
         ]);
     }
-    #[Route('/statistiques', name: 'app_statistiques_utlisateurs')]
+    #[Route('/statistiques/user', name: 'app_statistiques_utlisateurs')]
     public function index(): Response
     {
         return $this->render('utilisateur/satistiquesUser.html.twig');

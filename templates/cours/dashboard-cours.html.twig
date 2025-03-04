@@ -1,0 +1,158 @@
+{% extends 'base2.html.twig' %}
+
+{% block title %}Dashboard Cours{% endblock %}
+
+{% block body %}
+<main id="main" class="main">
+
+  <!-- 1) Nombre du workshop par catégorie (Bar Chart) -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Nombre du workshop par catégorie</h5>
+      <div id="chartCategory"></div>
+    </div>
+  </div>
+
+  <!-- 2) Répartition du total des notes par catégorie (Pie Chart) -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Répartition du total des notes par catégorie</h5>
+      <div id="pieChartByCategory"></div>
+    </div>
+  </div>
+
+  <!-- 3) Moyenne de notes par Workshop (Polar Area Chart) -->
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Moyenne de notes par Workshop</h5>
+      <div id="polarChartAverage"></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ApexCharts -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+<script>
+  // -----------------------------------------
+  // 1) Nombre de workshops par catégorie (Bar Chart)
+  // -----------------------------------------
+  const statsCategory = {{ statsCategory|json_encode()|raw }};
+  // Tri décroissant par total
+  statsCategory.sort((a, b) => b.total - a.total);
+
+  const catNames  = statsCategory.map(item => item.category || 'SansCat');
+  const catTotals = statsCategory.map(item => item.total);
+
+  document.addEventListener("DOMContentLoaded", () => {
+    var optionsCategory = {
+      series: [{
+        name: 'Cours',
+        data: catTotals
+      }],
+      chart: {
+        type: 'bar',
+        height: 400
+      },
+      xaxis: {
+        categories: catNames
+      },
+      yaxis: {
+        labels: {
+          formatter: function(val) {
+            return parseInt(val);
+          }
+        },
+        forceNiceScale: true,
+        tickAmount: 5,
+        min: 0
+      }
+    };
+
+    var chartCategory = new ApexCharts(
+      document.querySelector("#chartCategory"),
+      optionsCategory
+    );
+    chartCategory.render();
+  });
+
+
+  // -----------------------------------------
+  // 2) Pie Chart : Somme des notes par catégorie
+  // -----------------------------------------
+  const statsRatingSumByCategory = {{ statsRatingSumByCategory|json_encode()|raw }};
+  const pieLabels = statsRatingSumByCategory.map(item => item.category);
+  const pieSeries = statsRatingSumByCategory.map(item => parseFloat(item.ratingSum));
+
+  document.addEventListener("DOMContentLoaded", () => {
+    var optionsPie = {
+      series: pieSeries,
+      chart: {
+        type: 'pie',
+        height: 350
+      },
+      labels: pieLabels,
+      legend: {
+        position: 'bottom'
+      }
+    };
+
+    var chartPie = new ApexCharts(
+      document.querySelector("#pieChartByCategory"),
+      optionsPie
+    );
+    chartPie.render();
+  });
+
+
+  // -----------------------------------------
+  // 3) Polar Area Chart : Moyenne de notes par Workshop
+  // -----------------------------------------
+  const averageByWorkshop = {{ averageByWorkshop|json_encode()|raw }};
+  // Tri décroissant par moyenne
+  averageByWorkshop.sort((a, b) => b.averageRating - a.averageRating);
+
+  const polarLabels = averageByWorkshop.map(item => item.workshop);
+  const polarSeries = averageByWorkshop.map(item => parseFloat(item.averageRating));
+
+  document.addEventListener("DOMContentLoaded", () => {
+    var optionsPolar = {
+      series: polarSeries,
+      chart: {
+        type: 'polarArea',
+        height: 350
+      },
+      labels: polarLabels,
+      fill: {
+        opacity: 1
+      },
+      stroke: {
+        width: 1
+      },
+      legend: {
+        position: 'bottom'
+      },
+      yaxis: {
+        show: false
+      },
+      plotOptions: {
+        polarArea: {
+          rings: {
+            strokeWidth: 0
+          },
+          spokes: {
+            strokeWidth: 0
+          }
+        }
+      }
+    };
+
+    var chartPolar = new ApexCharts(
+      document.querySelector("#polarChartAverage"),
+      optionsPolar
+    );
+    chartPolar.render();
+  });
+</script>
+{% endblock %}
