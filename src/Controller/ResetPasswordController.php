@@ -164,6 +164,7 @@ class ResetPasswordController extends AbstractController
             ->context([
                 'resetToken' => $resetToken,
             ])
+            ->embedFromPath(__DIR__.'/../../public/frontOffice/img/mainlogo.png', 'logo_cid');
         ;
 
         $mailer->send($email);
