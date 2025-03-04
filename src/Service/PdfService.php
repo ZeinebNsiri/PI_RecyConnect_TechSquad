@@ -14,24 +14,23 @@ class PdfService
         $this->domPdf = new Dompdf();
 
         $pdfOptions = new Options();
-
-        $pdfOptions->set('defaultFont','Garamond');
-
+        $pdfOptions->set('defaultFont', 'Garamond');
         $this->domPdf->setOptions($pdfOptions);
-
     }
-    public function showPdfFile($html) {
+
+    public function showPdfFile($html)
+    {
         $this->domPdf->loadHtml($html);
         $this->domPdf->render();
-        $this->domPdf->stream("detail.pdf",[
+        $this->domPdf->stream("detail.pdf", [
             'Attachement' => false
         ]);
-
     }
 
-    public function generateBinaryPDF($html){
+    public function generateBinaryPDF($html)
+    {
         $this->domPdf->loadHtml($html);
         $this->domPdf->render();
-        $this->domPdf->output();
+        return $this->domPdf->output();
     }
 }

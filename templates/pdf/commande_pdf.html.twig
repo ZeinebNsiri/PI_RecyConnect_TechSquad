@@ -1,113 +1,134 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Facture</title>
+{% block title %}Facture{% endblock %}
+
+{% block body %}
+<main id="main" class="main">
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            font-size: 14px;
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f7fc;
+            background-color: #f4f4f4;
         }
+
         .container {
-            width: 80%;
-            margin: 30px auto;
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
         }
-        .header {
-            text-align: center;
+
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #ddd;
         }
-        .header img {
-            width: 150px;
-            margin-bottom: 10px;
+
+        .invoice-details {
+            text-align: left; /* Aligner à gauche */
         }
-        h2 {
+
+        .invoice-details h1 {
             font-size: 24px;
-            color: #333;
-            margin-top: 10px;
+            margin: 0;
         }
-        .user-info {
-            margin-top: 25px;
-            margin-bottom: 30px;
-        }
-        .user-info p {
-            font-size: 16px;
-            color: #555;
-            margin: 5px 0;
-        }
-        .order-details {
-            margin-top: 20px;
-        }
-        .order-details table {
+
+        table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-            font-size: 16px;
         }
-        .order-details th, .order-details td {
-            padding: 12px 20px;
-            text-align: left;
+
+        th, td {
+            padding: 10px;
             border: 1px solid #ddd;
+            text-align: left;
         }
-        .order-details th {
-            background-color: #f9f9f9;
-            color: #333;
-            font-weight: bold;
+
+        th {
+            background-color: #4CAF50;
+            color: white;
         }
-        .total-amount {
-            text-align: right;
-            font-size: 18px;
+
+        tr.total-row {
             font-weight: bold;
+            background-color: #e6f7e6;
+        }
+
+        .footer {
+            text-align: center;
             margin-top: 20px;
-            color: #333;
+            font-size: 14px;
+            color: #777;
+        }
+
+        .logo-img {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            max-width: 150px;
         }
     </style>
-</head>
-<body>
 
-<div class="container">
-    <div class="header">
-        <img src="{{ asset('backOffice/assets/img/mainlogo.png') }}" alt="Logo">
-        <h2>Facture de Commande</h2>
+    <!-- Logo en haut à droite -->
+    <div class="logo">
+        <img src="{{ asset('assets/backOffice/assets/img/mainlogo.png') }}" alt="" class="logo-img">
     </div>
 
-    <div class="user-info">
-        <p><strong>Nom de l'utilisateur :</strong> {{ utilisateur.firstName }} {{ utilisateur.lastName }}</p>
-        <p><strong>Date :</strong> {{ "now"|date("Y-m-d") }}</p>
-    </div>
+    <div class="container">
+        <div class="invoice-header">
+            <!-- Le logo est déjà ajouté, donc pas besoin ici -->
+            <div class="invoice-details">
+                <p><strong>Numéro de Facture :</strong> {{ commande.id }}</p>
+                <p><strong>Date :</strong> {{ "now"|date("d/m/Y") }}</p>
+            </div>
+        </div>
 
-    <div class="order-details">
-        <h3>Détails de la Commande</h3>
         <table>
             <thead>
                 <tr>
-                    <th>ID Commande</th>
-                    <th>Date de Commande</th>
-                    <th>Montant Total (TND)</th>
+                    <th colspan="2">Informations du client</th>
                 </tr>
             </thead>
             <tbody>
-                {% for commande in commandes %}
-                    <tr>
-                        <td>{{ commande.id }}</td>
-                        <td>{{ commande.dateCommande | date('Y-m-d') }}</td>
-                        <td>{{ commande.prixTotal }} TND</td>
-                    </tr>
-                {% endfor %}
+                <tr>
+                    <td><strong>Nom et Prénom :</strong> {{ utilisateur.NomUser }} {{ utilisateur.Prenom }}</td>
+                    <td><strong>Adresse :</strong> {{ utilisateur.adresse }}</td>
+                </tr>
             </tbody>
         </table>
-    </div>
 
-    <div class="total-amount">
-        <p><strong>Total à payer : {{ totalAmount }} TND</strong></p>
-    </div>
-</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Article</th>
+                    <th>Quantité</th>
+                    <th>Prix Unitaire (DT)</th>
+                    <th>Total (DT)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in lignesCommande %}
+                <tr>
+                    <td>{{ item.getArticleC().getNomArticle() }}</td>
+                    <td>{{ item.getQuantiteC() }}</td>
+                    <td>{{ item.getPrixC() }}</td>
+                    <td>{{ item.getPrixC() * item.getQuantiteC() }}</td>
+                </tr>
+                {% endfor %}
+                <tr class="total-row">
+                    <td colspan="3" style="text-align: right;">Total à payer :</td>
+                    <td>{{ total }} DT</td>
+                </tr>
+            </tbody>
+        </table>
 
-</body>
-</html>
+        <div class="footer">
+            <p>Merci pour votre commande !</p>
+        </div>
+    </div>
+</main>
+{% endblock %}

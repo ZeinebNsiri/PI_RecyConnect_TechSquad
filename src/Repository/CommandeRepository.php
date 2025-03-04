@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Commande;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\QueryBuilder;
 
 class CommandeRepository extends ServiceEntityRepository
 {
@@ -20,4 +21,5 @@ class CommandeRepository extends ServiceEntityRepository
             'user' => $utilisateur
         ]);
     }
+
 }

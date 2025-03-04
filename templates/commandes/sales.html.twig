@@ -1,0 +1,68 @@
+{% extends 'base2.html.twig' %}
+
+{% block title %}Dashboard - Ventes{% endblock %}
+
+{% block body %}
+<main id="main" class="main">
+
+    <div class="pagetitle">
+        <h1>Dashboard</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ path('home') }}">Home</a></li>
+                <li class="breadcrumb-item active">Dashboard</li>
+            </ol>
+        </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section dashboard">
+        <div class="row">
+
+            <!-- Left side columns -->
+            <div class="col-lg-8">
+                <div class="row">
+
+                    <!-- Sales Card -->
+                    <div class="col-xxl-6 col-md-6 d-flex">
+                        <div class="card info-card sales-card w-100">
+                            <div class="card-body d-flex flex-column">
+                                <!-- Affichage du total des commandes d'aujourd'hui -->
+                                <h5 class="card-title">Sales <span>| Today</span></h5>
+                                <div class="d-flex align-items-center">
+                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-cart"></i>
+                                    </div>
+                                    <div class="ps-3">
+                                        <h6>{{ todayOrdersTotal }} TND</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- End Sales Card -->
+
+                    <!-- Paid Orders Card -->
+                    <div class="col-xxl-6 col-md-6 d-flex">
+                        <div class="card info-card sales-card w-100">
+                            <div class="card-body d-flex flex-column">
+                                <!-- Affichage du nombre de commandes payées -->
+                                <h5 class="card-title">Ventes payées <span>| Nombre de commandes payées</span></h5>
+                                <div class="d-flex align-items-center">
+                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                        <i class="bi bi-check-circle"></i>
+                                    </div>
+                                    <div class="ps-3">
+                                        <h6>{{ paidOrdersCount }}</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- End Paid Orders Card -->
+
+                </div>
+            </div><!-- End Left side columns -->
+
+        </div>
+    </section>
+
+</main><!-- End #main -->
+{% endblock %}

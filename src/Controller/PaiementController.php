@@ -37,35 +37,35 @@ final class PaiementController extends AbstractController
     ): Response
     {
         $commande = $commandeRepository->find($commandeId);
-
+    
         if (!$commande) {
             $this->addFlash('error', 'Commande non trouvée.');
             return $this->redirectToRoute('app_cart');
         }
-
+    
         // Vérifier si la commande est déjà payée
         if (in_array($commande->getStatut(), ['Payé', 'Payé par VISA'])) {
             $this->addFlash('warning', 'Cette commande a déjà été payée.');
             return $this->redirectToRoute('app_article');
         }
-
+    
         $modePaiement = $request->request->get('mode_paiement');
-
+    
         if ($modePaiement === 'livraison') {
             $commande->setStatut('Payé à la livraison');
         } elseif ($modePaiement === 'visa') {
-            $commande->setStatut('En attente de paiement');
+            $commande->setStatut('Payé par VISA');  // Mise à jour du statut en "Payé par VISA"
         } else {
             $this->addFlash('error', 'Mode de paiement invalide.');
             return $this->redirectToRoute('paiement', ['commandeId' => $commandeId]);
         }
-
+    
         $entityManager->persist($commande);
         $entityManager->flush();
-
+    
         if ($modePaiement === 'visa') {
             $paymentData = $this->generatePaymentData($commande, $paymeeService);
-
+    
             if (isset($paymentData['data']['payment_url'])) {
                 return $this->redirect($paymentData['data']['payment_url']);
             } else {
@@ -74,11 +74,11 @@ final class PaiementController extends AbstractController
                 return $this->redirectToRoute('paiement', ['commandeId' => $commandeId]);
             }
         }
-
+    
         $this->addFlash('success', 'Votre paiement a été enregistré.');
         return $this->redirectToRoute('app_article');
     }
-
+    
     #[Route('/webhook-paymee', name: 'paymee_webhook', methods: ['POST'])]
     public function paymeeWebhook(
         Request $request,
