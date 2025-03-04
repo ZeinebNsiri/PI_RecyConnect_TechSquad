@@ -21,27 +21,41 @@ class EvenementRepository extends ServiceEntityRepository
      * @param string|null $date
      * @return Evenement[]
      */
-    public function searchEventsAdmin(?string $searchTerm, ?string $location, ?string $date): array
-    {
-        $qb = $this->createQueryBuilder('e');
+    public function searchEventsAdmin(?string $searchTerm, ?string $location, ?string $date, ?string $type): array
+{
+    $qb = $this->createQueryBuilder('e');
 
-        if (!empty($searchTerm)) {
-            $qb->andWhere('LOWER(e.nomEvent) LIKE LOWER(:search)')
-               ->setParameter('search', '%' . strtolower($searchTerm) . '%');
-        }
-
-        if (!empty($location)) {
-            $qb->andWhere('LOWER(e.lieuEvent) LIKE LOWER(:location)')
-               ->setParameter('location', '%' . strtolower($location) . '%');
-        }
-
-        if (!empty($date)) {
-            $qb->andWhere('e.dateEvent = :date')
-               ->setParameter('date', new \DateTime($date));
-        }
-
-        return $qb->getQuery()->getResult();
+    // Filter by search term (event name)
+    if (!empty($searchTerm)) {
+        $qb->andWhere('LOWER(e.nomEvent) LIKE LOWER(:search)')
+           ->setParameter('search', '%' . strtolower($searchTerm) . '%');
     }
+
+    // Filter by location
+    if (!empty($location)) {
+        $qb->andWhere('LOWER(e.lieuEvent) LIKE LOWER(:location)')
+           ->setParameter('location', '%' . strtolower($location) . '%');
+    }
+
+    // Filter by date
+    if (!empty($date)) {
+        $qb->andWhere('e.dateEvent = :date')
+           ->setParameter('date', new \DateTime($date));
+    }
+
+    // Filter by event type (en ligne or sur site)
+    if (!empty($type)) {
+        if ($type === 'en ligne') {
+            $qb->andWhere('e.lieuEvent = :type')
+               ->setParameter('type', 'en ligne');
+        } elseif ($type === 'sur site') {
+            $qb->andWhere('e.lieuEvent != :type')
+               ->setParameter('type', 'en ligne');
+        }
+    }
+
+    return $qb->getQuery()->getResult();
+}
 
     /**
      * Search events with optional filters.

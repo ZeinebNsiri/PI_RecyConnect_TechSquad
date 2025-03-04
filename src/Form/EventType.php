@@ -94,14 +94,11 @@ class EventType extends AbstractType
                 'constraints' => [
                     new Assert\Regex([
                         'pattern' => '/^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/',
-                        'message' => 'Please enter valid coordinates in the format "latitude, longitude".',
+                        'message' => 'Veuillez saisir des coordinates in the format "latitude, longitude".',
                     ]),
                 ],
             ])
-            ->add('endTime', TimeType::class, [
-                'label' => 'End Time',
-                'widget' => 'single_text', 
-            ])
+     
                         ->add('submit', SubmitType::class, [
                 'label' => $isEdit ? 'Modifier l\'événement' : 'Créer l\'événement',
                 'attr' => ['class' => 'btn btn-primary'],
@@ -112,7 +109,7 @@ class EventType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Evenement::class,
-            'is_edit' => false, // Default to false for create mode
+            'is_edit' => false, 
         ]);
     }
 }

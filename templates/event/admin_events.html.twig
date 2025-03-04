@@ -4,42 +4,57 @@
 
 {% block body %}
 <main id="main" class="main">
+  <div class="card shadow-lg">
+    <div class="card-body p-5">
+      <h1 class="card-title text-center mb-4 display-4 fw-bold">Gestion des Événements</h1>
 
-  <div class="card">
-    <div class="card-body">
-      <h5 class="card-title">Gestion des Événements</h5>
+      <!-- Search and Filter Form -->
+     <!-- Search and Filter Form -->
+<form method="get" action="{{ path('admin_events') }}" class="mb-4">
+  <div class="row g-3">
+    <!-- Search by Event Name -->
+    <div class="col-md-3">
+      <input type="text" name="search" class="form-control shadow-sm" placeholder="Rechercher un événement" value="{{ searchTerm }}">
+    </div>
 
-      <!-- Search Form -->
-      <form method="get" action="{{ path('admin_events') }}" class="mb-4">
-        <div class="row g-3">
-          <div class="col-md-4">
-            <input type="text" name="search" class="form-control" placeholder="Rechercher un événement" value="{{ searchTerm }}">
-          </div>
-          <div class="col-md-3">
-            <input type="text" name="location" class="form-control" placeholder="Lieu" value="{{ location }}">
-          </div>
-          <div class="col-md-3">
-            <input type="date" name="date" class="form-control" value="{{ date }}">
-          </div>
-          <div class="col-md-2">
-            <button type="submit" class="btn btn-primary">
-              <i class="bi bi-search"></i> Rechercher
-            </button>
-          </div>
-        </div>
-      </form>
+    <!-- Filter by Location -->
+    <div class="col-md-3">
+      <input type="text" name="location" class="form-control shadow-sm" placeholder="Lieu" value="{{ location }}">
+    </div>
 
+    <!-- Filter by Date -->
+    <div class="col-md-2">
+      <input type="date" name="date" class="form-control shadow-sm" value="{{ date }}">
+    </div>
+
+    <!-- Filter by Event Type (En ligne / Sur site) -->
+    <div class="col-md-2">
+      <select name="type" class="form-select shadow-sm">
+        <option value="">Tous les types</option>
+        <option value="en ligne" {% if type == 'en ligne' %}selected{% endif %}>En ligne</option>
+        <option value="sur site" {% if type == 'sur site' %}selected{% endif %}>Sur site</option>
+      </select>
+    </div>
+
+    <!-- Search Button -->
+    <div class="col-md-2">
+      <button type="submit" class="btn btn-primary w-100 shadow-sm hover-scale">
+        <i class="bi bi-search me-2"></i> Rechercher
+      </button>
+    </div>
+  </div>
+</form>
       <!-- Add Event Button -->
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <a href="{{ path('create_event') }}" class="btn btn-success">
-          <i class="fas fa-plus"></i> Ajouter événement
+      <div class="d-flex justify-content-end mb-4">
+        <a href="{{ path('create_event') }}" class="btn btn-success shadow-sm hover-scale">
+          <i class="fas fa-plus me-2"></i> Ajouter un événement
         </a>
       </div>
 
       <!-- Events Table -->
-      <table class="table table-hover">
-        <thead class="text-center bg-light">
-          <tr>
+      <table class="table table-hover table-striped shadow-sm">
+        <thead class="table-light">
+          <tr class="text-center">
             <th>#</th>
             <th>Image</th>
             <th>Nom</th>
@@ -55,29 +70,29 @@
               <th>{{ loop.index }}</th>
               <td>
                 {% if event.imageEvent %}
-                  <img src="{{ asset('uploads/images/' ~ event.imageEvent) }}" alt="Event Image" height="80">
+                  <img src="{{ asset('uploads/images/' ~ event.imageEvent) }}" alt="Event Image" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;">
                 {% else %}
-                  <span class="text-muted">No Image</span>
+                  <span class="text-muted">Aucune image</span>
                 {% endif %}
               </td>
               <td>{{ event.nomEvent }}</td>
               <td>{{ event.lieuEvent }}</td>
-              <td>{{ event.dateEvent|date('Y-m-d') }}</td>
+              <td>{{ event.dateEvent|date('d/m/Y') }}</td>
               <td>{{ event.heureEvent|date('H:i') }}</td>
               <td>
                 <div class="d-flex justify-content-center gap-2">
-                  <a href="{{ path('edit_event', {'id': event.id}) }}" class="btn btn-success">
-                    <i class="bi bi-pencil-square"></i> Modifier
+                  <a href="{{ path('edit_event', {'id': event.id}) }}" class="btn btn-sm btn-success shadow-sm hover-scale">
+                    <i class="bi bi-pencil-square me-2"></i> Modifier
                   </a>
-                  <a href="{{ path('delete_event_confirm', {'id': event.id}) }}" class="btn btn-danger">
-                    <i class="bi bi-trash"></i> Supprimer
+                  <a href="{{ path('delete_event_confirm', {'id': event.id}) }}" class="btn btn-sm btn-danger shadow-sm hover-scale">
+                    <i class="bi bi-trash me-2"></i> Supprimer
                   </a>
                 </div>
               </td>
             </tr>
           {% else %}
             <tr>
-              <td colspan="7" class="text-center text-muted">Aucun événement trouvé.</td>
+              <td colspan="7" class="text-center text-muted py-4">Aucun événement trouvé.</td>
             </tr>
           {% endfor %}
         </tbody>

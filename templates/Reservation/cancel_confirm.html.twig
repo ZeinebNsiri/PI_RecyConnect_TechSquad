@@ -4,9 +4,9 @@
 
 {% block body %}
     <!-- Page Header Start -->
-    <div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s">
+    <div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s" style="background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('{{ asset('images/header-bg.jpg') }}') center/cover no-repeat;">
         <div class="container text-center py-5">
-            <h1 class="display-3 text-white mb-4 animated slideInDown">Annuler la Réservation</h1>
+            <h1 class="display-4 text-white mb-4 animated slideInDown fw-bold">Annuler la Réservation</h1>
             <nav aria-label="breadcrumb animated slideInDown">
                 <ol class="breadcrumb justify-content-center mb-0">
                     <li class="breadcrumb-item"><a href="{{ path('events_list') }}" class="text-white">Accueil</a></li>
@@ -21,31 +21,37 @@
     <!-- Cancel Reservation Section Start -->
     <div class="container-xxl py-5">
         <div class="container">
-            <div class="row g-4">
-                <div class="col-lg-8 offset-lg-2">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
                     <div class="card border-0 shadow-lg wow fadeInUp" data-wow-delay="0.1s">
-                        <div class="card-body p-4">
+                        <div class="card-body p-4 p-md-5">
                             <!-- Confirmation Title -->
-                            <h2 class="card-title fw-bold mb-4 text-center text-primary">
+                            <h2 class="card-title fw-bold mb-4 text-center text-dark">
                                 Confirmer l'Annulation
                             </h2>
 
                             <!-- Reservation Details -->
                             <div class="reservation-details mb-4">
-                                <p class="card-text">
-                                    <i class="fas fa-calendar-alt me-2"></i><strong>Événement:</strong> {{ reservation.getEventId.nomEvent }}
-                                </p>
-                                <p class="card-text">
-                                    <i class="fas fa-user me-2"></i><strong>Nom du participant:</strong> {{ reservation.getUserId.nomUser }} {{ reservation.getUserId.prenom }}
-                                </p>
-                                <p class="card-text">
-                                    <i class="fas fa-ticket-alt me-2"></i><strong>Places réservées:</strong> <span class="badge bg-primary">{{ reservation.getNbPlaces() }} place(s)</span>
-                                </p>
-                                <p class="card-text">
-                                    <i class="fas fa-info-circle me-2"></i><strong>Statut:</strong> <span class="badge bg-{{ reservation.status == 'active' ? 'success' : (reservation.status == 'canceled' ? 'danger' : 'secondary') }}">
-                                        {{ reservation.status }}
-                                    </span>
-                                </p>
+                                <div class="mb-3">
+                                    <p class="mb-2 text-muted"><i class="fas fa-calendar-alt me-2 text-primary"></i><strong>Événement:</strong></p>
+                                    <p class="mb-0 fs-5">{{ reservation.getEventId().nomEvent }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <p class="mb-2 text-muted"><i class="fas fa-user me-2 text-primary"></i><strong>Nom du participant:</strong></p>
+                                    <p class="mb-0 fs-5">{{ reservation.getUser Id().nomUser  }} {{ reservation.getUser Id().prenom }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <p class="mb-2 text-muted"><i class="fas fa-ticket-alt me-2 text-primary"></i><strong>Places réservées:</strong></p>
+                                    <p class="mb-0 fs-5"><span class="badge bg-primary">{{ reservation.getNbPlaces() }} place(s)</span></p>
+                                </div>
+                                <div class="mb-3">
+                                    <p class="mb-2 text-muted"><i class="fas fa-info-circle me-2 text-primary"></i><strong>Statut:</strong></p>
+                                    <p class="mb-0 fs-5">
+                                        <span class="badge bg-{{ reservation.status == 'active' ? 'success' : (reservation.status == 'canceled' ? 'danger' : 'secondary') }}">
+                                            {{ reservation.status }}
+                                        </span>
+                                    </p>
+                                </div>
                             </div>
 
                             <!-- Confirmation Form -->
@@ -54,11 +60,11 @@
                                 <input type="hidden" name="_token" value="{{ csrf_token('cancel' ~ reservation.id) }}">
 
                                 <!-- Buttons -->
-                                <div class="d-flex justify-content-between gap-3 mt-4">
-                                    <button type="submit" class="btn btn-success btn-lg py-3 px-5 fw-bold">
+                                <div class="d-grid gap-3 d-md-flex justify-content-md-center mt-4">
+                                    <button type="submit" class="btn btn-danger btn-lg w-100 w-md-auto shadow-sm rounded-pill">
                                         <i class="fas fa-check me-2"></i> Oui, annuler la réservation
                                     </button>
-                                    <a href="{{ path('reservations_list') }}" class="btn btn-secondary btn-lg py-3 px-5 fw-bold">
+                                    <a href="{{ path('reservations_list') }}" class="btn btn-outline-secondary btn-lg w-100 w-md-auto shadow-sm rounded-pill">
                                         <i class="fas fa-arrow-left me-2"></i> Non, retour à la liste
                                     </a>
                                 </div>
@@ -70,4 +76,28 @@
         </div>
     </div>
     <!-- Cancel Reservation Section End -->
+
+    <!-- Custom CSS for Additional Styling -->
+    <style>
+        .page-header {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('{{ asset('images/header-bg.jpg') }}') center/cover no-repeat;
+        }
+        .reservation-details p {
+            margin: 0;
+        }
+        .reservation-details .badge {
+            font-size: 1rem;
+        }
+        .btn {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+            color: white;
+        }
+        .btn-outline-secondary:hover {
+            background-color: #6c757d;
+            color: white;
+        }
+    </style>
 {% endblock %}

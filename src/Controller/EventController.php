@@ -95,21 +95,23 @@ class EventController extends AbstractController
     }
 
     #[Route('/admin/events', name: 'admin_events')]
-    public function adminIndex(Request $request, EvenementRepository $evenementRepository): Response
-    {
-        $searchTerm = $request->query->get('search', '');
-        $location = $request->query->get('location', '');
-        $dateInput = $request->query->get('date', '');
+public function adminIndex(Request $request, EvenementRepository $evenementRepository): Response
+{
+    $searchTerm = $request->query->get('search', '');
+    $location = $request->query->get('location', '');
+    $date = $request->query->get('date', '');
+    $type = $request->query->get('type', ''); // New type filter
 
-        $events = $evenementRepository->searchEventsAdmin($searchTerm, $location, $dateInput);
+    $events = $evenementRepository->searchEventsAdmin($searchTerm, $location, $date, $type);
 
-        return $this->render('event/admin_events.html.twig', [
-            'events' => $events,
-            'searchTerm' => $searchTerm,
-            'location' => $location,
-            'date' => $dateInput,
-        ]);
-    }
+    return $this->render('event/admin_events.html.twig', [
+        'events' => $events,
+        'searchTerm' => $searchTerm,
+        'location' => $location,
+        'date' => $date,
+        'type' => $type, // Pass the type to the template
+    ]);
+}
 
     #[Route('/admin/events/create', name: 'create_event', methods: ['GET', 'POST'])]
     public function create(Request $request, EntityManagerInterface $entityManager): Response
@@ -117,47 +119,60 @@ class EventController extends AbstractController
         $event = new Evenement();
         $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
-
+    
         if ($form->isSubmitted() && $form->isValid()) {
+            // Handle image upload
             $imageFile = $form->get('imageEvent')->getData();
             if ($imageFile) {
                 $newFilename = uniqid() . '.' . $imageFile->guessExtension();
                 $uploadDir = $this->getParameter('photo_dir');
-
+    
+                // Ensure the upload directory exists
                 if (!file_exists($uploadDir)) {
                     mkdir($uploadDir, 0777, true);
                 }
-
+    
+                // Move the uploaded file to the directory
                 $imageFile->move($uploadDir, $newFilename);
                 $event->setImageEvent($newFilename);
             } else {
+                // Set a default image if no file is uploaded
                 $event->setImageEvent('uploads/images/default.png');
             }
-
+    
+            // Set Google Meet link for online events
             if (strtolower($event->getLieuEvent()) === 'en ligne') {
                 $event->setGoogleMeetLink('https://meet.jit.si/' . uniqid());
             }
-
+    
+            // Calculate start and end times
             $eventDate = $event->getDateEvent();
             $eventTime = $event->getHeureEvent();
-            $startTime = new \DateTime($eventDate->format('Y-m-d') . ' ' . $eventTime);
+    
+            // Format the date and time into a string before creating the DateTime object
+            $startTime = new \DateTime($eventDate->format('Y-m-d') . ' ' . $eventTime->format('H:i:s'));
+    
+            // Clone the start time and add 2 hours for the end time
             $endTime = (clone $startTime)->modify('+2 hours');
             $event->setEndTime($endTime);
-
+    
+            // Set the remaining places to the event capacity
             $event->setNbRestant($event->getCapacite());
-
+    
+            // Persist and flush the event to the database
             $entityManager->persist($event);
             $entityManager->flush();
-
+    
+            // Add a success flash message and redirect
             $this->addFlash('success', 'L\'événement a été créé avec succès.');
             return $this->redirectToRoute('admin_events');
         }
-
+    
+        // Render the form template
         return $this->render('event/create.html.twig', [
             'form' => $form->createView(),
         ]);
     }
-
     #[Route('/admin/events/edit/{id}', name: 'edit_event', methods: ['GET', 'POST'])]
     public function edit(Request $request, Evenement $event, EntityManagerInterface $entityManager): Response
     {
