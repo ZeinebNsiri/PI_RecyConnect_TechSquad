@@ -61,127 +61,151 @@
             </span>
         </div>
     {% endfor %}
-  <div class="comment-list12993">
-                        <div class="container">
-                            <div class="row">
-                           
-                                <div class="comments-container">
-                                    <a href="{{ path('app_posts') }}" class="btn btn-secondary mb-3">
-                                        <i class="fa fa-arrow-left"></i>
-                                    </a>
-                                    <!-- Bouton Ajouter un commentaire -->
-                                    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#verticalycentered">
-                                        Ajouter un Commentaire
-                                    </button>
-                                    <ul id="comments-list" class="comments-list">
-                                        {% if commentaires is empty %}
-                                            <li><p class="text-muted">Pas de commentaire pour le moment.</p></li>
-                                        {% else %}
-                                        {% for commentaire in commentaires %}
-                                            <li>
-                                                <div class="comment-main-level">
-                                                    <div class="comment-avatar"><img src="{{ asset(commentaire.UserCom.PhotoProfil ? 'uploads/profile_dir/' ~ commentaire.UserCom.PhotoProfil : 'backOffice/assets/img/profile.jpg') }}" alt=""></div>
-                                                    <div class="comment-box">
-                                                        <div class="comment-head">
-                                                            <h6 class="comment-name"><a href="#">{{ commentaire.UserCom.NomUser }}</a></h6> 
-                                                            <span><i class="fa fa-clock-o" aria-hidden="true">{{ commentaire.DateCom|date('F j, Y, g:i a') }}</i></span>
-                                                            
-                                                            <i data-bs-toggle="modal" data-bs-target="#replyModal-{{ commentaire.id }}" class="fa fa-reply"></i>
-                                                         
-                                                        </div>
-                                                        <div class="comment-content">{{ commentaire.ContenuCom }}</div>
-                                                        {% if commentaire.UserCom == app.user %}
-                                                                <!-- Bouton de suppression -->
-                                                                <form method="post" action="{{ path('comment_delete', { 'id': commentaire.id }) }}" style="display: inline;">
-                                                                    <button type="submit" class="btn btn-link text-danger" title="Supprimer le commentaire">
-                                                                        <i class="fa fa-trash"></i>
-                                                                    </button>
-                                                                </form>
-                                                            {% endif %}
-                                                    </div>
-                                                </div>
-                                            </li>
 
-                                            <div class="modal fade" id="replyModal-{{ commentaire.id }}" tabindex="-1">
-                                                <div class="modal-dialog modal-dialog-centered">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title">Répondre au commentaire de {{ commentaire.UserCom.NomUser }}</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <form id="reply-form-{{ commentaire.id }}" method="post" action="{{ path('comment_reply', { 'id': commentaire.id }) }}">
-                                                                <input type="hidden" name="post_com" value="{{ post.id }}">
-                                                                <input type="hidden" name="parent_id" value="{{ commentaire.id }}">
-                                                                <div class="mb-3">
-                                                                    <label for="contenu_com_{{ commentaire.id }}" class="form-label">Votre réponse</label>
-                                                                    <textarea class="form-control" id="contenu_com_{{ commentaire.id }}" name="contenu_com" rows="4" required></textarea>
-                                                                </div>
-                                                                <div class="modal-footer">
-                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                                                                    <button type="submit" class="btn btn-primary">Répondre</button>
-                                                                </div>
-                                                            </form>
-                                                        </div>
-                                                    </div>
-                                                </div>
+<div class="container mt-4 wow fadeInUp" style="visibility: visible; animation-name: fadeInUp;">
+    <a href="{{ path('app_posts') }}" class="btn btn-secondary mb-3">
+        <i class="fa fa-arrow-left"></i> Retour
+    </a>
+    <!-- Détails du post -->
+    <div class="post-detail-container">
+        <!-- Post Header -->
+        <div class="post-header">
+            
+            <div class="post-avatar">
+                <img src="{{ asset(post.userP.PhotoProfil ? 'uploads/profile_dir/' ~ post.userP.PhotoProfil : 'backOffice/assets/img/profile.jpg') }}" alt="User Profile">
+            </div>
+            <div class="post-info">
+                <span class="post-author">{{ post.userP.Prenom }} {{ post.userP.nomUser }}</span>
+                <span class="post-date"><i class="fa fa-clock-o"></i> {{ post.datePublication|date('d/m/Y H:i') }}</span>
+            </div>
+        </div>
+        <hr>
+
+        <!-- Post Content -->
+        <div class="post-content">
+            <p>{{ post.contenu }}</p>
+            
+            <!-- Tags -->
+            <div class="post-tags">
+                {% for tag in post.tags %}
+                    <span class="badge bg-primary">{{ tag }}</span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Commentaires -->
+    <div class="comment-list12993">
+        <div class="container">
+            <div class="row">
+                <div class="comments-container">
+                    <!-- Bouton Ajouter un commentaire -->
+                    <h4>Les Commentaires</h4>
+                    <hr>
+                    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#verticalycentered">
+                        <i class="fa fa-plus"></i> Ajouter un Commentaire
+                    </button>
+                    <ul id="comments-list" class="comments-list">
+                        {% if commentaires is empty %}
+                            <li><p class="text-muted">Pas de commentaire pour le moment.</p></li>
+                        {% else %}
+                            {% for commentaire in commentaires %}
+                                <li>
+                                    <div class="comment-main-level">
+                                        <div class="comment-avatar"><img src="{{ asset(commentaire.UserCom.PhotoProfil ? 'uploads/profile_dir/' ~ commentaire.UserCom.PhotoProfil : 'backOffice/assets/img/profile.jpg') }}" alt=""></div>
+                                        <div class="comment-box">
+                                            <div class="comment-head">
+                                                <h6 class="comment-name"><a href="#">{{ commentaire.UserCom.Prenom }} {{ commentaire.UserCom.nomUser }}</a></h6> 
+                                                <span><i class="fa fa-clock-o" aria-hidden="true">{{ commentaire.DateCom|date('F j, Y, g:i a') }}</i></span>
+                                                <i data-bs-toggle="modal" data-bs-target="#replyModal-{{ commentaire.id }}" class="fa fa-reply"></i>
                                             </div>
+                                            <div class="comment-content">{{ commentaire.ContenuCom }}</div>
+                                            {% if commentaire.UserCom == app.user %}
+                                                <!-- Bouton de suppression -->
+                                                <form method="post" action="{{ path('comment_delete', { 'id': commentaire.id }) }}" style="display: inline;">
+                                                    <button type="submit" class="btn btn-link text-danger" title="Supprimer le commentaire">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </li>
 
-                                            
-                                            {% for reply in commentaire.replies %}
-                                                <li class="comment-reply">
-                                                    <div class="comment-main-level">
-                                                        <div class="comment-avatar"><img src="{{ asset(commentaire.UserCom.PhotoProfil ? 'uploads/profile_dir/' ~ commentaire.UserCom.PhotoProfil : 'backOffice/assets/img/profile.jpg') }}" alt=""></div>
-                                                        <div class="comment-box">
-                                                            <div class="comment-head">
-                                                                <h6 class="comment-name"><a href="#">{{ reply.UserCom.NomUser }}</a></h6> 
-                                                                <span><i class="fa fa-clock-o" aria-hidden="true">{{ reply.DateCom|date('F j, Y, g:i a') }}</i></span>
-                                                                
-                                                            </div>
-                                                            <div class="comment-content">{{ reply.ContenuCom }}</div>
-                                                            
-                                                        </div>
+                                <!-- Modal pour répondre -->
+                                <div class="modal fade" id="replyModal-{{ commentaire.id }}" tabindex="-1">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Répondre au commentaire de {{ commentaire.UserCom.Prenom }}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form id="reply-form-{{ commentaire.id }}" method="post" action="{{ path('comment_reply', { 'id': commentaire.id }) }}">
+                                                    <input type="hidden" name="post_com" value="{{ post.id }}">
+                                                    <input type="hidden" name="parent_id" value="{{ commentaire.id }}">
+                                                    <div class="mb-3">
+                                                        <label for="contenu_com_{{ commentaire.id }}" class="form-label">Votre réponse</label>
+                                                        <textarea class="form-control" id="contenu_com_{{ commentaire.id }}" name="contenu_com" rows="4" required></textarea>
                                                     </div>
-                                                </li>
-                                            {% endfor %}
-
-                                        {% endfor %}
-                                        {% endif %}
-                                        
-                                           
-                                    </ul>
-                        
-                            </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <div class="modal fade" id="verticalycentered" tabindex="-1">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Ajouter un commentaire</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <form id="comment-form" method="post" action="{{ path('commentaire_ajout', { 'id': post.id }) }}">
-                                        <input type="hidden" name="post_com" value="{{ post.id }}">
-                                        <div class="mb-3">
-                                            <label for="contenu_com" class="form-label">Commentaire</label>
-                                            <textarea class="form-control" id="contenu_com" name="contenu_com" rows="4" required></textarea>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                                                        <button type="submit" class="btn btn-primary">Répondre</button>
+                                                    </div>
+                                                </form>
+                                            </div>
                                         </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                                            <button type="submit" class="btn btn-primary">Publier</button>
-                                        </div>
-                                    </form>
+                                    </div>
                                 </div>
-                            </div>
+
+                                <!-- Réponses aux commentaires -->
+                                {% for reply in commentaire.replies %}
+                                    <li class="comment-reply">
+                                        <div class="comment-main-level">
+                                            <div class="comment-avatar"><img src="{{ asset(commentaire.UserCom.PhotoProfil ? 'uploads/profile_dir/' ~ commentaire.UserCom.PhotoProfil : 'backOffice/assets/img/profile.jpg') }}" alt=""></div>
+                                            <div class="comment-box">
+                                                <div class="comment-head">
+                                                    <h6 class="comment-name"><a href="#">{{ reply.UserCom.Prenom }} {{ reply.UserCom.NomUser }}</a></h6> 
+                                                    <span><i class="fa fa-clock-o" aria-hidden="true">{{ reply.DateCom|date('F j, Y, g:i a') }}</i></span>
+                                                </div>
+                                                <div class="comment-content">{{ reply.ContenuCom }}</div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            {% endfor %}
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour ajouter un commentaire -->
+    <div class="modal fade" id="verticalycentered" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ajouter un commentaire</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="comment-form" method="post" action="{{ path('commentaire_ajout', { 'id': post.id }) }}">
+                        <input type="hidden" name="post_com" value="{{ post.id }}">
+                        <div class="mb-3">
+                            <label for="contenu_com" class="form-label">Commentaire</label>
+                            <textarea class="form-control" id="contenu_com" name="contenu_com" rows="4" required></textarea>
                         </div>
-                    </div>
-
-
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                            <button type="submit" class="btn btn-primary">Publier</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
                     
 
 {% endblock %}

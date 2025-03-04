@@ -2,45 +2,75 @@
 
 namespace App\Controller;
 
+use dump;
+use App\Entity\Like;
 use App\Entity\Post;
+use App\Enum\TagType;
 use App\Form\PostType;
-use App\Entity\Utilisateur;
 use App\Entity\MediaPost;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\Utilisateur;
+use App\Repository\LikeRepository;
+use App\Repository\PostRepository;
 use App\Repository\MediaPostRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use App\Repository\LikeRepository;
-use App\Entity\Like;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 final class PostsController extends AbstractController
 {   
     
     #[Route('/posts', name: 'app_posts')]
-    public function index(EntityManagerInterface $entityManager, MediaPostRepository $mediaPostRepository): Response
+    public function index(EntityManagerInterface $entityManager, MediaPostRepository $mediaPostRepository, PaginatorInterface $paginator, Request $request): Response
     {   
         if (!$this->isGranted('ROLE_USER') && !$this->isGranted('ROLE_PROFESSIONNEL')) {
             throw $this->createAccessDeniedException('Accès refusé.');
         }
         $user = $this->getUser();
-
-        $posts = $entityManager->getRepository(Post::class)->findBy(['status_post' => true], ['datePublication' => 'DESC']);
+    
+        // Récupérer les tags sélectionnés depuis l'URL
+        $selectedTags = $request->query->get('tags', '');
+        $selectedTagsArray = $selectedTags ? explode(',', $selectedTags) : [];
+    
+        // Création de la requête avec QueryBuilder
+        $queryBuilder = $entityManager->getRepository(Post::class)->createQueryBuilder('p')
+            ->where('p.status_post = :status')
+            ->setParameter('status', true)
+            ->orderBy('p.datePublication', 'DESC');
+    
+        // Appliquer un filtre si des tags sont sélectionnés
+        if (!empty($selectedTagsArray)) {
+            foreach ($selectedTagsArray as $key => $tag) {
+                $queryBuilder->andWhere($queryBuilder->expr()->like('p.tags', ":tag$key"));
+                $queryBuilder->setParameter("tag$key", '%"'.$tag.'"%');
+            }
+        }
+    
+        $posts = $queryBuilder->getQuery()->getResult();
+    
         $postsWithMedia = [];
         foreach ($posts as $post) {
             $medias = $mediaPostRepository->findBy(['post' => $post]);
             $postsWithMedia[] = [
                 'post' => $post,
                 'medias' => $medias,
-                
             ];
         }
-
+    
+        $pagination = $paginator->paginate(
+            $postsWithMedia,
+            $request->query->getInt('page', 1),
+            5
+        );
+    
         $myPostsWithMedia = [];
         foreach ($posts as $post) {
             if ($post->getUserP() === $user) {
@@ -48,17 +78,20 @@ final class PostsController extends AbstractController
                 $myPostsWithMedia[] = [
                     'post' => $post,
                     'medias' => $medias,
-                    
                 ];
             }
         }
-
+    
         return $this->render('posts/posts1.html.twig', [
-            'postsWithMedia' => $postsWithMedia,
+            'postsWithMedia' => $pagination,
             'user' => $user,
             'myPostsWithMedia' => $myPostsWithMedia,
+            'tags' => TagType::getChoices(),
+            'selectedTags' => $selectedTagsArray // Pour garder les tags sélectionnés actifs sur l'interface
         ]);
     }
+    
+    
 
 
     #[Route('/posts/new', name: 'post_create')]
@@ -78,7 +111,17 @@ final class PostsController extends AbstractController
                 return $this->redirectToRoute('app_posts');
             }
 
+
+            
             $post->setUserP($user);
+            
+            // Gestion des tags
+            $tags = json_decode($form->get('tags')->getData(), true); 
+            if (is_array($tags)) {
+                foreach ($tags as $tagValue) {
+                    $post->addTag($tagValue);
+                }
+            }
 
 
             // Gestion du fichier média
@@ -124,6 +167,7 @@ final class PostsController extends AbstractController
 
         return $this->render('posts/ajoutPost.html.twig', [
             'form' => $form->createView(),
+            'tags' => TagType::getChoices()
         ]);
     }
 
@@ -137,14 +181,14 @@ final class PostsController extends AbstractController
             return new JsonResponse(['message' => 'Unauthorized'], 403);
         }
 
-        // Vérifier si le like existe déjà
+        
         $existingLike = $likeRepository->findOneBy([
             'post_like' => $post,
             'user_like' => $user
         ]);
 
         if ($existingLike) {
-            // Supprimer le like
+            $post->removeLikesPost($existingLike);
             $entityManager->remove($existingLike);
             $liked = false;
         } else {
@@ -152,10 +196,12 @@ final class PostsController extends AbstractController
             $like = new Like();
             $like->setPostLike($post);
             $like->setUserLike($user);
+            $post->addLikesPost($like);
             $entityManager->persist($like);
             $liked = true;
         }
-
+        $post->setNbrJaime($post->getLikesPost()->count());
+        $entityManager->persist($post); 
         $entityManager->flush();
 
         return new JsonResponse([
@@ -169,11 +215,48 @@ final class PostsController extends AbstractController
     public function listPosts(EntityManagerInterface $entityManager): Response
     {
         $posts = $entityManager->getRepository(Post::class)->findAll();
+        $queryBuilder = $entityManager->createQueryBuilder();
+        $queryBuilder
+            ->select("SUBSTRING(p.datePublication, 6, 2) as month, COUNT(p.id) as count")
+            ->from('App\Entity\Post', 'p')
+            ->where('p.status_post = true')
+            ->groupBy('month')
+            ->orderBy('month', 'ASC');
+
+        $stats = $queryBuilder->getQuery()->getResult();
+
+        // Initialisation des données pour tous les mois (1 à 12)
+        $monthlyData = array_fill(0, 12, 0);
+
+        // Remplissage des données selon les résultats de la requête
+        foreach ($stats as $stat) {
+            $monthlyData[intval($stat['month']) - 1] = intval($stat['count']);
+        }
 
         return $this->render('posts/listePosts.html.twig', [
             'posts' => $posts,
+            'monthlyData' => json_encode(array_values($monthlyData)), 
         ]);
     }
+
+    #[Route('/admin/stats/posts-likes', name: 'admin_stats_posts_likes')]
+    public function statsPostsLikes(PostRepository $postRepository): JsonResponse
+    {
+        $topPosts = $postRepository->findTopLikedPosts();
+
+        $data = [];
+        foreach ($topPosts as $post) {
+            $data[] = [
+                'label' => substr($post['contenu'], 0, 20) . '..', // Pour limiter la longueur du texte
+                'value' => $post['nbrJaime']
+            ];
+        }
+
+        return new JsonResponse($data);
+    }
+
+
+
 
     #[Route('/admin/approvePost/{id}', name: 'admin_post_approve')]
     public function approve(Post $post, EntityManagerInterface $entityManager): Response
@@ -230,7 +313,23 @@ final class PostsController extends AbstractController
     }
 
 
+    public function filterBadWords($text)
+    {
+        $client = HttpClient::create();
+        $response = $client->request('POST', 'http://127.0.0.1:5001/detect', [
+            'json' => ['text' => $text]
+        ]);
+
+        dump($response->getContent(false));
+        $data = $response->toArray();
+        return $data['clean_text'];
+    }
+
+
+
+
     
+
 
 
 

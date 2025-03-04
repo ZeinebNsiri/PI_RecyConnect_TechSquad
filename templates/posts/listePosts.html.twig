@@ -1,10 +1,55 @@
 {% extends 'base2.html.twig' %}
 
 {% block title %}Gestion des Posts{% endblock %}
+{% block stylesheets %}
+<!-- Favicons -->
+  <link href="{{asset('backOffice/assets/img/favicon.png')}}" rel="icon">
+  <link href="{{asset('backOffice/assets/img/apple-touch-icon.png')}}" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{{asset('backOffice/assets/vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
+  <link href="{{asset('backOffice/assets/vendor/bootstrap-icons/bootstrap-icons.css')}}" rel="stylesheet">
+  <link href="{{asset('backOffice/assets/vendor/boxicons/css/boxicons.min.css')}}" rel="stylesheet">
+  <link href="{{asset('backOffice/assets/vendor/quill/quill.snow.css')}}" rel="stylesheet">
+  <link href="{{asset('backOffice/assets/vendor/quill/quill.bubble.css')}}" rel="stylesheet">
+  <link href="{{asset('backOffice/assets/vendor/remixicon/remixicon.css')}}" rel="stylesheet">
+  <link href="{{asset('backOffice/assets/vendor/simple-datatables/style.css')}}" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="{{asset('backOffice/assets/css/style.css')}}" rel="stylesheet">
+   {% endblock %}
 
 {% block body %}
 <main id="main" class="main">
     <h1>Gestion des Posts</h1>
+
+    <!-- Card du Line Chart -->
+    <div class="row">
+        <!-- Card du Line Chart -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Nombre de Posts par Mois</h5>
+                    <div id="lineChart"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card du Pie Chart -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Top 5 posts les plus likés</h5>
+                    <div id="pieChart" style="min-height: 400px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;" class="echart" _echarts_instance_="ec_1741116430187"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     
     <table class="table table-hover">
         <thead class="thead-dark">
@@ -21,7 +66,7 @@
             {% for post in posts %}
                 <tr>
                     <td>{{ post.id }}</td>
-                    <td>{{ post.userP.NomUser }}</td>
+                    <td>{{ post.userP.Prenom }} {{ post.userP.NomUser }}</td>
                     <td>{{ post.contenu }}</td>
                     <td>{{ post.datePublication|date('d/m/Y H:i') }}</td>
                     <td>{{ post.StatusPost ? 'Approuvé' : 'En attente' }}</td>
@@ -48,3 +93,99 @@
     </table>
     </main>
 {% endblock %}
+
+ {% block javascripts %}
+    <script src="{{asset('backOffice/assets/vendor/echarts/echarts.min.js')}}"></script>
+    <script src="{{asset('backOffice/assets/vendor/apexcharts/apexcharts.min.js')}}"></script>
+  <script src="{{asset('backOffice/assets/vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+  <script src="{{asset('backOffice/assets/vendor/chart.js/chart.umd.js')}}"></script>
+ 
+  <script src="{{asset('backOffice/assets/vendor/quill/quill.js')}}"></script>
+  <script src="{{asset('backOffice/assets/vendor/simple-datatables/simple-datatables.js')}}"></script>
+  <script src="{{asset('backOffice/assets/vendor/tinymce/tinymce.min.js')}}"></script>
+  <script src="{{asset('backOffice/assets/vendor/php-email-form/validate.js')}}"></script>
+
+  <!-- Template Main JS File -->
+  <script src="{{asset('backOffice/assets/js/main.js')}}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <!-- Include the ECharts library from a CDN -->
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.3.0/dist/echarts.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const monthlyData = {{ monthlyData|raw }};
+            new ApexCharts(document.querySelector("#lineChart"), {
+                series: [{
+                    name: "Posts",
+                    data: monthlyData
+                }],
+                chart: {
+                    height: 350,
+                    type: 'line',
+                    zoom: {
+                        enabled: false
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    curve: 'smooth'
+                },
+                grid: {
+                    row: {
+                        colors: ['#f3f3f3', 'transparent'], // Alternance des couleurs de ligne
+                        opacity: 0.5
+                    },
+                },
+                xaxis: {
+                    categories: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
+                }
+            }).render();
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            fetch('/admin/stats/posts-likes')
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Données reçues:", data);
+                    let chartData = data.map(post => ({
+                        value: post.value,
+                        name: post.label
+                    }));
+
+                    let chart = echarts.init(document.querySelector("#pieChart"));
+                    chart.setOption({
+                        title: {
+                            subtext: 'Nombre de likes par post',
+                            left: 'center'
+                        },
+                        tooltip: {
+                            trigger: 'item'
+                        },
+                        legend: {
+                            orient: 'vertical',
+                            left: 'left'
+                        },
+                        series: [{
+                            name: 'Likes',
+                            type: 'pie',
+                            radius: '50%',
+                            data: chartData,
+                            emphasis: {
+                                itemStyle: {
+                                    shadowBlur: 10,
+                                    shadowOffsetX: 0,
+                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                }
+                            }
+                        }]
+                    });
+                })
+                .catch(error => console.error('Erreur chargement stats:', error));
+        });
+        </script>
+
+ {% endblock %}

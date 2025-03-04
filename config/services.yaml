@@ -29,6 +29,12 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
-
+    App\Service\BadWords:
+        arguments: ['@http_client']
+    App\EventListener\PostListener:
+        arguments: ['@App\Service\BadWordFilter']
+        tags:
+            - { name: doctrine.event_listener, event: prePersist }
+            
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

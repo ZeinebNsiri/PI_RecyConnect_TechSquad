@@ -42,6 +42,20 @@
                                 </div>
                             </div>
                             <div class="col-12">
+                                <h5 class="card-title">Tags</h5>
+                                <div class="d-flex flex-wrap gap-2" id="tags-container">
+                                    {% for name, value in tags %}
+                                        <span class="badge rounded-pill bg-secondary tag-badge" 
+                                            data-value="{{ value }}"
+                                            style="cursor: pointer;">
+                                            {{ name }}
+                                        </span>
+                                    {% endfor %}
+                                </div>
+                                {{ form_widget(form.tags) }}
+                            </div>
+
+                            <div class="col-12">
                                 <div class="form-floating">
                                     {{ form_widget(form.media, {'attr': {'class': 'form-control border-0'}}) }}
                                     {{ form_label(form.media) }}
@@ -52,6 +66,7 @@
                                     {% endif %}
                                 </div>
                             </div>
+
                             <div class="col-12 text-center">
                                 <button type="submit" class="btn btn-primary py-3 px-4">Publier</button>
                             </div>
@@ -73,4 +88,38 @@
             </div>
         </div>
     </div>
+{% endblock %}
+{% block javascripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+        const tagsInput = document.querySelector('.tags-input');
+        const tagsContainer = document.querySelector('#tags-container');
+        const selectedTags = [];
+
+        tagsContainer.addEventListener('click', function(event) {
+            const badge = event.target;
+            if (badge.classList.contains('tag-badge')) {
+                const value = badge.getAttribute('data-value');
+
+                if (selectedTags.includes(value)) {
+                    selectedTags.splice(selectedTags.indexOf(value), 1);
+                    badge.classList.remove('bg-primary');
+                    badge.classList.add('bg-secondary');
+                } else {
+                    selectedTags.push(value);
+                    badge.classList.remove('bg-secondary');
+                    badge.classList.add('bg-primary');
+                }
+
+                tagsInput.value = JSON.stringify(selectedTags);
+            }
+        });
+    });
+
+
+    </script>
+
+
+
+
 {% endblock %}

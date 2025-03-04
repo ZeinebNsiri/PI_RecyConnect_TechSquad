@@ -3,16 +3,19 @@
 namespace App\Form;
 
 use App\Entity\Post;
+use App\Enum\TagType;
 use App\Entity\Utilisateur;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 
 class PostType extends AbstractType
@@ -32,6 +35,14 @@ class PostType extends AbstractType
                 ],
             
         ])
+
+        ->add('tags', HiddenType::class, [
+            'mapped' => true,
+            'attr' => [
+                'class' => 'tags-input'
+            ]
+        ])
+
         ->add('media', FileType::class,  [
             'label' => 'Média (images)',
             'multiple' => true,
@@ -52,6 +63,8 @@ class PostType extends AbstractType
             ],
             
         ]);
+
+        
         
     }
 

@@ -4,12 +4,13 @@
 {% block title %}Forum{% endblock %}
 
 {% block stylesheets %}
-   
+   <link href="{{asset('Posts/css/post.css')}}" rel="stylesheet" type="text/css">
     <link href="{{asset('Posts/css/bootstrap.css')}}" rel="stylesheet" type="text/css">
     <link href="{{asset('Posts/css/style.css')}}" rel="stylesheet" type="text/css">
     <!-- <link href="{{asset('Posts/css/animate.css')}}" rel="stylesheet" type="text/css"> -->
     <link href="{{asset('Posts/css/font-awesome.min.css')}}" rel="stylesheet" type="text/css"> 
-    <link href="{{asset('Posts/css/post.css')}}" rel="stylesheet" type="text/css">
+    <link href="{{asset('Posts/css/modal.css')}}" rel="stylesheet" type="text/css">
+    
 
     <style>
         .alert-success {
@@ -94,7 +95,7 @@
                                         <div class="left-user12923 left-user12923-repeat">
                                             
                                             <a href="#"><img src="{{ asset(postData.post.userP.PhotoProfil ? 'uploads/profile_dir/' ~ postData.post.userP.PhotoProfil : 'backOffice/assets/img/profile.jpg') }}" alt="User Profile"></a>
-                                            <a href="#" class="user-name">{{ postData.post.userP.nomUser }}</a>
+                                            <a href="#" class="user-name">{{ postData.post.userP.Prenom }} {{ postData.post.userP.nomUser }}</a>
                                         </div>
                                     </div>
                                     
@@ -106,6 +107,12 @@
                                             </div>
                                             <div class="ques-details10018">
                                                 <p>{{ postData.post.contenu }}</p>
+                                                
+                                            </div>
+                                            <div class="post-tags">
+                                                {% for tag in postData.post.tags %}
+                                                    <span class="badge bg-primary">{{ tag }}</span>
+                                                {% endfor %}
                                             </div>
                                             <!-- Gestion des médias associés au post -->
                                             {% if postData.medias is not empty %}
@@ -152,21 +159,7 @@
                             
                             <nav aria-label="Page navigation">
                                 <ul class="pagination">
-                                  <li>
-                                    <a href="#" aria-label="Previous">
-                                      <span aria-hidden="true">&laquo;</span>
-                                    </a>
-                                  </li>
-                                  <li><a href="#">1</a></li>
-                                  <li><a href="#">2</a></li>
-                                  <li><a href="#">3</a></li>
-                                  <li><a href="#">4</a></li>
-                                  <li><a href="#">5</a></li>
-                                  <li>
-                                    <a href="#" aria-label="Next">
-                                      <span aria-hidden="true">&raquo;</span>
-                                    </a>
-                                  </li>
+                                    {{ knp_pagination_render(postsWithMedia) }}
                                 </ul>
                             </nav>
                         </section>
@@ -182,7 +175,7 @@
                                     <div class="col-md-1">
                                         <div class="left-user12923 left-user12923-repeat">
                                             <a href="#"><img src="{{ asset(postData.post.userP.PhotoProfil ? 'uploads/profile_dir/' ~ postData.post.userP.PhotoProfil : 'backOffice/assets/img/profile.jpg') }}" alt="User Profile"></a>
-                                            <a href="#" class="user-name">{{ postData.post.userP.nomUser }}</a>
+                                            <a href="#" class="user-name">{{ postData.post.userP.Prenom }} {{ postData.post.userP.nomUser }}</a>
                                         </div>
                                     </div>
                                     <div class="col-md-9">
@@ -224,10 +217,24 @@
                             {% else %}
                             <p>Aucun post disponible.</p>
                             {% endfor %}
+
+
+
                         </section>
                 
                     </div>
                 </div>
+                <aside class="col-md-3 sidebar97239">
+                    <div class="categori-part329">
+                        <h4>Tags</h4>
+                        <div class="d-flex flex-wrap gap-2">  
+                            {% for tag in tags %} 
+                                <a href="#" class="badge custom-tag {% if tag in selectedTags %} active-tag {% endif %}" data-tag="{{ tag }}">{{ tag }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </aside>
+
               
             </div>
         </div>
@@ -239,6 +246,8 @@
                 <div id="modal-images"></div>
             </div>
         </div>
+
+         
     </section>
 {% endblock %}
 
@@ -254,21 +263,41 @@
                 const modal = document.getElementById('imageModal');
                 const modalImages = document.getElementById('modal-images');
                 const closeModal = document.querySelector('.close');
+                const prevButton = document.createElement('button');
+                const nextButton = document.createElement('button');
+                prevButton.classList.add('prev');
+                nextButton.classList.add('next');
+                prevButton.innerHTML = '&#10094;'; 
+                nextButton.innerHTML = '&#10095;';
+                modal.appendChild(prevButton);
+                modal.appendChild(nextButton); 
+
+
+                let currentImageIndex = 0;
+                let imagesList = [];
 
                 // Fonction pour afficher toutes les images d'un post dans la modale
                 function openImageModal(postId) {
-                    modal.style.display = 'block';
-                    modalImages.innerHTML = ''; // Vider les images précédentes
+                    modal.style.display = 'flex';
+                    modalImages.innerHTML = ''; 
 
-                    // Récupérer toutes les images du post
+                  
                     const images = document.querySelectorAll(`[data-post-id="${postId}"]`);
                     images.forEach(img => {
-                        const imgElement = document.createElement('img');
-                        imgElement.src = img.src;
-                        imgElement.alt = 'Post Image';
-                        imgElement.classList.add('modal-image');
-                        modalImages.appendChild(imgElement);
+                        imagesList.push(img.src);
                     });
+
+                    displayImage(0);
+                }
+
+                function displayImage(index) {
+                    modalImages.innerHTML = '';
+                    const imgElement = document.createElement('img');
+                    imgElement.src = imagesList[index];
+                    imgElement.alt = 'Post Image';
+                    imgElement.classList.add('modal-image');
+                    modalImages.appendChild(imgElement);
+                    currentImageIndex = index;
                 }
 
                 // Gérer les clics sur les images et le "+X"
@@ -289,6 +318,20 @@
                         modal.style.display = 'none';
                     }
                 });
+
+
+                // Navigation avec les flèches
+                nextButton.addEventListener('click', () => {
+                    const nextIndex = (currentImageIndex + 1) % imagesList.length;
+                    displayImage(nextIndex);
+                });
+
+                prevButton.addEventListener('click', () => {
+                    const prevIndex = (currentImageIndex - 1 + imagesList.length) % imagesList.length;
+                    displayImage(prevIndex);
+                });
+
+                
             });
 
         </script>
@@ -319,6 +362,46 @@
                 });
             });
         });
+        </script>
+
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                let selectedTags = new Set(); // Utilisation d'un Set pour éviter les doublons
+
+                // Récupérer les tags déjà sélectionnés dans l'URL
+                let params = new URLSearchParams(window.location.search);
+                let currentTags = params.get("tags") ? params.get("tags").split(",") : [];
+                
+                currentTags.forEach(tag => selectedTags.add(tag));
+
+                // Ajouter la classe active aux tags déjà sélectionnés
+                document.querySelectorAll(".custom-tag").forEach(tag => {
+                    if (selectedTags.has(tag.getAttribute("data-tag"))) {
+                        tag.classList.add("active-tag");
+                    }
+
+                    tag.addEventListener("click", function (event) {
+                        event.preventDefault(); // Empêcher le rechargement
+
+                        let tagValue = this.getAttribute("data-tag");
+
+                        if (selectedTags.has(tagValue)) {
+                            selectedTags.delete(tagValue); // Retirer le tag
+                            this.classList.remove("active-tag"); // Retirer le style actif
+                        } else {
+                            selectedTags.add(tagValue); // Ajouter le tag
+                            this.classList.add("active-tag"); // Ajouter un style actif
+                        }
+
+                        // Mise à jour de l'URL avec les tags sélectionnés
+                        let queryParams = new URLSearchParams(window.location.search);
+                        queryParams.set("tags", Array.from(selectedTags).join(",")); 
+                        window.location.search = queryParams.toString(); // Recharger avec les filtres
+                    });
+                });
+            });
+
         </script>
 
     {% endblock %}

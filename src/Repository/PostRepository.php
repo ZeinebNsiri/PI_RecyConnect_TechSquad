@@ -40,4 +40,15 @@ class PostRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+
+        public function findTopLikedPosts(int $limit = 5): array
+        {
+            return $this->createQueryBuilder('p')
+                ->select('p.id, p.contenu, p.nbrJaime')
+                ->orderBy('p.nbrJaime', 'DESC')
+                ->setMaxResults($limit)
+                ->getQuery()
+                ->getResult();
+        }
+
 }
