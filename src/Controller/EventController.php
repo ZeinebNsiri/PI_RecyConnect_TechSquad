@@ -8,42 +8,48 @@ use App\Repository\EvenementRepository;
 use App\Repository\ReservationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use function strtolower;
-use function uniqid;
-use function file_exists;
-use function mkdir;
-use function unlink;
 
 class EventController extends AbstractController
 {
     #[Route('/events', name: 'events_list')]
     public function index(Request $request, EvenementRepository $evenementRepository): Response
     {
+        $name = $request->query->get('name');
         $location = $request->query->get('location');
         $date = $request->query->get('date');
-
-        $events = $evenementRepository->searchEvents($location, $date);
-
-        $onlineEvents = [];
-        $onsiteEvents = [];
-
-        foreach ($events as $event) {
-            if (strtolower($event->getLieuEvent()) === 'en ligne') {
-                $onlineEvents[] = $event;
-            } else {
-                $onsiteEvents[] = $event;
-            }
-        }
-
+        $type = $request->query->get('type'); // Ensure this is passed
+    
+        $events = $evenementRepository->searchEvents($name, $location, $date, $type);
+    
         return $this->render('event/index.html.twig', [
-            'onlineEvents' => $onlineEvents,
-            'onsiteEvents' => $onsiteEvents,
+            'events' => $events,
+            'name' => $name,
             'location' => $location,
             'date' => $date,
+            'type' => $type, // Pass the type to the template
         ]);
+    
+    }
+
+    #[Route('/events/search', name: 'event_search')]
+    public function search(Request $request, EvenementRepository $evenementRepository): JsonResponse
+    {
+        $name = $request->query->get('name');
+        $events = $evenementRepository->findByName($name);
+
+        $results = [];
+        foreach ($events as $event) {
+            $results[] = [
+                'id' => $event->getId(),
+                'name' => $event->getNomEvent(),
+            ];
+        }
+
+        return new JsonResponse($results);
     }
 
     #[Route('/event/{id}', name: 'event_show')]
@@ -58,9 +64,8 @@ class EventController extends AbstractController
         $user = $this->getUser();
         $meetingLink = null;
         $isEventActive = false;
-        $isUserRegistered = false; // Initialize the variable
+        $isUserRegistered = false;
 
-        // Check if the user is registered for this event
         if ($user) {
             $reservation = $reservationRepository->findOneBy([
                 'event' => $evenement,
@@ -68,10 +73,9 @@ class EventController extends AbstractController
             ]);
 
             if ($reservation) {
-                $isUserRegistered = true; // Set to true if the user is registered
+                $isUserRegistered = true;
                 $meetingLink = $reservation->getMeetingLink();
 
-                // Check if the event is currently active
                 $now = new \DateTime();
                 $eventDate = $evenement->getDateEvent();
                 $eventStart = new \DateTime($eventDate->format('Y-m-d') . ' ' . $evenement->getHeureEvent()->format('H:i:s'));
@@ -81,15 +85,11 @@ class EventController extends AbstractController
             }
         }
 
-        // Debugging: Dump the variables to check their values
-        dump($isUserRegistered); // Check if this shows up in the Symfony profiler
-
-        // Render the template with all the variables
         return $this->render('event/detail.html.twig', [
             'evenement' => $evenement,
             'meetingLink' => $meetingLink,
             'isEventActive' => $isEventActive,
-            'isUserRegistered' => $isUserRegistered, // Pass the variable to the template
+            'isUserRegistered' => $isUserRegistered,
             'mapCoordinates' => $evenement->getMapCoordinates(),
         ]);
     }
@@ -134,16 +134,14 @@ class EventController extends AbstractController
                 $event->setImageEvent('uploads/images/default.png');
             }
 
-            // Generate a unique Jitsi Meet link for online events
             if (strtolower($event->getLieuEvent()) === 'en ligne') {
                 $event->setGoogleMeetLink('https://meet.jit.si/' . uniqid());
             }
 
-            // Set the end time
-            $eventDate = $event->getDateEvent(); // DateTime object
-            $eventTime = $event->getHeureEvent(); // DateTime or string
+            $eventDate = $event->getDateEvent();
+            $eventTime = $event->getHeureEvent();
             $startTime = new \DateTime($eventDate->format('Y-m-d') . ' ' . $eventTime);
-            $endTime = (clone $startTime)->modify('+2 hours'); // Adjust as needed
+            $endTime = (clone $startTime)->modify('+2 hours');
             $event->setEndTime($endTime);
 
             $event->setNbRestant($event->getCapacite());
@@ -166,7 +164,7 @@ class EventController extends AbstractController
         $oldImage = $event->getImageEvent();
 
         $form = $this->createForm(EventType::class, $event, [
-            'is_edit' => true, // Pass a flag to indicate edit mode
+            'is_edit' => true,
         ]);
         $form->handleRequest($request);
 
@@ -183,11 +181,9 @@ class EventController extends AbstractController
                     unlink($uploadDir . '/' . $oldImage);
                 }
             } else {
-                // Keep the old image if no new image is uploaded
                 $event->setImageEvent($oldImage);
             }
 
-            // Regenerate Jitsi Meet link if the event is online
             if (strtolower($event->getLieuEvent()) === 'en ligne' && !$event->getGoogleMeetLink()) {
                 $event->setGoogleMeetLink('https://meet.jit.si/' . uniqid());
             }

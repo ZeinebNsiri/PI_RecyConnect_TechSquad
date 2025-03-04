@@ -13,68 +13,91 @@ class EvenementRepository extends ServiceEntityRepository
         parent::__construct($registry, Evenement::class);
     }
 
+    /**
+     * Search events for the admin panel with optional filters.
+     *
+     * @param string|null $searchTerm
+     * @param string|null $location
+     * @param string|null $date
+     * @return Evenement[]
+     */
     public function searchEventsAdmin(?string $searchTerm, ?string $location, ?string $date): array
+    {
+        $qb = $this->createQueryBuilder('e');
+
+        if (!empty($searchTerm)) {
+            $qb->andWhere('LOWER(e.nomEvent) LIKE LOWER(:search)')
+               ->setParameter('search', '%' . strtolower($searchTerm) . '%');
+        }
+
+        if (!empty($location)) {
+            $qb->andWhere('LOWER(e.lieuEvent) LIKE LOWER(:location)')
+               ->setParameter('location', '%' . strtolower($location) . '%');
+        }
+
+        if (!empty($date)) {
+            $qb->andWhere('e.dateEvent = :date')
+               ->setParameter('date', new \DateTime($date));
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Search events with optional filters.
+     *
+     * @param string|null $name
+     * @param string|null $location
+     * @param string|null $date
+     * @param string|null $type
+     * @return Evenement[]
+     */
+    public function searchEvents(?string $name, ?string $location, ?string $date, ?string $type): array
 {
     $qb = $this->createQueryBuilder('e');
 
-    if (!empty($searchTerm)) {
-        $qb->andWhere('LOWER(e.nomEvent) LIKE LOWER(:search)')
-           ->setParameter('search', '%' . strtolower($searchTerm) . '%');
+    if ($name) {
+        $qb->andWhere('e.nomEvent LIKE :name')
+           ->setParameter('name', '%' . $name . '%');
     }
 
-    if (!empty($location)) {
-        $qb->andWhere('LOWER(e.lieuEvent) LIKE LOWER(:location)')
-           ->setParameter('location', '%' . strtolower($location) . '%');
+    if ($location) {
+        $qb->andWhere('e.lieuEvent LIKE :location')
+           ->setParameter('location', '%' . $location . '%');
     }
 
-    if (!empty($date) && $date !== null) {
+    if ($date) {
         $qb->andWhere('e.dateEvent = :date')
-           ->setParameter('date', new \DateTime($date));
+           ->setParameter('date', $date);
+    }
+
+    if ($type) {
+        if ($type === 'en ligne') {
+            $qb->andWhere('e.lieuEvent = :type')
+               ->setParameter('type', 'en ligne');
+        } elseif ($type === 'sur site') {
+            $qb->andWhere('e.lieuEvent != :type')
+               ->setParameter('type', 'en ligne');
+        }
     }
 
     return $qb->getQuery()->getResult();
 }
-public function searchEvents(?string $location, ?string $date): array
-{
-    $qb = $this->createQueryBuilder('e');
 
-    if (!empty($location)) {
-        $qb->andWhere('LOWER(e.lieuEvent) LIKE LOWER(:location)')
-           ->setParameter('location', '%' . strtolower($location) . '%');
+  
+
+    /**
+     * Find events by name.
+     *
+     * @param string $name
+     * @return Evenement[]
+     */
+    public function findByName(string $name): array
+    {
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.nomEvent LIKE :name')
+            ->setParameter('name', '%' . $name . '%')
+            ->getQuery()
+            ->getResult();
     }
-
-    if (!empty($date)) {
-        $qb->andWhere('e.dateEvent = :date')
-           ->setParameter('date', new \DateTime($date));
-    }
-
-    // Order by dateEvent in ascending order (closest dates first)
-    $qb->orderBy('e.dateEvent', 'ASC');
-
-    return $qb->getQuery()->getResult();
-}   
-//    /**
-//     * @return Evenement[] Returns an array of Evenement objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('e')
-//            ->andWhere('e.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('e.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Evenement
-//    {
-//        return $this->createQueryBuilder('e')
-//            ->andWhere('e.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }
