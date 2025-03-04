@@ -1,0 +1,125 @@
+{% extends 'base2.html.twig' %}
+
+{% block title %}Statistiques des Utilisateurs{% endblock %}
+
+{% block body %}
+<style>
+    .chart-container {
+        width: 100%;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .chart-wrapper {
+        display: flex;
+        justify-content: center;
+        gap: 50px;
+        flex-wrap: wrap;
+    }
+
+    .chart-title {
+        text-align: center;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .card {
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    canvas {
+        width: 100% !important;
+        height: 400px !important;
+    }
+</style>
+
+<main id="main" class="main">
+    <div class="pagetitle">
+        <h4>Statistiques des Utilisateurs</h4>
+    </div>
+
+    <div class="row">
+        <!-- Graphique des rôles -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="chart-title">Répartition des Rôles</h5>
+                    <div class="chart-container">
+                        <canvas id="rolesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Graphique des statuts -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="chart-title">Statut des Comptes</h5>
+                    <div class="chart-container">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch("{{ path('app_statistiques_data') }}") 
+            .then(response => response.json())
+            .then(data => {
+                let rolesCtx = document.getElementById('rolesChart').getContext('2d');
+                let statusCtx = document.getElementById('statusChart').getContext('2d');
+
+                // 🎯 Graphique des Rôles (Professionnels vs Particuliers)
+                new Chart(rolesCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ["Professionnels", "Particuliers"],
+                        datasets: [{
+                            data: [data.roles.Professionnels, data.roles.Particuliers],
+                            backgroundColor: ['rgba(54, 162, 235, 0.8)', 'rgba(255, 206, 86, 0.8)'], // Bleu, Jaune
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        cutout: '60%',
+                        plugins: {
+                            legend: { position: 'top' }
+                        }
+                    }
+                });
+
+                // 🎯 Graphique des Statuts (Dégradé de vert)
+                new Chart(statusCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ["Activés", "Désactivés"],
+                        datasets: [{
+                            data: [data.status.Activés, data.status.Désactivés],
+                            backgroundColor: [
+                                'rgba(40, 167, 69, 0.8)', // Vert foncé (Activés)
+                                'rgba(144, 238, 144, 0.8)' // Vert clair (Désactivés)
+                            ],
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        cutout: '60%',
+                        plugins: {
+                            legend: { position: 'top' }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error("Erreur lors du chargement des statistiques :", error));
+    });
+</script>
+{% endblock %}

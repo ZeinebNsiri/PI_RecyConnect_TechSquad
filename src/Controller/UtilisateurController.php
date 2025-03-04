@@ -11,6 +11,7 @@ use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,32 +20,46 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 final class UtilisateurController extends AbstractController
 {
     #[Route('/Liste/utilisateurs/{type?}', name: 'app_Listeutilisateur')]
-    public function Listeutilisateur(?string $type,UtilisateurRepository $repository,PaginatorInterface $paginator,Request $request
-    ): Response
-    {   
-        
-        if ($type == 'particuliers') {
-            $users = $repository->findByRole('ROLE_USER');
-        } elseif ($type == 'professionnels') {
-            $users = $repository->findByRole('ROLE_PROFESSIONNEL');
-        }elseif ($type == 'true') {
-            $users = $repository->findBystatus(true);
-        }elseif ($type == 'false') {
-            $users = $repository->findBystatus(false);
-        }  else {
-            $users = $repository->findusers();
-        }
-        
-        $pagination = $paginator->paginate(
-            $users, // Données à paginer
-            $request->query->getInt('page', 1), // Numéro de page
-            5 // Nombre de posts par page
-        );
+        public function Listeutilisateur(?string $type, UtilisateurRepository $repository, PaginatorInterface $paginator, Request $request): Response
+        {   
+            // Récupérer les critères de recherche depuis la requête
+            $email = $request->query->get('email');
+            
+            $numTel = $request->query->get('numTel');
+            
+            $role = $request->query->get('role');
 
-        return $this->render('utilisateur/index.html.twig', [
-            'users' => $pagination,
-        ]);
-    }
+            // Vérifier si une recherche est en cours
+            if ($email || $numTel ||  $role  !== null) {
+                // Recherche avancée avec plusieurs critères
+                $users = $repository->searchUsers($email, $numTel,  $role);
+            } else {
+                // Sinon, appliquer le filtre existant basé sur {type}
+                if ($type == 'particuliers') {
+                    $users = $repository->findByRole('ROLE_USER');
+                } elseif ($type == 'professionnels') {
+                    $users = $repository->findByRole('ROLE_PROFESSIONNEL');
+                } elseif ($type == 'true') {
+                    $users = $repository->findBystatus(true);
+                } elseif ($type == 'false') {
+                    $users = $repository->findBystatus(false);
+                } else {
+                    $users = $repository->findusers();
+                }
+            }
+
+            // Pagination
+            $pagination = $paginator->paginate(
+                $users,
+                $request->query->getInt('page', 1),
+                5
+            );
+
+            return $this->render('utilisateur/index.html.twig', [
+                'users' => $pagination,
+            ]);
+        }
+
     #[Route('/activer/user/{id}', name: 'app_Activer')]
     public function activer($id,UtilisateurRepository $repository,ManagerRegistry $manager): Response
     {   
@@ -235,6 +250,59 @@ final class UtilisateurController extends AbstractController
             'user'=>$user
         ]);
     }
+    #[Route('/statistiques', name: 'app_statistiques_utlisateurs')]
+    public function index(): Response
+    {
+        return $this->render('utilisateur/satistiquesUser.html.twig');
+    }
+
+    #[Route('/statistiques/data', name: 'app_statistiques_data')]
+    public function getStats(UtilisateurRepository $repository): JsonResponse
+    {
+        // Récupérer tous les utilisateurs avec ROLE_USER ou ROLE_PROFESSIONNEL
+        $users = $repository->findAll();
+
+        // Initialisation des compteurs
+        $rolesCounts = [
+            'Professionnels' => 0,
+            'Particuliers' => 0
+        ];
+        $statusCounts = [
+            'Activés' => 0,
+            'Désactivés' => 0
+        ];
+
+        // Parcourir les utilisateurs pour compter les rôles et les statuts
+        foreach ($users as $user) {
+            $roles = $user->getRoles(); // Tableau de rôles JSON
+
+            if (in_array('ROLE_PROFESSIONNEL', $roles)) {
+                $rolesCounts['Professionnels']++;
+
+                // Vérifier le statut uniquement pour ROLE_PROFESSIONNEL
+                if ($user->isStatus()) {
+                    $statusCounts['Activés']++;
+                } else {
+                    $statusCounts['Désactivés']++;
+                }
+            } elseif (in_array('ROLE_USER', $roles)) {
+                $rolesCounts['Particuliers']++;
+
+                // Vérifier le statut uniquement pour ROLE_USER
+                if ($user->isStatus()) {
+                    $statusCounts['Activés']++;
+                } else {
+                    $statusCounts['Désactivés']++;
+                }
+            }
+        }
+
+        return new JsonResponse([
+            'roles' => $rolesCounts,
+            'status' => $statusCounts
+        ]);
+    }
 }
+
 
 

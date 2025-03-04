@@ -81,5 +81,50 @@ class UtilisateurRepository extends ServiceEntityRepository implements PasswordU
                 ->getQuery()
                 ->getResult();
         }
+        public function searchUsers(?string $email, ?string $numTel, ?string $role): array
+        {
+            $qb = $this->createQueryBuilder('u');
+
+            if ($email) {
+                $qb->andWhere('u.email LIKE :email')
+                ->setParameter('email', "%$email%");
+            }
+
+            
+
+            if ($numTel) {
+                $qb->andWhere('u.numTel LIKE :numTel')
+                ->setParameter('numTel', "%$numTel%");
+            }
+
+           
+
+            if ($role) {
+                $qb->andWhere('u.roles LIKE :role')
+                   ->setParameter('role', "%$role%");
+            }
+            
+
+           
+
+            return $qb->getQuery()->getResult();
+        }
+        public function countByRole(): array
+        {
+            return $this->createQueryBuilder('u')
+                ->select('COUNT(u.id) as count, u.roles')
+                ->groupBy('u.roles')
+                ->getQuery()
+                ->getResult();
+        }
+
+        public function countByStatus(): array
+        {
+            return $this->createQueryBuilder('u')
+                ->select('COUNT(u.id) as count, u.status')
+                ->groupBy('u.status')
+                ->getQuery()
+                ->getResult();
+        }
 
 }

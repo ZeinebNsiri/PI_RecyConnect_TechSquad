@@ -49,6 +49,11 @@
     input:checked + .slider:before {
     transform: translateX(24px);
     }
+    select option:hover {
+    background-color: #205719 !important;
+    color: white !important;
+    }
+
     </style>
 <main id="main" class="main">
 <section class="section dashboard">
@@ -68,19 +73,51 @@
                 <div class="card top-selling overflow-auto">
 
                     <div class="card-body pb-0">
-                        <h5 class="card-title">Liste des utilisateurs</h5>
-                        <div class="col-md-2">
-                  
-                <select id="inputState" class="form-select" onchange="filterUsers(this.value)">
-                    <option value="all">Tous les utilisateurs</option>
-                    <option value="particuliers">Les particuliers</option>
-                    <option value="professionnels">Les professionnels</option>
-                    <option value="true">Les comptes activé</option>
-                    <option value="false">Les comptes désactivé</option>
-                </select>
+                    <a href="{{ path('app_statistiques_utlisateurs') }}" class="btn btn-success">Statistiques des Catégories</a>
+                        <div class="row align-items-center d-flex justify-content-between mb-3">
+                            <div class="col-auto">
+                                <h5 class="card-title mb-0">Liste des utilisateurs</h5>
+                            </div>
 
-
-                </div>
+                            <div class="col-auto">
+                                <select id="inputState" class="form-select" onchange="filterUsers(this.value)">
+                                    <option value="all">Tous les utilisateurs</option>
+                                    <option value="particuliers">Les particuliers</option>
+                                    <option value="professionnels">Les professionnels</option>
+                                    <option value="true">Les comptes activé</option>
+                                    <option value="false">Les comptes désactivé</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <form id="searchForm">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" name="email" placeholder="Email">
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" name="numTel" placeholder="Numéro de téléphone">
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-control" name="role">
+                                    <option value="">Tous les rôles</option>
+                                    <option value="ROLE_USER">Particulier</option>
+                                    <option value="ROLE_PROFESSIONNEL">Professionnel</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <button type="button" class="btn btn-success" onclick="searchUsers()">Rechercher</button>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-2">
+                            
+                            
+                        </div>
+                    </form>
+                
 
                         <table class="table table-borderless" id="userTable">
                             <thead>
@@ -89,6 +126,7 @@
                                     <th scope="col">Nom utilisateur</th>
                                     <th scope="col">Prénom_utilisateur</th>
                                     <th scope="col">Email</th>
+                                    <th scope="col">Téléphone</th>
                                     <th scope="col">Role</th>
                                     <th scope="col">Matricule_fiscale</th>
                                     <th scope="col">Etat</th>
@@ -105,6 +143,7 @@
                                         <td>{{user.nomUser}}</td>
                                         <td>{{user.prenom}}</td>
                                         <td>{{user.email}}</td>
+                                        <td>{{user.numTel}}</td>
                                         {% if 'ROLE_PROFESSIONNEL' in user.roles %}
                                         <td>Professionnel</td>
                                         {% endif %}
@@ -199,7 +238,30 @@
 </script>
 
 
+<script>
+    function searchUsers() {
+    let form = document.getElementById('searchForm');
+    let formData = new FormData(form);
+    let query = new URLSearchParams(formData).toString();
 
+    
+
+    fetch('/Liste/utilisateurs?' + query, {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.text())
+    .then(data => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(data, 'text/html');
+        document.querySelector('#userTable tbody').innerHTML = doc.querySelector('#userTable tbody').innerHTML;
+    })
+    .catch(error => console.error('Erreur lors du filtrage :', error));
+}
+
+</script>
 
     
 {% endblock %}
