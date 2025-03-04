@@ -1,0 +1,85 @@
+{% extends 'basecnx.html.twig' %}
+
+{% block title %}Détails de la Réservation{% endblock %}
+
+{% block body %}
+    <!-- Page Header Start -->
+    <div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s">
+        <div class="container text-center py-5">
+            <h1 class="display-3 text-white mb-4 animated slideInDown">Détails de la Réservation</h1>
+            <nav aria-label="breadcrumb animated slideInDown">
+                <ol class="breadcrumb justify-content-center mb-0">
+                    <li class="breadcrumb-item"><a href="{{ path('events_list') }}" class="text-white">Accueil</a></li>
+                    <li class="breadcrumb-item"><a href="{{ path('reservations_list') }}" class="text-white">Mes Réservations</a></li>
+                    <li class="breadcrumb-item text-white active" aria-current="page">Détails</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    <!-- Page Header End -->
+
+    <!-- Reservation Details Section Start -->
+    <div class="container-xxl py-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="card border-0 shadow-lg wow fadeInUp" data-wow-delay="0.1s">
+                        <div class="card-body p-4">
+                            <!-- Reservation Title -->
+                            <h2 class="card-title fw-bold mb-4">
+                                <i class="fas fa-calendar-alt me-2"></i>{{ reservation.getEventId.nomEvent }}
+                            </h2>
+
+                            <!-- Reservation Details -->
+                            <div class="reservation-details mb-4">
+                                <p class="card-text">
+                                    <i class="fas fa-user me-2"></i><strong>Nom:</strong> {{ reservation.getUserId.nomUser }} {{ reservation.getUserId.prenom }}
+                                </p>
+                                <p class="card-text">
+                                    <i class="fas fa-envelope me-2"></i><strong>Email:</strong> {{ reservation.getUserId.email }}
+                                </p>
+                                <p class="card-text">
+                                    <i class="fas fa-ticket-alt me-2"></i><strong>Places réservées:</strong> <span class="badge bg-primary">{{ reservation.getNbPlaces() }} place(s)</span>
+                                </p>
+                                <p class="card-text">
+                                    <i class="fas fa-info-circle me-2"></i><strong>Statut:</strong> <span class="badge bg-{{ reservation.status == 'active' ? 'success' : (reservation.status == 'canceled' ? 'danger' : 'secondary') }}">
+                                        {{ reservation.status }}
+                                    </span>
+                                </p>
+                                <p class="card-text">
+                                    <i class="fas fa-clock me-2"></i><strong>Date de l'événement:</strong> {{ reservation.getEventId.dateEvent|date('d/m/Y') }} à {{ reservation.getEventId.heureEvent|date('H:i') }}
+                                </p>
+                                <p class="card-text">
+                                    <i class="fas fa-map-marker-alt me-2"></i><strong>Lieu:</strong> {{ reservation.getEventId.lieuEvent }}
+                                </p>
+                            </div>
+
+                            <!-- Event Description -->
+                            <div class="event-description mb-4">
+                                <h5 class="fw-bold mb-3">Description de l'événement</h5>
+                                <p class="card-text">{{ reservation.getEventId.descriptionEvent }}</p>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="d-flex justify-content-end">
+                                {% if reservation.getEventId.dateEvent < date() %}
+                                    <span class="text-muted">Cet événement est passé.</span>
+                                {% elseif reservation.status == 'canceled' %}
+                                    <span class="text-muted">Cette réservation est annulée.</span>
+                                {% else %}
+                                    <a href="{{ path('reservation_edit', {'id': reservation.id}) }}" class="btn btn-outline-primary btn-sm me-2">
+                                        <i class="fas fa-edit"></i> Modifier
+                                    </a>
+                                    <a href="{{ path('reservation_cancel_confirm', {'id': reservation.id}) }}" class="btn btn-outline-danger btn-sm">
+                                        <i class="fas fa-times"></i> Annuler
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Reservation Details Section End -->
+{% endblock %}

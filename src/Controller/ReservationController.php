@@ -111,7 +111,17 @@ public function listReservations(Request $request, EntityManagerInterface $entit
         'status' => $status,
     ]);
 }
+#[Route('/reservation/{id}', name: 'reservation_show', methods: ['GET'])]
+public function show(Reservation $reservation): Response
+{
+    $now = new \DateTime();
 
+    // Fetch the reservation details
+    return $this->render('reservation/show.html.twig', [
+        'reservation' => $reservation,
+        'now' => $now,
+    ]);
+}
     #[Route('/reservation/edit/{id}', name: 'reservation_edit', methods: ['GET', 'POST'])]
     public function editReservation(Request $request, int $id, EntityManagerInterface $entityManager): Response
     {
@@ -182,6 +192,7 @@ public function listReservations(Request $request, EntityManagerInterface $entit
         $this->addFlash('success', 'La réservation a été annulée avec succès.');
         return $this->redirectToRoute('reservations_list');
     }
+    
 
     #[Route('/admin/reservation/{id}', name: 'admin_reservation_show', methods: ['GET'])]
     public function adminShowReservation(int $id, EntityManagerInterface $entityManager): Response

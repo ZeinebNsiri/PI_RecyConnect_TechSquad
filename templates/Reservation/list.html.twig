@@ -9,50 +9,56 @@
             <h1 class="display-3 text-white mb-4 animated slideInDown">Mes réservations</h1>
             <nav aria-label="breadcrumb animated slideInDown">
                 <ol class="breadcrumb justify-content-center mb-0">
-                    <li class="breadcrumb-item"><a href="{{ path('events_list') }}">Accueil</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Réservation</li>
+                    <li class="breadcrumb-item"><a href="{{ path('events_list') }}" class="text-white">Accueil</a></li>
+                    <li class="breadcrumb-item text-white active" aria-current="page">Réservation</li>
                 </ol>
             </nav>
         </div>
     </div>
     <!-- Page Header End -->
 
-    <section id="reservations" class="reservations section">
-        <div class="container" data-aos="fade-up">
-
+    <!-- Reservations Section Start -->
+    <div class="container-xxl py-5">
+        <div class="container">
             <!-- Search Form -->
-            <form action="{{ path('reservations_list') }}" method="get" class="mb-4">
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <input type="text" name="eventName" class="form-control" placeholder="Nom de l'événement" value="{{ eventName }}">
+            <div class="bg-light rounded p-4 p-sm-5 wow fadeInUp" data-wow-delay="0.1s">
+                <h2 class="mb-4">Rechercher une Réservation</h2>
+                <form action="{{ path('reservations_list') }}" method="get" class="row g-3">
+                    <div class="col-md-6">
+                        <input type="text" name="eventName" class="form-control form-control-lg" placeholder="Nom de l'événement" value="{{ eventName }}">
                     </div>
                     <div class="col-md-4">
-                        <select name="status" class="form-select">
+                        <select name="status" class="form-select form-select-lg">
                             <option value="">Tous les statuts</option>
                             <option value="active" {{ status == 'active' ? 'selected' : '' }}>Active</option>
                             <option value="canceled" {{ status == 'canceled' ? 'selected' : '' }}>Annulée</option>
                             <option value="upcoming" {{ status == 'upcoming' ? 'selected' : '' }}>À venir</option>
                         </select>
                     </div>
-                    <div class="col-md-4">
-                        <button type="submit" class="btn btn-primary w-100">Rechercher</button>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary btn-lg w-100">Rechercher</button>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
 
             <!-- Reservations List -->
-            <div id="reservations-list">
+            <div class="mt-5">
                 {% if reservations is empty %}
                     <p class="text-center text-muted">Aucune réservation trouvée.</p>
                 {% else %}
-                    <div class="row">
+                    <div class="row g-4">
                         {% for reservation in reservations %}
-                            <div class="col-md-6 mb-4">
-                                <div class="card reservation-card shadow-lg hover-effect">
-                                    <div class="card-body">
-                                        <h5 class="card-title mb-3">
-                                            <i class="fas fa-calendar-alt me-2"></i>{{ reservation.getEventId.nomEvent }}
+                            <div class="col-lg-6 col-md-12 wow fadeInUp" data-wow-delay="0.1s">
+                                <div class="card border-0 shadow-lg h-100 hover-effect">
+                                    <div class="card-body p-4">
+                                        <!-- Clickable Event Name -->
+                                        <h5 class="card-title fw-bold mb-3">
+                                            <a href="{{ path('reservation_show', {'id': reservation.id}) }}" class="text-decoration-none text-dark">
+                                                <i class="fas fa-calendar-alt me-2"></i>{{ reservation.getEventId.nomEvent }}
+                                            </a>
                                         </h5>
+
+                                        <!-- Event Details -->
                                         <p class="card-text text-muted">
                                             <i class="fas fa-clock me-2"></i><strong>Date:</strong> {{ reservation.getEventId.dateEvent|date('d/m/Y') }} à {{ reservation.getEventId.heureEvent|date('H:i') }}<br>
                                             <i class="fas fa-map-marker-alt me-2"></i><strong>Lieu:</strong> {{ reservation.getEventId.lieuEvent }}
@@ -93,5 +99,6 @@
                 {% endif %}
             </div>
         </div>
-    </section>
+    </div>
+    <!-- Reservations Section End -->
 {% endblock %}
