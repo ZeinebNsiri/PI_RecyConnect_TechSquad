@@ -45,12 +45,10 @@ final class PostsController extends AbstractController
     
         // Appliquer un filtre si des tags sont sélectionnés
         if (!empty($selectedTagsArray)) {
-            $orX = $queryBuilder->expr()->orX();
             foreach ($selectedTagsArray as $key => $tag) {
-                $orX->add($queryBuilder->expr()->like('p.tags', ":tag$key"));
-                $queryBuilder->setParameter("tag$key", '%"'.$tag.'"%'); // Recherche du tag dans le JSON
+                $queryBuilder->andWhere($queryBuilder->expr()->like('p.tags', ":tag$key"));
+                $queryBuilder->setParameter("tag$key", '%"'.$tag.'"%');
             }
-            $queryBuilder->andWhere($orX);
         }
     
         $posts = $queryBuilder->getQuery()->getResult();

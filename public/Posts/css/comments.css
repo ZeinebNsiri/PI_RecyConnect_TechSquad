@@ -1,9 +1,10 @@
 /* Conteneur principal des commentaires */
 .comment-list12993 {
-    background-color: #f8f9fa;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 13px -3px;
+    margin-top: 20px;
 }
 
 /* Liste des commentaires */
@@ -16,15 +17,16 @@
 /* Élément de la liste de commentaires */
 .comments-list li {
     margin-bottom: 20px;
-    padding: 15px;
-    background: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease-in-out;
+    padding: 20px;
+    background: #f9fafb;
+    border-radius: 8px;
+    border: 1px solid #eaecef;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
 .comments-list li:hover {
-    transform: scale(1.02);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* Conteneur principal du commentaire */
@@ -46,10 +48,10 @@
 /* Conteneur du texte */
 .comment-box {
     flex: 1;
-    background: #fff;
+    background: #ffffff;
     border-radius: 8px;
     padding: 15px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    border: 1px solid #eaecef;
 }
 
 /* En-tête du commentaire */
@@ -62,8 +64,8 @@
 
 .comment-name {
     font-size: 16px;
-    font-weight: bold;
-    color: #333;
+    font-weight: 600;
+    color: #2d3748;
 }
 
 .comment-name a {
@@ -79,14 +81,14 @@
 /* Date du commentaire */
 .comment-head span {
     font-size: 13px;
-    color: #777;
+    color: #718096;
 }
 
 /* Contenu du commentaire */
 .comment-content {
     font-size: 14px;
-    color: #555;
-    line-height: 1.5;
+    color: #4a5568;
+    line-height: 1.6;
 }
 
 /* Bouton pour ajouter un commentaire */
@@ -95,29 +97,145 @@
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
     transition: background 0.3s ease-in-out;
 }
 
 .btn-primary:hover {
-    background-color: #83ad88;
+    background-color: #5596b3;
 }
 
 /* Réponses aux commentaires */
 .comment-reply {
     margin-left: 50px;
-    border-left: 3px solid #67a9c5;
+    border-left: 3px solid #eaecef;
     padding-left: 15px;
     margin-top: 15px;
 }
 
-
 /* Icône de suppression */
 .comment-delete {
-    color: red;
+    color: #e53e3e;
     cursor: pointer;
     transition: color 0.3s;
 }
 
 .comment-delete:hover {
-    color: darkred;
+    color: #c53030;
+}
+
+/* Conteneur principal du post */
+.post-detail-container {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 13px -3px;
+    margin-bottom: 20px;
+}
+
+/* En-tête du post */
+.post-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+/* Avatar de l'auteur du post */
+.post-avatar img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid #67a9c5;
+    object-fit: cover;
+}
+
+/* Informations sur l'auteur */
+.post-info {
+    flex: 1;
+}
+
+.post-author {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.post-date {
+    font-size: 14px;
+    color: #718096;
+}
+
+/* Contenu du post */
+.post-content {
+    font-size: 16px;
+    color: #4a5568;
+    line-height: 1.6;
+    background: #f9fafb;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #eaecef;
+}
+
+/* Tags */
+.post-tags {
+    margin-top: 15px;
+}
+
+.post-tags .badge {
+    background-color: #67a9c5;
+    color: #ffffff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    margin-right: 5px;
+}
+
+/* Modal */
+.modal-content {
+    border-radius: 8px;
+    border: 1px solid #eaecef;
+}
+
+.modal-header {
+    border-bottom: 1px solid #eaecef;
+    padding: 15px 20px;
+}
+
+.modal-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-footer {
+    border-top: 1px solid #eaecef;
+    padding: 15px 20px;
+}
+
+/* Formulaires */
+.form-control {
+    border-radius: 6px;
+    border: 1px solid #eaecef;
+    padding: 10px;
+    font-size: 14px;
+    color: #4a5568;
+}
+
+.form-control:focus {
+    border-color: #67a9c5;
+    box-shadow: 0 0 0 3px rgba(103, 169, 197, 0.1);
+}
+
+.form-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 5px;
 }
