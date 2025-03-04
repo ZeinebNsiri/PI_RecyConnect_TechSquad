@@ -53,6 +53,35 @@
     background-color: #205719 !important;
     color: white !important;
     }
+                .pagination .page-link {
+        color: #138A4B !important;  /* Texte vert */
+        background-color: white !important; /* Fond blanc */
+        border-color: #138A4B !important; /* Bordure verte */
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #0F6B3D !important; /* Fond vert foncé */
+        color: white !important; /* Texte blanc */
+        border-color: #0F6B3D !important;
+    }
+
+    .pagination .page-link:hover {
+        background-color: #A5D6A7 !important; /* Vert clair au survol */
+        color: #0F6B3D !important; /* Texte vert foncé */
+    }
+
+    .pagination .page-item:first-child .page-link,
+    .pagination .page-item:last-child .page-link {
+        background-color: #138A4B !important; /* Fond vert pour Précédent et Suivant */
+        color: white !important; /* Texte blanc */
+        border-color: #138A4B !important;
+    }
+
+    .pagination .page-item:first-child .page-link:hover,
+    .pagination .page-item:last-child .page-link:hover {
+        background-color: #A5D6A7 !important; /* Vert clair au survol */
+        color: #0F6B3D !important; /* Texte vert foncé */
+    }
 
     </style>
 <main id="main" class="main">

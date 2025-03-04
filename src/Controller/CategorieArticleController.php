@@ -6,6 +6,7 @@ use App\Entity\CategorieArticle;
 use App\Form\CategoriArticleType;
 use App\Repository\ArticleRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\CategorieArticleRepository;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,7 +28,7 @@ final class CategorieArticleController extends AbstractController
 
     #[Route('/categorie/article/add', name: 'app_addCategorieArticle')]
     public function addCategorieArticle(ManagerRegistry $manager, Request $req, CategorieArticleRepository $repository, SluggerInterface $slugger,
-    #[Autowire('%kernel.project_dir%/public/uploads/photo_dir')] string $brochuresDirectory, ArticleRepository $articleRepo,)
+    #[Autowire('%kernel.project_dir%/public/uploads/photo_dir')] string $brochuresDirectory, ArticleRepository $articleRepo, PaginatorInterface $paginator, Request $request)
     {
         $em= $manager->getManager();
 
@@ -74,6 +75,11 @@ final class CategorieArticleController extends AbstractController
             
         }
         $categories= $repository-> findAll();
+        $pagination = $paginator->paginate(
+            $categories, // Données à paginer
+            $request->query->getInt('page', 1), // Numéro de page
+            5 // Nombre de posts par page
+            );
         //calcule des nb articles par categorie
         $articleCounts = [];
 
@@ -93,7 +99,7 @@ final class CategorieArticleController extends AbstractController
         return $this->render('categorie_article/index.html.twig',[
             
             'form'=>$form->createView(),
-            'categories' => $categories,
+            'categories' => $pagination,
             'articleCounts' => $articleCounts,
 
         ]);
@@ -166,4 +172,36 @@ final class CategorieArticleController extends AbstractController
 
       ]);
     }
+
+    #[Route('/statistiques', name: 'app_statistiques')]
+    public function statistiques(ArticleRepository $articleRepository, CategorieArticleRepository $categorieRepository): Response
+    {
+        
+        $categories = $categorieRepository->findAll();
+        $categoryData = [];
+        foreach ($categories as $categorie) {
+            $categoryData[] = [
+                'nom' => $categorie->getNomCategorie(),
+                'count' => $articleRepository->countArticlesInCategory($categorie->getId()),
+            ];
+        }
+    
+        
+        $articles = $articleRepository->findAll();
+        $articleData = [];
+        foreach ($articles as $article) {
+            $articleData[] = [
+                'nom' => $article->getNomArticle(),
+                'quantite' => $article->getQuantiteArticle(),
+            ];
+        }
+    
+        return $this->render('categorie_article/statistiques_categories.html.twig', [
+            'categoryData' => json_encode($categoryData),
+            'articleData' => json_encode($articleData),
+        ]);
+    }
+    
+
+
 }

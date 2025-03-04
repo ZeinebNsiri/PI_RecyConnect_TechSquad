@@ -9,7 +9,12 @@
     .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
 </style>
 
-<!-- About Start -->
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
 <div class="container-xxl py-5">
 
@@ -19,14 +24,25 @@
             <div class="col-lg-3 col-md-5 wow fadeInUp" data-wow-delay="0.1s">
                 <h1 class="display-5 mb-4">{{ article.nomArticle }}</h1>
                 <h4 class=" ">{{ article.categorie }}</h4>
-                <h5 class=" ">{{ article.localisationArticle }}</h5>
+                <h5 class=" ">{{ article.localisationArticle }}
+                
+                <a href="https://www.google.com/maps/search/?api=1&query={{ article.localisationArticle|url_encode }}" 
+                    target="_blank" class="btn btn-sm btn-primary ms-2">
+                    Ouvrir Maps
+                </a>
+                
+                </h5>
                 <img class="img-fluid rounded" data-wow-delay="0.1s" src="{{ asset('uploads/photo_dir/' ~ article.imageArticle ) }}">
             </div>
             <div class="col-lg-6 col-md-7 wow fadeInUp" >
                 <h1 class="display-6 mb-4">Propriétaire: {{ article.utilisateur.nomUser }} {{ article.utilisateur.prenom }}</h1>
                 <h3 class="display-7 mb-4">Description de l'article</h3>
                 <p class="mb-4">{{ article.descriptionArticle }}</p>
+                {% if app.user != article.utilisateur %}
                 <a class="btn btn-primary py-3 px-4" href="{{ path('cart_add', { id: article.id }) }}">Commander</a>
+                {% else %}
+                <a class="btn btn-primary py-3 px-4" href="#">Liste des commandes</a>
+                {% endif %}
             </div>
             <div class="col-lg-3 col-md-12 wow fadeInUp" data-wow-delay="0.5s">
                 <div class="row g-5">
@@ -51,10 +67,63 @@
         </div>
         
     </div>
-   
+    
+   <div id="map" style="height: 400px; width: 100%; margin-top: 20px; "></div>
 </div>
 
-<!-- About End -->
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var map = L.map('map').setView([33.8869, 9.5375], 7); // Centré sur la Tunisie
+
+        // Ajouter la couche OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        var localisationString = "{{ article.localisationArticle|escape('js') }}"; // Récupérer la localisation
+
+        if (localisationString.trim() !== "") {
+            var url = `https://nominatim.openstreetmap.org/search?format=json&countrycodes=TN&q=${encodeURIComponent(localisationString)}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        var lat = parseFloat(data[0].lat);
+                        var lon = parseFloat(data[0].lon);
+                        var latlng = [lat, lon];
+
+                        // Ajouter un marqueur sur la localisation
+                        var marker = L.marker(latlng).addTo(map)
+                            .bindPopup(`<b>${localisationString}</b>`)
+                            .openPopup();
+
+                        // Ajouter un cercle rouge autour de la zone
+                        var circle = L.circle(latlng, {
+                            color: 'red',         
+                            fillColor: '#f03',    
+                            fillOpacity: 0.4,     
+                            radius: 3000          
+                        }).addTo(map);
+
+                        // Zoomer sur la localisation trouvée
+                        map.setView(latlng, 12);
+                    } else {
+                        console.error("Aucune localisation trouvée pour : " + localisationString);
+                        alert("Localisation introuvable en Tunisie : " + localisationString);
+                    }
+                })
+                .catch(error => console.error("Erreur de géocodage :", error));
+        } else {
+            console.error("Localisation vide");
+        }
+    });
+</script>
+
+
+
+
 
 
 

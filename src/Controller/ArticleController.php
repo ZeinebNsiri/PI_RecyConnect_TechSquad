@@ -4,9 +4,12 @@ namespace App\Controller;
 
 use App\Entity\Article;
 use App\Form\ArticleType;
+use App\Service\MailerService;
 use App\Repository\ArticleRepository;
 use App\Repository\UtilisateurRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Repository\LigneCommandeRepository;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\CategorieArticleRepository;
 use Symfony\Component\HttpFoundation\Response;
@@ -199,23 +202,66 @@ final class ArticleController extends AbstractController
         return $this-> redirectToRoute('app_article_mine'); 
     }
 
-    #[Route('/Article/getall/admin', name: 'app_article_admin')]
-    public function getallArticleAdmin(ArticleRepository $repository)
+    #[Route('/Article/getall/admin/{category?}', name: 'app_article_admin')]
+    public function getallArticleAdmin(?string $category, ArticleRepository $repository, CategorieArticleRepository $categorieRepo, PaginatorInterface $paginator, Request $request) 
     {
-        $articles= $repository-> findAll();
+        $categories = $categorieRepo->findAll();
+    
+        // Récupération des critères de recherche
+        $articleNom = $request->query->get('article');
+        $proprietaireNom = $request->query->get('proprietaire');
+    
+        if ($articleNom || $proprietaireNom) {
+            $articles = $repository->searchBymulticritaire($articleNom, $proprietaireNom);
+        } else {
+            if ($category && $category !== 'all') {
+                $articles = $repository->findByCategory2($category);
+            } else {
+                $articles = $repository->findAll();
+            }
+        }
+        $pagination = $paginator->paginate(
+            $articles,
+            $request->query->getInt('page', 1), 
+            5
+        );
+    
         return $this->render('categorie_article/liste_articles_admin.html.twig', [
-            'articles' => $articles,
-        ]);  
-    }
+            'articles' => $pagination,
+            'categories' => $categories,
+        ]);
+    }   
 
     #[Route('article/delete/admin/{id}', name: 'app_deleteArticleAdmin')]
-    public function deleteArticleAdmin (ManagerRegistry $manager, ArticleRepository $repository, $id) {
+    public function deleteArticleAdmin (ManagerRegistry $manager, ArticleRepository $repository, $id, LigneCommandeRepository $ligneCommandeRepository, MailerService $mailer) {
         $em= $manager->getManager();
-       
+        
         $Article = $repository -> find($id);
+
+        $email_ban= $Article -> getUtilisateur() -> getEmail() ;
+        $article_name = $Article->getNomArticle();
+        $article_cat = $Article->getCategorie();
+
+        $ligneCommandes = $ligneCommandeRepository->findBy(['article_c' => $Article]);
+
+            foreach ($ligneCommandes as $ligneCommande) {
+                if ($ligneCommande->getEtatC() === "confirmée") {
+                    $this->addFlash('success', 'Cet article a déjà été commandé, vous ne pouvez pas le supprimer!');
+                    return $this->redirectToRoute('app_article_admin');
+                }
+            }
+
+
         $em -> remove($Article);
 
         $em -> flush();
+        
+        $mailer->sendEmail(
+            $email_ban, 
+            'Notification de bannissement de votre article',
+            $article_name,
+            $article_cat
+            ) ;
         $this->addFlash('success', ' L\'article supprimé avec succès!');
         return $this-> redirectToRoute('app_article_admin'); 
     }
