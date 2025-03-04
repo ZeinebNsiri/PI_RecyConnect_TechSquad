@@ -89,6 +89,26 @@ class ArticleRepository extends ServiceEntityRepository
         ->getSingleScalarResult();
     }
 
+    public function searchBymulticritaire(?string $articleNom, ?string $proprietaireNom): array
+    {
+        $query = $this->createQueryBuilder('a')
+            ->leftJoin('a.utilisateur', 'u')
+            ->addSelect('u');
     
+        if (!empty($articleNom)) {
+            $query->andWhere('a.nom_article LIKE :articleNom') 
+                  ->setParameter('articleNom', '%'.$articleNom.'%');
+        }
+    
+        if (!empty($proprietaireNom)) {
+            $query->andWhere('u.nom_user LIKE :proprietaireNom OR u.prenom LIKE :proprietaireNom') 
+                  ->setParameter('proprietaireNom', '%'.$proprietaireNom.'%');
+        }
+    
+        return $query->getQuery()->getResult();
+    }
+    
+    
+
 
 }

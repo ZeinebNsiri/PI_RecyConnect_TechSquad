@@ -69,6 +69,22 @@
                                     </select>
                                 </div>
                             </div>
+
+                            <!-- Formulaire de recherche -->
+                            <form id="search-form" class="mb-3">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <input type="text" id="article-name" name="article" class="form-control" placeholder="Nom de l'article">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="text" id="proprietaire-name" name="proprietaire" class="form-control" placeholder="Nom du propriétaire">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button type="submit" class="btn btn-success">Rechercher</button>
+                                    </div>
+                                </div>
+                            </form>
+
                             <table class="table table-borderless" id="articlesTable">
                                 <thead>
                                     <tr>
@@ -132,4 +148,35 @@
             .catch(error => console.error('Erreur:', error));
     }
 </script>
+
+<script>
+document.getElementById('search-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    let form = document.getElementById('search-form');
+    let formData = new FormData(form);
+    let query = new URLSearchParams(formData).toString();
+
+    fetch('/Article/getall/admin?' + query, {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erreur serveur');
+        }
+        return response.text();
+    })
+    .then(data => {
+        // Remplace TOUT le contenu de la page avec la nouvelle version
+        document.open();
+        document.write(data);
+        document.close();
+    })
+    .catch(error => console.error('Erreur AJAX :', error));
+});
+</script>
+
 {% endblock %}

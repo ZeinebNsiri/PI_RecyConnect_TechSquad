@@ -203,28 +203,34 @@ final class ArticleController extends AbstractController
     }
 
     #[Route('/Article/getall/admin/{category?}', name: 'app_article_admin')]
-    public function getallArticleAdmin(?string $category, ArticleRepository $repository, CategorieArticleRepository $categorieRepo, PaginatorInterface $paginator, Request $request)
+    public function getallArticleAdmin(?string $category, ArticleRepository $repository, CategorieArticleRepository $categorieRepo, PaginatorInterface $paginator, Request $request) 
     {
         $categories = $categorieRepo->findAll();
-        
     
-        if ($category && $category !== 'all') {
-            $articles = $repository->findByCategory2($category);
-            
+        // Récupération des critères de recherche
+        $articleNom = $request->query->get('article');
+        $proprietaireNom = $request->query->get('proprietaire');
+    
+        if ($articleNom || $proprietaireNom) {
+            $articles = $repository->searchBymulticritaire($articleNom, $proprietaireNom);
         } else {
-            $articles = $repository->findAll();
-            
+            if ($category && $category !== 'all') {
+                $articles = $repository->findByCategory2($category);
+            } else {
+                $articles = $repository->findAll();
+            }
         }
         $pagination = $paginator->paginate(
-            $articles, // Données à paginer
-            $request->query->getInt('page', 1), // Numéro de page
-            5 // Nombre de posts par page
-            );
+            $articles,
+            $request->query->getInt('page', 1), 
+            5
+        );
+    
         return $this->render('categorie_article/liste_articles_admin.html.twig', [
             'articles' => $pagination,
             'categories' => $categories,
         ]);
-    }    
+    }   
 
     #[Route('article/delete/admin/{id}', name: 'app_deleteArticleAdmin')]
     public function deleteArticleAdmin (ManagerRegistry $manager, ArticleRepository $repository, $id, LigneCommandeRepository $ligneCommandeRepository, MailerService $mailer) {
