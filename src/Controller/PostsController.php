@@ -24,6 +24,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use App\Entity\Notification;
 
 final class PostsController extends AbstractController
 {   
@@ -149,9 +150,15 @@ final class PostsController extends AbstractController
             try {
                 $entityManager->persist($post);
                 $entityManager->flush();
+                
             } catch (\Exception $e) {
                 dump($e->getMessage()); // Affiche l'erreur
             }
+
+            $notification = new Notification();
+            $notification->setMessage("Un nouveau post a été ajouté par: " . $post->getUserP()->getPrenom() . $post->getUserP()->getNomUser());
+            $entityManager->persist($notification);
+            $entityManager->flush();
 
             $this->addFlash('success', 'Post ajouté avec succès !');
             return $this->redirectToRoute('app_posts');

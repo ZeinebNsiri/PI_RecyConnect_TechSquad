@@ -109,9 +109,9 @@
                                             <td>{{ article.prix }} TN/KG</td>
                                             <td>{{ article.utilisateur.nomUser }} {{ article.utilisateur.prenom }}</td>
                                             <td>
-                                                <a class="btn btn-danger detail-button" href="{{ path('app_deleteArticleAdmin', {'id': article.id}) }}">
+                                                <button class="btn btn-danger detail-button" onclick="confirmDeletion('{{ path('app_deleteArticleAdmin', {'id': article.id}) }}')">
                                                     <i class="bi bi-trash"></i> Ban
-                                                </a>
+                                                </button>
                                             </td>
                                         </tr>
                                     {% else %}
@@ -191,6 +191,26 @@ document.getElementById('search-form').addEventListener('submit', function(event
     })
     .catch(error => console.error('Erreur AJAX :', error));
 });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function confirmDeletion(deleteUrl) {
+    Swal.fire({
+        title: "Es-tu sûr?",
+        text: "Cette action est irréversible!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Oui, supprimer!",
+        cancelButtonText: "Annuler"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = deleteUrl;
+        }
+    });
+}
 </script>
 
 {% endblock %}

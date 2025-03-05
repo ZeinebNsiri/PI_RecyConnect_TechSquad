@@ -18,6 +18,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use App\Entity\Notification;
 
 
 final class ArticleController extends AbstractController
@@ -70,6 +71,12 @@ final class ArticleController extends AbstractController
             $Article->setUtilisateur($user);
             $em->persist($Article);
             $em->flush();
+
+            $notification = new Notification();
+            $notification->setMessage("Un nouveau article a été ajouté par: " . $Article->getUtilisateur()->getPrenom() . $Article->getUtilisateur()->getNomUser() );
+            $em->persist($notification);
+            $em->flush();
+
             $this->addFlash('success', 'L\'article ajouté avec succès!');
             return $this->redirectToRoute('app_article');
             

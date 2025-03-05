@@ -57,9 +57,9 @@
                                <h5 class="card-title">
                                         {{ article.nomArticle }} <br> PU: {{ article.prix }} TN/Kg | {{ article.quantiteArticle }} Kg
                                 </h5>
-                                <td><a class="detail-button" href='{{ path ('pp_updateArticle' , { 'id':article.id } ) }}'><i class="fas fa-edit"></i></a><td>
-                                <td><a class="detail-button" href='{{ path ('app_deleteArticle' , { 'id':article.id } ) }}'><i class="fas fa-trash"></i></a><td>
-                            </div>
+                                <td><a class="edit-icon" href="{{ path('pp_updateArticle', { 'id': article.id }) }}"><i class="fas fa-edit"></i></a></td>
+                                <td><a class="delete-article btn btn-danger" data-url="{{ path('app_deleteArticle', { 'id': article.id }) }}"><i class="fas fa-trash text-white"></i></a></td>
+                                </div>
                         </div>
                     </div>
                 {% else %}
@@ -112,25 +112,7 @@
     font-size: 18px;
   }
 
-  .detail-button {
-    background-color: green;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 5px 10px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    transition: background-color 0.3s;
-  }
 
-  .detail-button:hover {
-    background-color: darkgreen;
-  }
-
-  .detail-button i {
-    margin-left: 5px;
-  }
 
   .row.g-4 {
     display: grid;
@@ -142,7 +124,44 @@
   .col-lg-6.col-md-6 {
     width: 100%;
   }
+    .edit-icon i {
+    font-size: 40px; 
+    color: #28a745; 
+    transition: color 0.3s ease-in-out;
+  }
+
+  .edit-icon:hover i {
+    color: #218838; 
+  }
 </style>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll('.delete-article').forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.preventDefault();  // Empêcher le lien de rediriger immédiatement
+            
+            let deleteUrl = this.getAttribute('data-url'); // Récupérer l'URL de suppression
+
+            Swal.fire({
+                title: "Es-tu sûr?",
+                text: "Cette action est irréversible!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",  // Rouge
+                cancelButtonColor: "#3085d6", // Bleu
+                confirmButtonText: "Oui, supprimer!",
+                cancelButtonText: "Annuler"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = deleteUrl; // Rediriger vers l'URL de suppression
+                }
+            });
+        });
+    });
+});
+</script>
 
 
 {% endblock %}

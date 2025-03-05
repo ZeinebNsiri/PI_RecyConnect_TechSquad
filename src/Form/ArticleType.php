@@ -18,6 +18,7 @@ use Symfony\Component\Form\Extension\Core\Type\ResetType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 
 class ArticleType extends AbstractType
@@ -35,7 +36,7 @@ class ArticleType extends AbstractType
                     ])
                 ]
             ])
-            ->add('description_article', TextType::class, [
+            ->add('description_article', TextareaType::class, [
                 'attr' => ['class' => 'form-control', 'rows' => 4],
                 'empty_data' => '',
                 'required' => true,
