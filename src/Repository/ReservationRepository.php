@@ -60,6 +60,15 @@ public function findMostPopularEvents($limit = 5)
         ->getQuery()
         ->getResult();
 }
+public function findEventCapacityUtilization(): array
+{
+    return $this->createQueryBuilder('r')
+        ->select('e.nomEvent as event_name, e.capacite as capacity, COUNT(r.id) as total_reservations')
+        ->join('r.event', 'e')
+        ->groupBy('e.id')
+        ->getQuery()
+        ->getResult();
+}
 
 //    /**
 //     * @return Reservation[] Returns an array of Reservation objects

@@ -255,11 +255,13 @@ public function show(Reservation $reservation): Response
 
     #[Route('/dashboard/count', name: 'admin_stats')]
     public function stats(ReservationRepository $reservationRepository): Response
-    {
-        $popularEvents = $reservationRepository->findMostPopularEvents();
+{
+    $popularEvents = $reservationRepository->findMostPopularEvents();
+    $capacityUtilization = $reservationRepository->findEventCapacityUtilization();
 
-        return $this->render('reservation/adminStat.html.twig', [
-            'popularEvents' => $popularEvents,
-        ]);
-    }
+    return $this->render('reservation/adminStat.html.twig', [
+        'popularEvents' => $popularEvents,
+        'capacityUtilization' => $capacityUtilization,
+    ]);
+}
 }
