@@ -5,8 +5,10 @@ namespace App\Controller;
 use App\Entity\Evenement;
 use App\Form\EventType;
 use App\Repository\EvenementRepository;
+use App\Repository\ReservationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -14,105 +16,175 @@ use Symfony\Component\Routing\Annotation\Route;
 class EventController extends AbstractController
 {
     #[Route('/events', name: 'events_list')]
-    public function index(EntityManagerInterface $entityManager): Response
-    {   $template = $this->getUser() ? 'basecnx.html.twig' : 'base.html.twig';
-        $events = $entityManager->getRepository(Evenement::class)->findAll();
-
+    public function index(Request $request, EvenementRepository $evenementRepository): Response
+    {
+        $name = $request->query->get('name');
+        $location = $request->query->get('location');
+        $date = $request->query->get('date');
+        $type = $request->query->get('type'); // Ensure this is passed
+    
+        $events = $evenementRepository->searchEvents($name, $location, $date, $type);
+    
         return $this->render('event/index.html.twig', [
             'events' => $events,
-            'template'=>$template
+            'name' => $name,
+            'location' => $location,
+            'date' => $date,
+            'type' => $type, // Pass the type to the template
         ]);
+    
+    }
+
+    #[Route('/events/search', name: 'event_search')]
+    public function search(Request $request, EvenementRepository $evenementRepository): JsonResponse
+    {
+        $name = $request->query->get('name');
+        $events = $evenementRepository->findByName($name);
+
+        $results = [];
+        foreach ($events as $event) {
+            $results[] = [
+                'id' => $event->getId(),
+                'name' => $event->getNomEvent(),
+            ];
+        }
+
+        return new JsonResponse($results);
     }
 
     #[Route('/event/{id}', name: 'event_show')]
-    public function detail(EvenementRepository $evenementRepository, int $id): Response
-    {   if (!$this->isGranted('ROLE_USER') && !$this->isGranted('ROLE_PROFESSIONNEL')) {
-        throw $this->createAccessDeniedException('Accès refusé.');
-        }
+    public function detail(EvenementRepository $evenementRepository, ReservationRepository $reservationRepository, int $id): Response
+    {
         $evenement = $evenementRepository->find($id);
 
         if (!$evenement) {
             throw $this->createNotFoundException('Événement non trouvé');
         }
 
+        $user = $this->getUser();
+        $meetingLink = null;
+        $isEventActive = false;
+        $isUserRegistered = false;
+
+        if ($user) {
+            $reservation = $reservationRepository->findOneBy([
+                'event' => $evenement,
+                'user_id' => $user,
+            ]);
+
+            if ($reservation) {
+                $isUserRegistered = true;
+                $meetingLink = $reservation->getMeetingLink();
+
+                $now = new \DateTime();
+                $eventDate = $evenement->getDateEvent();
+                $eventStart = new \DateTime($eventDate->format('Y-m-d') . ' ' . $evenement->getHeureEvent()->format('H:i:s'));
+                $eventEnd = new \DateTime($eventDate->format('Y-m-d') . ' ' . $evenement->getEndTime()->format('H:i:s'));
+
+                $isEventActive = ($now >= $eventStart && $now <= $eventEnd);
+            }
+        }
+
         return $this->render('event/detail.html.twig', [
             'evenement' => $evenement,
+            'meetingLink' => $meetingLink,
+            'isEventActive' => $isEventActive,
+            'isUserRegistered' => $isUserRegistered,
+            'mapCoordinates' => $evenement->getMapCoordinates(),
         ]);
     }
 
     #[Route('/admin/events', name: 'admin_events')]
-    public function adminIndex(EntityManagerInterface $entityManager): Response
-    {
-        $events = $entityManager->getRepository(Evenement::class)->findAll();
+public function adminIndex(Request $request, EvenementRepository $evenementRepository): Response
+{
+    $searchTerm = $request->query->get('search', '');
+    $location = $request->query->get('location', '');
+    $date = $request->query->get('date', '');
+    $type = $request->query->get('type', ''); // New type filter
 
-        return $this->render('event/admin_events.html.twig', [
-            'events' => $events,
-        ]);
-    }
+    $events = $evenementRepository->searchEventsAdmin($searchTerm, $location, $date, $type);
+
+    return $this->render('event/admin_events.html.twig', [
+        'events' => $events,
+        'searchTerm' => $searchTerm,
+        'location' => $location,
+        'date' => $date,
+        'type' => $type, // Pass the type to the template
+    ]);
+}
 
     #[Route('/admin/events/create', name: 'create_event', methods: ['GET', 'POST'])]
     public function create(Request $request, EntityManagerInterface $entityManager): Response
     {
         $event = new Evenement();
-        $form = $this->createForm(EventType::class, $event,[
-            'validation_groups' => ['create']
-        ]);
+        $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
-
+    
         if ($form->isSubmitted() && $form->isValid()) {
-
-
+            // Handle image upload
             $imageFile = $form->get('imageEvent')->getData();
-
             if ($imageFile) {
                 $newFilename = uniqid() . '.' . $imageFile->guessExtension();
                 $uploadDir = $this->getParameter('photo_dir');
-
+    
+                // Ensure the upload directory exists
                 if (!file_exists($uploadDir)) {
                     mkdir($uploadDir, 0777, true);
                 }
-
+    
+                // Move the uploaded file to the directory
                 $imageFile->move($uploadDir, $newFilename);
-                $event->setImageEvent( $newFilename);
+                $event->setImageEvent($newFilename);
             } else {
-                $event -> setImageEvent('uploads/images/defaultpng');  
-                }
-            
-
-
-
+                // Set a default image if no file is uploaded
+                $event->setImageEvent('uploads/images/default.png');
+            }
+    
+            // Set Google Meet link for online events
+            if (strtolower($event->getLieuEvent()) === 'en ligne') {
+                $event->setGoogleMeetLink('https://meet.jit.si/' . uniqid());
+            }
+    
+            // Calculate start and end times
+            $eventDate = $event->getDateEvent();
+            $eventTime = $event->getHeureEvent();
+    
+            // Format the date and time into a string before creating the DateTime object
+            $startTime = new \DateTime($eventDate->format('Y-m-d') . ' ' . $eventTime->format('H:i:s'));
+    
+            // Clone the start time and add 2 hours for the end time
+            $endTime = (clone $startTime)->modify('+2 hours');
+            $event->setEndTime($endTime);
+    
+            // Set the remaining places to the event capacity
             $event->setNbRestant($event->getCapacite());
-
+    
+            // Persist and flush the event to the database
             $entityManager->persist($event);
             $entityManager->flush();
-
+    
+            // Add a success flash message and redirect
             $this->addFlash('success', 'L\'événement a été créé avec succès.');
             return $this->redirectToRoute('admin_events');
         }
-
-        if ($form->isSubmitted() && !$form->isValid()) {
-            // Récupérer les erreurs
-            foreach ($form->getErrors() as $error) {
-                // Ajouter le message d'erreur
-                $this->addFlash('error', $error->getMessage());
-            }
-            }
-
+    
+        // Render the form template
         return $this->render('event/create.html.twig', [
             'form' => $form->createView(),
-        ]);}
-
+        ]);
+    }
     #[Route('/admin/events/edit/{id}', name: 'edit_event', methods: ['GET', 'POST'])]
     public function edit(Request $request, Evenement $event, EntityManagerInterface $entityManager): Response
     {
         $oldImage = $event->getImageEvent();
 
-        $form = $this->createForm(EventType::class, $event);
+        $form = $this->createForm(EventType::class, $event, [
+            'is_edit' => true,
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $imageFile = $form->get('imageEvent')->getData();
-
             if ($imageFile) {
                 $newFilename = uniqid() . '.' . $imageFile->guessExtension();
                 $uploadDir = $this->getParameter('photo_dir');
@@ -125,6 +197,10 @@ class EventController extends AbstractController
                 }
             } else {
                 $event->setImageEvent($oldImage);
+            }
+
+            if (strtolower($event->getLieuEvent()) === 'en ligne' && !$event->getGoogleMeetLink()) {
+                $event->setGoogleMeetLink('https://meet.jit.si/' . uniqid());
             }
 
             $entityManager->flush();
@@ -162,4 +238,50 @@ class EventController extends AbstractController
         $this->addFlash('success', 'L\'événement a été supprimé avec succès.');
         return $this->redirectToRoute('admin_events');
     }
+    #[Route('/events/recommendations', name: 'event_recommendations')]
+public function recommendations(ReservationRepository $reservationRepository, EvenementRepository $evenementRepository): Response
+{
+    $user = $this->getUser();
+    if (!$user) {
+        return $this->redirectToRoute('app_login');
+    }
+
+    // Get all events the user has registered for
+    $reservations = $reservationRepository->findBy(['user_id' => $user]);
+    $registeredEvents = array_map(function ($reservation) {
+        return $reservation->getEventId();
+    }, $reservations);
+
+    // Extract keywords from registered events
+    $keywords = [];
+    foreach ($registeredEvents as $event) {
+        $keywords = array_merge($keywords, $this->extractKeywords($event));
+    }
+
+    // Remove duplicates
+    $keywords = array_unique($keywords);
+
+    // Find similar events based on keywords
+    $recommendedEvents = $evenementRepository->findByKeywords($keywords);
+
+    return $this->render('event/recommendations.html.twig', [
+        'recommendedEvents' => $recommendedEvents,
+    ]);
+}
+private function extractKeywords(Evenement $event): array
+{
+    // Extract keywords from event name and description
+    $text = $event->getNomEvent() . ' ' . $event->getDescriptionEvent();
+    $words = str_word_count(strtolower($text), 1);
+
+    // French stopwords
+    $stopWords = [
+        'le', 'la', 'les', 'de', 'des', 'du', 'et', 'en', 'à', 'au', 'aux', 'pour', 'dans', 'sur', 'avec', 'par', 'est', 'un', 'une', 'son', 'ses', 'ces', 'cet', 'cette', 'qui', 'que', 'quoi', 'où', 'quand', 'comment', 'pourquoi', 'mais', 'ou', 'donc', 'or', 'ni', 'car', 'sont', 'a', 'as', 'ai', 'ont', 'été', 'être', 'avoir', 'il', 'elle', 'ils', 'elles', 'nous', 'vous', 'ils', 'elles', 'je', 'tu', 'il', 'elle', 'on', 'nous', 'vous', 'ils', 'elles', 'ce', 'cet', 'cette', 'ces', 'mon', 'ton', 'son', 'notre', 'votre', 'leur', 'mes', 'tes', 'ses', 'nos', 'vos', 'leurs', 'duquel', 'auquel', 'dont', 'lequel', 'laquelle', 'lesquels', 'lesquelles', 'quel', 'quels', 'quelle', 'quelles', 'quand', 'que', 'qui', 'quoi', 'où', 'comment', 'pourquoi', 'combien', 'quelque', 'plusieurs', 'certains', 'certaines', 'tout', 'tous', 'toute', 'toutes', 'aucun', 'aucune', 'plus', 'moins', 'très', 'peu', 'beaucoup', 'bien', 'mal', 'meilleur', 'pire', 'bon', 'mauvais', 'grand', 'petit', 'haut', 'bas', 'premier', 'dernier', 'autre', 'même', 'tel', 'telle', 'tels', 'telles', 'chaque', 'plusieurs', 'quelques', 'certain', 'certaine', 'certains', 'certaines', 'tout', 'tous', 'toute', 'toutes', 'aucun', 'aucune', 'plus', 'moins', 'très', 'peu', 'beaucoup', 'bien', 'mal', 'meilleur', 'pire', 'bon', 'mauvais', 'grand', 'petit', 'haut', 'bas', 'premier', 'dernier', 'autre', 'même', 'tel', 'telle', 'tels', 'telles', 'chaque'
+    ];
+
+    // Remove stopwords
+    $keywords = array_diff($words, $stopWords);
+
+    return array_values($keywords);
+}
 }

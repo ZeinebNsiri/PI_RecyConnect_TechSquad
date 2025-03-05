@@ -6,9 +6,6 @@ use App\Entity\Evenement;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @extends ServiceEntityRepository<Evenement>
- */
 class EvenementRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -16,28 +13,118 @@ class EvenementRepository extends ServiceEntityRepository
         parent::__construct($registry, Evenement::class);
     }
 
-//    /**
-//     * @return Evenement[] Returns an array of Evenement objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('e')
-//            ->andWhere('e.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('e.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    /**
+     * Search events for the admin panel with optional filters.
+     *
+     * @param string|null $searchTerm
+     * @param string|null $location
+     * @param string|null $date
+     * @return Evenement[]
+     */
+    public function searchEventsAdmin(?string $searchTerm, ?string $location, ?string $date, ?string $type): array
+{
+    $qb = $this->createQueryBuilder('e');
 
-//    public function findOneBySomeField($value): ?Evenement
-//    {
-//        return $this->createQueryBuilder('e')
-//            ->andWhere('e.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    // Filter by search term (event name)
+    if (!empty($searchTerm)) {
+        $qb->andWhere('LOWER(e.nomEvent) LIKE LOWER(:search)')
+           ->setParameter('search', '%' . strtolower($searchTerm) . '%');
+    }
+
+    // Filter by location
+    if (!empty($location)) {
+        $qb->andWhere('LOWER(e.lieuEvent) LIKE LOWER(:location)')
+           ->setParameter('location', '%' . strtolower($location) . '%');
+    }
+
+    // Filter by date
+    if (!empty($date)) {
+        $qb->andWhere('e.dateEvent = :date')
+           ->setParameter('date', new \DateTime($date));
+    }
+
+    // Filter by event type (en ligne or sur site)
+    if (!empty($type)) {
+        if ($type === 'en ligne') {
+            $qb->andWhere('e.lieuEvent = :type')
+               ->setParameter('type', 'en ligne');
+        } elseif ($type === 'sur site') {
+            $qb->andWhere('e.lieuEvent != :type')
+               ->setParameter('type', 'en ligne');
+        }
+    }
+
+    return $qb->getQuery()->getResult();
+}
+
+    /**
+     * Search events with optional filters.
+     *
+     * @param string|null $name
+     * @param string|null $location
+     * @param string|null $date
+     * @param string|null $type
+     * @return Evenement[]
+     */
+    public function searchEvents(?string $name, ?string $location, ?string $date, ?string $type): array
+{
+    $qb = $this->createQueryBuilder('e');
+
+    if ($name) {
+        $qb->andWhere('e.nomEvent LIKE :name')
+           ->setParameter('name', '%' . $name . '%');
+    }
+
+    if ($location) {
+        $qb->andWhere('e.lieuEvent LIKE :location')
+           ->setParameter('location', '%' . $location . '%');
+    }
+
+    if ($date) {
+        $qb->andWhere('e.dateEvent = :date')
+           ->setParameter('date', $date);
+    }
+
+    if ($type) {
+        if ($type === 'en ligne') {
+            $qb->andWhere('e.lieuEvent = :type')
+               ->setParameter('type', 'en ligne');
+        } elseif ($type === 'sur site') {
+            $qb->andWhere('e.lieuEvent != :type')
+               ->setParameter('type', 'en ligne');
+        }
+    }
+
+    return $qb->getQuery()->getResult();
+}
+
+  
+
+    /**
+     * Find events by name.
+     *
+     * @param string $name
+     * @return Evenement[]
+     */
+    public function findByName(string $name): array
+    {
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.nomEvent LIKE :name')
+            ->setParameter('name', '%' . $name . '%')
+            ->getQuery()
+            ->getResult();
+    }
+    // src/Repository/EvenementRepository.php
+
+public function findByKeywords(array $keywords): array
+{
+    $qb = $this->createQueryBuilder('e');
+    foreach ($keywords as $keyword) {
+        $qb->orWhere('e.nomEvent LIKE :keyword')
+           ->orWhere('e.descriptionEvent LIKE :keyword')
+           ->setParameter('keyword', '%' . $keyword . '%');
+    }
+
+    return $qb->getQuery()->getResult();
+}
 }

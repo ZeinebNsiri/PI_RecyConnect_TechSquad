@@ -1,9 +1,10 @@
 {% extends 'base2.html.twig' %}
 
-{% block title %} Ajouter Événement {% endblock %}
+{% block title %}Ajouter Événement{% endblock %}
 
 {% block body %}
 <main id="main" class="main">
+
   <div class="card">
     <div class="card-body">
       <h5 class="card-title">Ajouter Événement</h5>
@@ -80,6 +81,14 @@
         {% endfor %}
       </div>
 
+      <div class="col-12">
+        {{ form_label(form.mapCoordinates, 'Coordonnées de la carte (latitude,longitude)') }}
+        {{ form_widget(form.mapCoordinates, {'attr': {'class': 'form-control', 'placeholder': 'Ex: 48.8566,2.3522'}}) }}
+        {% for error in form.mapCoordinates.vars.errors %}
+          <div class="alert alert-danger">{{ error.message }}</div>
+        {% endfor %}
+      </div>
+
       <div class="col-12 text-center d-flex justify-content-center gap-2 mt-3">
         {{ form_widget(form.submit, {'label': 'Ajouter', 'attr': {'class': 'btn btn-success'}}) }}
         <a href="{{ path('admin_events') }}" class="btn btn-secondary">Annuler</a>
@@ -88,5 +97,6 @@
       {{ form_end(form) }}
     </div>
   </div>
-  </main>
+      </main>
+
 {% endblock %}
