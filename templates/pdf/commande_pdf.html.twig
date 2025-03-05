@@ -5,130 +5,90 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
+            margin: 20px;
+            padding: 20px;
             background-color: #f4f4f4;
         }
 
-        .container {
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #fff;
-        }
-
-        .invoice-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #ddd;
-        }
-
-        .invoice-details {
-            text-align: left; /* Aligner à gauche */
-        }
-
-        .invoice-details h1 {
-            font-size: 24px;
-            margin: 0;
+        h1 {
+            color: #008000;
+            text-align: center;
+            border-bottom: 3px solid #008000;
+            padding-bottom: 10px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 15px;
         }
 
         th, td {
+            border: 1px solid black;
             padding: 10px;
-            border: 1px solid #ddd;
             text-align: left;
         }
 
         th {
-            background-color: #4CAF50;
+            background-color: #008000;
             color: white;
         }
 
-        tr.total-row {
-            font-weight: bold;
-            background-color: #e6f7e6;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #777;
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
         }
 
         .logo-img {
+            width: 100px;
             position: absolute;
             top: 10px;
-            right: 20px;
-            max-width: 150px;
+            left: 10px;
         }
     </style>
 
-    <!-- Logo en haut à droite -->
-    <div class="logo">
-        <img src="{{ asset('assets/backOffice/assets/img/mainlogo.png') }}" alt="" class="logo-img">
-    </div>
+<img src="{{ asset('backOffice/assets/img/mainlogo.png') }}" alt="Logo" class="logo-img">
 
-    <div class="container">
-        <div class="invoice-header">
-            <!-- Le logo est déjà ajouté, donc pas besoin ici -->
-            <div class="invoice-details">
-                <p><strong>Numéro de Facture :</strong> {{ commande.id }}</p>
-                <p><strong>Date :</strong> {{ "now"|date("d/m/Y") }}</p>
-            </div>
-        </div>
+    <h1>Facture</h1>
+    
+    <p><strong>Numéro de Facture :</strong> {{ commande.id }}</p>
+    <p><strong>Date :</strong> {{ "now"|date("d/m/Y") }}</p>
 
-        <table>
-            <thead>
-                <tr>
-                    <th colspan="2">Informations du client</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><strong>Nom et Prénom :</strong> {{ utilisateur.NomUser }} {{ utilisateur.Prenom }}</td>
-                    <td><strong>Adresse :</strong> {{ utilisateur.adresse }}</td>
-                </tr>
-            </tbody>
-        </table>
+    <h2>Informations du Client</h2>
+    <table>
+        <tr>
+            <td><strong>Nom et Prénom :</strong> {{ utilisateur.NomUser }} {{ utilisateur.Prenom }}</td>
+            <td><strong>Adresse :</strong> {{ utilisateur.adresse }}</td>
+        </tr>
+    </table>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Article</th>
-                    <th>Quantité</th>
-                    <th>Prix Unitaire (DT)</th>
-                    <th>Total (DT)</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in lignesCommande %}
-                <tr>
-                    <td>{{ item.getArticleC().getNomArticle() }}</td>
-                    <td>{{ item.getQuantiteC() }}</td>
-                    <td>{{ item.getPrixC() }}</td>
-                    <td>{{ item.getPrixC() * item.getQuantiteC() }}</td>
-                </tr>
-                {% endfor %}
-                <tr class="total-row">
-                    <td colspan="3" style="text-align: right;">Total à payer :</td>
-                    <td>{{ total }} DT</td>
-                </tr>
-            </tbody>
-        </table>
+    <h2>Détails de la Commande</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Article</th>
+                <th>Quantité</th>
+                <th>Prix Unitaire (DT)</th>
+                <th>Total (DT)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in lignesCommande %}
+            <tr>
+                <td>{{ item.getArticleC().getNomArticle() }}</td>
+                <td>{{ item.getQuantiteC() }}</td>
+                <td>{{ item.getPrixC() }}</td>
+                <td>{{ item.getPrixC() * item.getQuantiteC() }}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="3" style="text-align: right;"><strong>Total à payer :</strong></td>
+                <td><strong>{{ total }} DT</strong></td>
+            </tr>
+        </tbody>
+    </table>
 
-        <div class="footer">
-            <p>Merci pour votre commande !</p>
-        </div>
-    </div>
+    <p style="text-align: center; font-size: 12px; color: #555; margin-top: 20px;">
+        <strong>FIRMA</strong> - Tous les droits sont réservés. Conçu par Byteshifters.
+    </p>
 </main>
 {% endblock %}
