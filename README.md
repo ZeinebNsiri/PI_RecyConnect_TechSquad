@@ -105,10 +105,13 @@ RecyConnect s’inscrit pleinement dans une démarche éco-responsable en répon
 
 ### 🔌 APIs & Intégrations externes
 
-- **[reCAPTCHA](https://www.google.com/recaptcha/about/)** – Protection contre les bots et les soumissions frauduleuses
-- **[MailerSend](https://www.mailersend.com/)** – Envoi d’emails transactionnels (validation, notifications, etc.)
-- **Chatbot intégré** – Interaction automatisée avec les utilisateurs
-- **[Paymee](https://sandbox.paymee.tn/)** – Paiement sécurisé en ligne
+- 🔐 [**Google Authentication**](https://developers.google.com/identity) – Connexion sécurisée via un compte Google.  
+- 📬 [**MailerSend**](https://www.mailersend.com/) – Envoi d’e-mails transactionnels (validation, notifications, confirmations…).  
+- 🤖 **Chatbot intégré** – Interaction automatisée avec les utilisateurs pour l’assistance ou les réponses fréquentes.  
+- 💳 [**Paymee (sandbox)**](https://sandbox.paymee.tn/) – Paiement sécurisé en ligne adapté au marché tunisien.  
+- 🗺️ [**Leaflet**](https://leafletjs.com/) – Affichage de cartes interactives pour géolocalisation et navigation.  
+- 🔍 [**Sightengine**](https://sightengine.com/) – Modération automatique de contenu (images ou textes inappropriés).  
+- 🎥 [**Jitsi Meet**](https://jitsi.org/jitsi-meet/) – Intégration de visioconférence pour des réunions ou consultations en ligne.
 
 ### 🧠 Intelligence Artificielle & IA appliquée
 
