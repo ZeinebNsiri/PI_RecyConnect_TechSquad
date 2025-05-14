@@ -116,6 +116,16 @@ RecyConnect s’inscrit pleinement dans une démarche éco-responsable en répon
 - **Analyse vidéo par IA** – Génération automatique de résumés descriptifs pour les workshops
 
 ---
+## 📸 Aperçu de l’application
+Voici quelques captures d’écran de l’interface utilisateur de RecyConnect :
+
+### 🖼️ Accueil de l'application
+<img src="symfony1.jfif" alt="Accueil RecyConnect" width="600"/>
+
+### 🛍️ Interface de gestion des articles
+<img src="java2.jfif" alt="Gestion des articles RecyConnect" width="600"/>
+
+---
 
 
 ## 📚 Projet académique
