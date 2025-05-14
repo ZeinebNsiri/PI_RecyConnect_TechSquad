@@ -90,31 +90,31 @@
                 </li>
 
                 <!-- Online Event: Meeting Link -->
-                {% if evenement.lieuEvent|lower == 'en ligne' %}
-                  {% if isUserRegistered is defined and isUserRegistered %}
-                    {% if isEventActive is defined and isEventActive %}
-                      <li class="mb-3">
-                        <i class="fas fa-video me-2 text-primary"></i>
-                        <strong>Lien de la réunion :</strong>
-                        <a href="{{ meetingLink }}" target="_blank" class="btn btn-warning btn-sm shadow-sm hover-scale">
-                          <i class="fas fa-video me-2"></i> Rejoindre la réunion
-                        </a>
-                      </li>
-                    {% else %}
-                      <li class="mb-3">
-                        <i class="fas fa-video me-2 text-primary"></i>
-                        <strong>Lien de la réunion :</strong>
-                        <p class="text-muted">Le lien sera disponible le jour de l'événement à l'heure indiquée.</p>
-                      </li>
-                    {% endif %}
-                  {% else %}
-                    <li class="mb-3">
-                      <i class="fas fa-video me-2 text-primary"></i>
-                      <strong>Lien de la réunion :</strong>
-                      <p class="text-muted">Veuillez vous inscrire pour accéder au lien de la réunion.</p>
-                    </li>
-                  {% endif %}
-                {% endif %}
+            {% if evenement.lieuEvent|lower == 'en ligne' %}
+  {% if isUserRegistered is defined and isUserRegistered %}
+    {% if isEventActive is defined and isEventActive %}
+      <li class="mb-3">
+        <i class="fas fa-video me-2 text-primary"></i>
+        <strong>Lien de la réunion :</strong>
+        <a href="{{ meetingLink }}" target="_blank" class="btn btn-warning btn-sm shadow-sm hover-scale">
+          <i class="fas fa-video me-2"></i> Rejoindre la réunion
+        </a>
+      </li>
+    {% else %}
+      <li class="mb-3">
+        <i class="fas fa-video me-2 text-primary"></i>
+        <strong>Lien de la réunion :</strong>
+        <p class="text-muted">Le lien sera disponible le jour de l'événement à l'heure indiquée.</p>
+      </li>
+    {% endif %}
+  {% else %}
+    <li class="mb-3">
+      <i class="fas fa-video me-2 text-primary"></i>
+      <strong>Lien de la réunion :</strong>
+      <p class="text-muted">Veuillez vous inscrire pour accéder au lien de la réunion.</p>
+    </li>
+  {% endif %}
+{% endif %}
 
                 <!-- Onsite Event: Map -->
                 {% if evenement.lieuEvent|lower != 'en ligne' %}
@@ -181,4 +181,6 @@
       border-radius: 8px; /* Rounded corners */
     }
   </style>
+
+ 
 {% endblock %}

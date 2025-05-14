@@ -53,43 +53,60 @@ class EventController extends AbstractController
     }
 
     #[Route('/event/{id}', name: 'event_show')]
-    public function detail(EvenementRepository $evenementRepository, ReservationRepository $reservationRepository, int $id): Response
-    {
+    public function detail(
+        EvenementRepository $evenementRepository,
+        ReservationRepository $reservationRepository,
+        int $id
+    ): Response {
         $evenement = $evenementRepository->find($id);
-
+    
         if (!$evenement) {
             throw $this->createNotFoundException('Événement non trouvé');
         }
-
+    
         $user = $this->getUser();
         $meetingLink = null;
         $isEventActive = false;
-        $isUserRegistered = false;
-
+        $isUserRegistered = false; // Default to false
+    
         if ($user) {
+            // Manually check if the user has a reservation for this event
             $reservation = $reservationRepository->findOneBy([
                 'event' => $evenement,
-                'user_id' => $user,
+                'user_id' => $user, // Use the user_id field directly
             ]);
-
+    
             if ($reservation) {
-                $isUserRegistered = true;
+                $isUserRegistered = true; // Set to true if the user is registered
                 $meetingLink = $reservation->getMeetingLink();
+    
+                // Calculate event start and end times
+$now = new \DateTime();
+$eventDate = $evenement->getDateEvent();
+$eventTime = $evenement->getHeureEvent();
 
-                $now = new \DateTime();
-                $eventDate = $evenement->getDateEvent();
-                $eventStart = new \DateTime($eventDate->format('Y-m-d') . ' ' . $evenement->getHeureEvent()->format('H:i:s'));
-                $eventEnd = new \DateTime($eventDate->format('Y-m-d') . ' ' . $evenement->getEndTime()->format('H:i:s'));
+// Combine date and time into a single DateTime object
+$eventStart = new \DateTime($eventDate->format('Y-m-d') . ' ' . $eventTime->format('H:i:s'));
 
-                $isEventActive = ($now >= $eventStart && $now <= $eventEnd);
+// Assume the event lasts for 2 hours (you can adjust this as needed)
+$eventEnd = (clone $eventStart)->modify('+2 hours');
+
+$isEventActive = ($now >= $eventStart && $now <= $eventEnd);
             }
         }
-
+    
+        // Debugging: Log the values
+        dump([
+            'isUserRegistered' => $isUserRegistered,
+            'meetingLink' => $meetingLink,
+            'isEventActive' => $isEventActive,
+        ]);
+    
         return $this->render('event/detail.html.twig', [
             'evenement' => $evenement,
             'meetingLink' => $meetingLink,
             'isEventActive' => $isEventActive,
-            'isUserRegistered' => $isUserRegistered,
+            'isUserRegistered' => $isUserRegistered, // Ensure this is passed
             'mapCoordinates' => $evenement->getMapCoordinates(),
         ]);
     }

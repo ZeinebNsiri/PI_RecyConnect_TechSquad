@@ -86,6 +86,7 @@ final class UtilisateurController extends AbstractController
 
         if ($user) {
             $user->setStatus(false); // ou false dans 'deactiver'
+            $user->setBannedBy("ADMIN");
             $em->persist($user); // Ajouté pour éviter l'oubli de l'entité
             $em->flush();
             

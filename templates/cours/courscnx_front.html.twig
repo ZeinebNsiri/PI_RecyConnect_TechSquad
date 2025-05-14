@@ -1,6 +1,8 @@
 {% extends template %}
 
+
 {% block title %}Workshops{% endblock %}
+
 
 {% block body %}
 <style>
@@ -62,6 +64,7 @@
         background: #218838;
     }
 
+
     /* ==================== Styles du formulaire de recherche ==================== */
     .search-form {
         display: flex;
@@ -97,6 +100,7 @@
         outline: none;
     }
 
+
     /* ==================== Styles des étoiles de notation ==================== */
     .star-rating-readonly {
         text-align: center;
@@ -115,10 +119,11 @@
         color: gold;
     }
 
+
     /* ==================== Styles de la bulle de chat et fenêtre ==================== */
     .chat-container {
         position: fixed;
-        bottom: 80px; 
+        bottom: 80px;
         right: 20px;
         z-index: 9999;
         display: flex;
@@ -154,6 +159,7 @@
         text-align: center;
     }
 
+
     /* ==================== Styles du formulaire dans la fenêtre de chat ==================== */
     .chat-form {
         display: flex;
@@ -178,6 +184,7 @@
     .chat-form button:hover {
         background-color: #218838;
     }
+
 
     /* ==================== Styles de la conversation (bulles façon Messenger) ==================== */
     .chat-response {
@@ -222,6 +229,7 @@
     }
 </style>
 
+
 <!-- ==================== En-tête de page ==================== -->
 <div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s">
     <div class="container text-center py-5">
@@ -239,6 +247,7 @@
     </div>
 </div>
 
+
 <!-- ==================== Section des workshops ==================== -->
 <div class="container-xxl py-5">
     <div class="container">
@@ -247,11 +256,13 @@
             <h1 class="display-5 mb-5">Vidéos et guides pour redonner vie à vos produits</h1>
         </div>
 
+
         <!-- ==================== Formulaire de recherche ==================== -->
         <form method="get" action="{{ path('app_workshops') }}" class="search-form">
             {% if selectedCategory %}
                 <input type="hidden" name="category" value="{{ selectedCategory }}">
             {% endif %}
+
 
             <label for="searchTitle">Rechercher par Titre:</label>
             <input
@@ -264,6 +275,7 @@
                 style="margin: 0 10px;"
             />
 
+
             <label for="video">Vidéo:</label>
             <select id="video" name="video" class="form-select">
                 <option value="" {% if videoFilter is empty %}selected{% endif %}>-- Tous --</option>
@@ -271,11 +283,13 @@
                 <option value="no" {% if videoFilter == 'no' %}selected{% endif %}>Non</option>
             </select>
 
+
             <button type="submit" class="btn btn-sm btn-primary">
                 Chercher
                 <i class="bi bi-search ms-2"></i>
             </button>
         </form>
+
 
         <!-- ==================== Liste des catégories ==================== -->
         <center>
@@ -293,13 +307,14 @@
             </ul>
         </center>
 
+
         <!-- ==================== Affichage des workshops sous forme de cartes ==================== -->
         <div class="workshop-container" data-aos="zoom-in" data-aos-delay="100">
             {% for workshop in workshops %}
                 <div class="card">
-                    <img 
-                        src="{{ asset('uploads/images/' ~ workshop.imageCours) }}" 
-                        class="card-img-top" 
+                    <img
+                        src="{{ asset('uploads/images/' ~ workshop.imageCours) }}"
+                        class="card-img-top"
                         alt="{{ workshop.titreCours }}"
                     >
                     <div class="card-body">
@@ -311,22 +326,24 @@
                             {{ workshop.descriptionCours|slice(0, 120) }}...
                         </p>
                         <div style="display: flex; align-items: center; justify-content: space-between;">
-                            <a 
-                                href="{{ path('appworkshop_details', { id: workshop.id }) }}" 
+                            <a
+                                href="{{ path('appworkshop_details', { id: workshop.id }) }}"
                                 class="btn-voir-plus"
                             >
                                 Voir plus
                             </a>
-                            {% set rating = workshop.userRating|default(0) %}
-                            <div class="star-rating-readonly">
-                                {% for i in range(5, 1, -1) %}
-                                    {% if rating >= i %}
-                                        <span class="filled">★</span>
-                                    {% else %}
-                                        <span>★</span>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
+                            {% set rating = workshop.averageRating|default(0) %}
+<div class="star-rating-readonly">
+    {% for i in range(1, 5) %}
+        {% if rating >= i %}
+            <span class="filled">★</span>
+        {% else %}
+            <span>★</span>
+        {% endif %}
+    {% endfor %}
+</div>
+
+
                         </div>
                     </div>
                 </div>
@@ -335,6 +352,7 @@
     </div>
 </div>
 
+
 <!-- ==================== Chat Container avec la bulle ==================== -->
 <div class="chat-container">
     <!-- Bouton d'activation du chat (bulle) -->
@@ -342,9 +360,11 @@
         <i class="bi bi-chat-dots"></i> Chat
     </div>
 
+
     <!-- Fenêtre de chat (cachée par défaut) -->
     <div id="chatWindow" class="chat-window">
         <h2>Discuter avec Chatbot</h2>
+
 
         <!-- Zone d'affichage de la conversation -->
         <div id="chatResponse" class="chat-response">
@@ -366,6 +386,7 @@
             </div>
         </div>
 
+
         <!-- Formulaire EN-DESSOUS de la discussion -->
         {{ form_start(chat_form, {
             'attr': {
@@ -385,6 +406,7 @@
     </div>
 </div>
 
+
 <script>
     // Toggle pour afficher/cacher la fenêtre de chat
     document.getElementById('chatToggle').addEventListener('click', function() {
@@ -396,18 +418,21 @@
         }
     });
 
+
     // Gestion de l'envoi du formulaire
     document.getElementById('chatForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const form = e.target;
         const button = document.getElementById('submitBtn');
         const responseDiv = document.getElementById('chatResponse');
-        
+       
         button.disabled = true;
         button.innerHTML = 'Envoi...';
 
+
         // Petit message d'attente
         responseDiv.innerHTML = '<div class="loading">Traitement...</div>';
+
 
         fetch(form.action, {
             method: 'POST',

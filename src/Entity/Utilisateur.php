@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UtilisateurRepository;
 use Doctrine\Common\Collections\Collection;
@@ -99,6 +100,17 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $photo_profil = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $face_image = null;
+
+    #[ORM\Column(type: Types::BIGINT, nullable: true)]
+    private ?string $ban_time = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $bannedBy = null;
+
+    
 
     public function __construct()
     {
@@ -483,5 +495,43 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->getId();
     }
+
+    public function getFaceImage(): ?string
+    {
+        return $this->face_image;
+    }
+
+    public function setFaceImage(?string $face_image): static
+    {
+        $this->face_image = $face_image;
+
+        return $this;
+    }
+
+    public function getBanTime(): ?string
+    {
+        return $this->ban_time;
+    }
+
+    public function setBanTime(?string $ban_time): static
+    {
+        $this->ban_time = $ban_time;
+
+        return $this;
+    }
+
+    public function getBannedBy(): ?string
+    {
+        return $this->bannedBy;
+    }
+
+    public function setBannedBy(?string $bannedBy): static
+    {
+        $this->bannedBy = $bannedBy;
+
+        return $this;
+    }
+
+   
     
 }

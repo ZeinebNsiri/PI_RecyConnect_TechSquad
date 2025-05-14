@@ -15,56 +15,73 @@ use Symfony\Component\Routing\Annotation\Route;
 class ReservationController extends AbstractController
 {
     #[Route('/event/{id}/register', name: 'event_registration', methods: ['GET', 'POST'])]
-public function register(Request $request, EntityManagerInterface $entityManager, Evenement $evenement, ReservationRepository $reservationRepository): Response
-{
-    $reservation = new Reservation();
-    $form = $this->createForm(RegistrationType::class, $reservation);
-    $form->handleRequest($request);
-
-    if ($form->isSubmitted() && $form->isValid()) {
-        // Set the event and user for the reservation
-        $reservation->setEventId($evenement);
-        $reservation->setUserId($this->getUser());
-
-        // Update the remaining places for the event
-        $nbPlacesReservees = $reservation->getNbPlaces();
-        $evenement->setNbRestant($evenement->getNbRestant() - $nbPlacesReservees);
-
-        // Generate a unique meeting link for online events
-        if (strtolower($evenement->getLieuEvent()) === 'en ligne') {
-            $reservation->setMeetingLink('https://meet.jit.si/' . uniqid());
+    public function register(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        Evenement $evenement,
+        ReservationRepository $reservationRepository
+    ): Response {
+        $reservation = new Reservation();
+        $form = $this->createForm(RegistrationType::class, $reservation);
+        $form->handleRequest($request);
+    
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Set the event and user for the reservation
+            $reservation->setEventId($evenement);
+            $reservation->setUserId($this->getUser());
+    
+            // Update the remaining places for the event
+            $nbPlacesReservees = $reservation->getNbPlaces();
+            $evenement->setNbRestant($evenement->getNbRestant() - $nbPlacesReservees);
+    
+            // Generate or reuse a meeting link for online events
+            if (strtolower($evenement->getLieuEvent()) === 'en ligne') {
+                // Check if a meeting link already exists for this event
+                $existingReservation = $reservationRepository->findOneBy([
+                    'event' => $evenement,
+                ]);
+    
+                if ($existingReservation && $existingReservation->getMeetingLink()) {
+                    // Use the existing meeting link
+                    $reservation->setMeetingLink($existingReservation->getMeetingLink());
+                } else {
+                    // Generate a new meeting link for the event
+                    $meetingLink = 'https://meet.jit.si/' . uniqid();
+                    $reservation->setMeetingLink($meetingLink);
+                }
+            }
+    
+            // Save the reservation
+            $entityManager->persist($reservation);
+            $entityManager->flush();
+    
+            // Check if the event is currently active
+            $now = new \DateTime();
+            $eventDate = $evenement->getDateEvent();
+            $eventTime = $evenement->getHeureEvent();
+    
+            // Combine date and time into a single DateTime object
+            $eventStart = new \DateTime($eventDate->format('Y-m-d') . ' ' . $eventTime->format('H:i:s'));
+    
+            // Assume the event lasts for 2 hours (you can adjust this as needed)
+            $eventEnd = (clone $eventStart)->modify('+2 hours');
+    
+            $isEventActive = ($now >= $eventStart && $now <= $eventEnd);
+    
+            // Pass the meeting link and event active status to the template
+            return $this->render('event/detail.html.twig', [
+                'evenement' => $evenement,
+                'meetingLink' => $reservation->getMeetingLink(),
+                'isEventActive' => $isEventActive,
+                'isUserRegistered' => true, // User is now registered
+            ]);
         }
-
-        // Save the reservation
-        $entityManager->persist($reservation);
-        $entityManager->flush();
-
-        // Check if the event is currently active
-        $now = new \DateTime();
-        $eventDate = $evenement->getDateEvent();
-        $eventTime = $evenement->getHeureEvent();
-
-        // Combine date and time into a single DateTime object
-        $eventStart = new \DateTime($eventDate->format('Y-m-d') . ' ' . $eventTime->format('H:i:s'));
-
-        // Assume the event lasts for 2 hours (you can adjust this as needed)
-        $eventEnd = (clone $eventStart)->modify('+2 hours');
-
-        $isEventActive = ($now >= $eventStart && $now <= $eventEnd);
-
-        // Pass the meeting link and event active status to the template
-        return $this->render('event/detail.html.twig', [
+    
+        return $this->render('reservation/register.html.twig', [
+            'form' => $form->createView(),
             'evenement' => $evenement,
-            'meetingLink' => $reservation->getMeetingLink(),
-            'isEventActive' => $isEventActive,
         ]);
     }
-
-    return $this->render('reservation/register.html.twig', [
-        'form' => $form->createView(),
-        'evenement' => $evenement,
-    ]);
-}
     
 #[Route('/reservations', name: 'reservations_list')]
 public function listReservations(Request $request, EntityManagerInterface $entityManager): Response
