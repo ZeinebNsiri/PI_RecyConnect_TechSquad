@@ -120,7 +120,7 @@ RecyConnect s’inscrit pleinement dans une démarche éco-responsable en répon
 Voici quelques captures d’écran de l’interface utilisateur de RecyConnect :
 
 ### 🖼️ Accueil de l'application
-<img src="symfony1.jfif" alt="Accueil RecyConnect" width="600"/>
+<img src="public/frontOffice/img/symfony1.jfif alt="Accueil RecyConnect" width="600"/>
 
 ### 🛍️ Interface de gestion des articles
 <img src="java2.jfif" alt="Gestion des articles RecyConnect" width="600"/>
