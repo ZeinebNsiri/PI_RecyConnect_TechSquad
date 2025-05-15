@@ -107,16 +107,18 @@ RecyConnect s’inscrit pleinement dans une démarche éco-responsable en répon
 
 - 🔐 [**Google Authentication**](https://developers.google.com/identity) – Connexion sécurisée via un compte Google.  
 - 📬 [**MailerSend**](https://www.mailersend.com/) – Envoi d’e-mails transactionnels (validation, notifications, confirmations…).  
-- 🤖 **Chatbot intégré** – Interaction automatisée avec les utilisateurs pour l’assistance ou les réponses fréquentes.  
+- 🤖 [**Chatbot intégré**](https://huggingface.co/) Interaction automatisée avec les utilisateurs pour l’assistance ou les réponses fréquentes.  
 - 💳 [**Paymee (sandbox)**](https://sandbox.paymee.tn/) – Paiement sécurisé en ligne adapté au marché tunisien.  
 - 🗺️ [**Leaflet**](https://leafletjs.com/) – Affichage de cartes interactives pour géolocalisation et navigation.  
-- 🔍 [**Sightengine**](https://sightengine.com/) – Modération automatique de contenu (images ou textes inappropriés).  
 - 🎥 [**Jitsi Meet**](https://jitsi.org/jitsi-meet/) – Intégration de visioconférence pour des réunions ou consultations en ligne.
+- 🧹 [**Purgomalum**](https://www.purgomalum.com/service/json) – Filtrage automatique des mots inappropriés dans les textes via une API simple et rapide.
+
 
 ### 🧠 Intelligence Artificielle & IA appliquée
 
 - **Chatbot intelligent** – Réponses automatiques aux questions fréquentes
-- **Analyse vidéo par IA** – Génération automatique de résumés descriptifs pour les workshops
+- **Filtrage de mots inappropriés** – Détection et suppression automatique des termes offensants dans les textes.
+
 
 ---
 ## 📸 Aperçu de l’application
